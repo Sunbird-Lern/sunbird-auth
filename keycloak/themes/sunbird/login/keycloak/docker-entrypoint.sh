@@ -1,11 +1,17 @@
 #!/bin/bash
 
+
 KEYCLOAK_USER=admin
-KEYCLOAK_PASSWORD=ash12345678
+KEYCLOAK_PASSWORD=ash12345^&*()
 
 if [ $KEYCLOAK_USER ] && [ $KEYCLOAK_PASSWORD ]; then
     keycloak/bin/add-user-keycloak.sh --user $KEYCLOAK_USER --password $KEYCLOAK_PASSWORD
 fi
 
-exec /opt/jboss/keycloak/bin/standalone.sh -b 0.0.0.0 -bprivate=$(hostname) --server-config standalone-ha.xml
+
+export HOSTNAME_IP=$(hostname -i)
+export HOSTNAME_IP_ALL=$(hostname --all-ip-addresses)
+echo "hostname -i returned: $HOSTNAME_IP, -I returned: $HOSTNAME_IP_ALL"
+
+exec /opt/jboss/keycloak/bin/standalone.sh -Djboss.bind.address.private=$HOSTNAME_IP $@
 exit $?

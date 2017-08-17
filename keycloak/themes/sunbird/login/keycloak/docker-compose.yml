@@ -7,7 +7,7 @@ services:
     environment:
       POSTGRES_DB: keycloak
       POSTGRES_USER: keycloak
-      POSTGRES_PASSWORD: passkeycloak
+      POSTGRES_PASSWORD: password
       POSTGRES_ROOT_PASSWORD: root_password
     networks:
         - default
@@ -19,13 +19,14 @@ services:
       KEYCLOAK_LOGLEVEL: DEBUG
       POSTGRES_PORT_5432_TCP_ADDR: keycloak_db
       POSTGRES_USER: keycloak
-      POSTGRES_PASSWORD: passkeycloak      
+      POSTGRES_PASSWORD: password      
     ports:
         - "8080:8080"
     networks:
         - default
     deploy:
       replicas: 1
+   
 
   keycloak-2:
     image: keycloak_image:3.2.1.Final
@@ -34,7 +35,7 @@ services:
       KEYCLOAK_LOGLEVEL: DEBUG
       POSTGRES_PORT_5432_TCP_ADDR: keycloak_db
       POSTGRES_USER: keycloak 
-      POSTGRES_PASSWORD: passkeycloak
+      POSTGRES_PASSWORD: password
     ports:
         - "8081:8080"
     networks:
@@ -45,3 +46,4 @@ services:
 networks:
  default:
    driver: overlay
+
