@@ -6,6 +6,8 @@ package org.sunbird.keycloak;
 public class KeycloakSmsAuthenticatorConstants {
     public static final String ATTR_MOBILE = "mobile";
     public static final String ANSW_SMS_CODE = "smsCode";
+    public static final String COUNTRY_CODE = "+91";
+    public static final String DEFAULT_COUNTRY_CODE = "0";
 
     public static final String CONF_PRP_SMS_CODE_TTL = "sms-auth.code.ttl";
     public static final String CONF_PRP_SMS_CODE_LENGTH = "sms-auth.code.length";

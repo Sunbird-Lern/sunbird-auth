@@ -49,9 +49,8 @@ public class KeycloakSmsAuthenticator implements Authenticator {
     public void authenticate(AuthenticationFlowContext context) {
         logger.debug("authenticate called ... context = " + context);
         UserModel user = context.getUser();
-        AuthenticatorConfigModel config = context.getAuthenticatorConfig();
 
-        List<String> mobileNumberCreds = user.getAttribute("mobile");
+        List<String> mobileNumberCreds = user.getAttribute(KeycloakSmsAuthenticatorConstants.ATTR_MOBILE);
 
         String mobileNumber = null;
         String userEmail = user.getEmail();
@@ -60,53 +59,41 @@ public class KeycloakSmsAuthenticator implements Authenticator {
             mobileNumber = mobileNumberCreds.get(0);
         }
 
-        if (!TextUtils.isEmpty(userEmail)) {
-            logger.debug("Email is not null - " + userEmail);
-        }
-
         if (mobileNumber != null) {
-            // The mobile number is configured --> send an SMS
-            long nrOfDigits = KeycloakSmsAuthenticatorUtil.getConfigLong(config, KeycloakSmsAuthenticatorConstants.CONF_PRP_SMS_CODE_LENGTH, 8L);
-            logger.debug("Using nrOfDigits " + nrOfDigits);
-
-
-            long ttl = KeycloakSmsAuthenticatorUtil.getConfigLong(config, KeycloakSmsAuthenticatorConstants.CONF_PRP_SMS_CODE_TTL, 10 * 60L); // 10 minutes in s
-
-            logger.debug("Using ttl " + ttl + " (s)");
-
-            String code = KeycloakSmsAuthenticatorUtil.getSmsCode(nrOfDigits);
-
-            storeSMSCode(context, code, new Date().getTime() + (ttl * 1000)); // s --> ms
-            if (KeycloakSmsAuthenticatorUtil.sendSmsCode(mobileNumber, code, context.getAuthenticatorConfig())) {
-                Response challenge = context.form().createForm("sms-validation.ftl");
-                context.challenge(challenge);
-            } else {
-                Response challenge = context.form()
-                        .setError("SMS could not be sent.")
-                        .createForm("sms-validation-error.ftl");
-                context.failureChallenge(AuthenticationFlowError.INTERNAL_ERROR, challenge);
-            }
+            sendSMS(context, mobileNumber);
         } else if (!TextUtils.isEmpty(userEmail)) {
             logger.debug("Trying to send email to - " + userEmail);
             sendEmail(context);
-
-//            try {
-//                sendPasswordResetLink("Link", 15, context);
-//            } catch (EmailException e) {
-//                e.printStackTrace();
-//
-//                Response challenge = context.form()
-//                        .setError("Some error occurred - " + e.getMessage())
-//                        .createForm("sms-validation-error.ftl");
-//                context.failureChallenge(AuthenticationFlowError.UNKNOWN_USER, challenge);
-//            }
-
         } else {
             // The mobile number is NOT configured --> complain
             Response challenge = context.form()
                     .setError("Missing mobile number and email!")
                     .createForm("sms-validation-error.ftl");
             context.failureChallenge(AuthenticationFlowError.CLIENT_CREDENTIALS_SETUP_REQUIRED, challenge);
+        }
+    }
+
+    private void sendSMS(AuthenticationFlowContext context, String mobileNumber) {
+        // The mobile number is configured --> send an SMS
+        long nrOfDigits = KeycloakSmsAuthenticatorUtil.getConfigLong(context.getAuthenticatorConfig(), KeycloakSmsAuthenticatorConstants.CONF_PRP_SMS_CODE_LENGTH, 8L);
+        logger.debug("Using nrOfDigits " + nrOfDigits);
+
+
+        long ttl = KeycloakSmsAuthenticatorUtil.getConfigLong(context.getAuthenticatorConfig(), KeycloakSmsAuthenticatorConstants.CONF_PRP_SMS_CODE_TTL, 10 * 60L); // 10 minutes in s
+
+        logger.debug("Using ttl " + ttl + " (s)");
+
+        String code = KeycloakSmsAuthenticatorUtil.getSmsCode(nrOfDigits);
+
+        storeSMSCode(context, code, new Date().getTime() + (ttl * 1000)); // s --> ms
+        if (KeycloakSmsAuthenticatorUtil.sendSmsCode(mobileNumber, code, context.getAuthenticatorConfig())) {
+            Response challenge = context.form().createForm("sms-validation.ftl");
+            context.challenge(challenge);
+        } else {
+            Response challenge = context.form()
+                    .setError("SMS could not be sent.")
+                    .createForm("sms-validation-error.ftl");
+            context.failureChallenge(AuthenticationFlowError.INTERNAL_ERROR, challenge);
         }
     }
 
@@ -251,112 +238,10 @@ public class KeycloakSmsAuthenticator implements Authenticator {
 
         if (expectedCode != null) {
             result = enteredCode.equals(expectedCode.getValue()) ? CODE_STATUS.VALID : CODE_STATUS.INVALID;
-            /*long now = new Date().getTime();
-
-            logger.debug("Valid code expires in " + (Long.parseLong(expTimeString.getValue()) - now) + " ms");
-            if (result == CODE_STATUS.VALID) {
-                if (Long.parseLong(expTimeString.getValue()) < now) {
-                    logger.debug("Code is expired !!");
-                    result = CODE_STATUS.EXPIRED;
-                }
-            }*/
         }
         logger.debug("result : " + result);
         return result;
     }
-
-//    public void sendPasswordResetLink (String link, long expirationInMinutes, AuthenticationFlowContext context) throws EmailException {
-//        logger.debug("sendPasswordResetLink : entered");
-//        Map<String, Object> attributes = new HashMap<String, Object>();
-//        attributes.put("link", link);
-//        attributes.put("linkExpiration", expirationInMinutes);
-//
-//        String realmName = context.getRealm().getName().substring(0, 1).toUpperCase() + context.getRealm().getName().substring(1);
-//        attributes.put("realmName", realmName);
-//
-//        logger.debug("sendPasswordResetLink : exiting");
-//
-//        send("passwordResetSubject", "password-reset-email.ftl", attributes, context);
-//    }
-//
-//    private void send(String subjectKey, String template, Map<String, Object> attributes, AuthenticationFlowContext context) throws EmailException {
-//        try {
-//            logger.debug("send1 : entered");
-//
-//            FreeMarkerUtil freeMarkerUtil = new FreeMarkerUtil();
-//            ThemeProvider themeProvider = context.getSession().getProvider(ThemeProvider.class, "extending");
-//            Theme theme = themeProvider.getTheme(context.getRealm().getEmailTheme(), Theme.Type.EMAIL);
-//            Locale locale = LocaleHelper.getLocale(context.getSession(), context.getRealm(), context.getUser());
-//            attributes.put("locale", locale);
-//            Properties rb = theme.getMessages(locale);
-//            attributes.put("msg", new MessageFormatterMethod(locale, rb));
-//            String subject = new MessageFormat(rb.getProperty(subjectKey, subjectKey), locale).format(new Object[0]);
-////            String body = freeMarkerUtil.processTemplate(attributes, template, theme);
-//            String body = "some body with link!" ;
-//
-//            logger.debug("send1 : exiting");
-//            send(subject, body, context);
-//        } catch (Exception e) {
-//            throw new EmailException("Failed to template email", e);
-//        }
-//    }
-//
-//    private void send(String subject, String body, AuthenticationFlowContext context) throws EmailException {
-//        try {
-//            logger.debug("send2 : entered");
-//
-//            String address = context.getUser().getEmail();
-//            Map<String, String> config = context.getRealm().getSmtpConfig();
-//
-//            Properties props = new Properties();
-//            props.setProperty("mail.smtp.host", config.get("host"));
-//
-//            boolean auth = "true".equals(config.get("auth"));
-//            boolean ssl = "true".equals(config.get("ssl"));
-//            boolean starttls = "true".equals(config.get("starttls"));
-//
-//            if (config.containsKey("port")) {
-//                props.setProperty("mail.smtp.port", config.get("port"));
-//            }
-//
-//            if (auth) {
-//                props.put("mail.smtp.auth", "true");
-//            }
-//
-//            if (ssl) {
-//                props.put("mail.smtp.socketFactory.port", config.get("port"));
-//                props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-//            }
-//
-//            if (starttls) {
-//                props.put("mail.smtp.starttls.enable", "true");
-//            }
-//
-//            String from = config.get("from");
-//
-//            Session session = Session.getInstance(props);
-//
-//            Message msg = new MimeMessage(session);
-//            msg.setFrom(new InternetAddress(from));
-//            msg.setHeader("To", address);
-//            msg.setSubject(subject);
-//            msg.setText(body);
-//            msg.saveChanges();
-//            msg.setSentDate(new Date());
-//
-//            Transport transport = session.getTransport("smtp");
-//            if (auth) {
-//                transport.connect(config.get("user"), config.get("password"));
-//            } else {
-//                transport.connect();
-//            }
-//            transport.sendMessage(msg, new InternetAddress[]{new InternetAddress(address)});
-//            logger.debug("send2 : exiting");
-//        } catch (Exception e) {
-//            logger.warn("Failed to send email", e);
-//            throw new EmailException(e);
-//        }
-//    }
 
     public boolean requiresUser() {
         logger.debug("requiresUser called ... returning true");

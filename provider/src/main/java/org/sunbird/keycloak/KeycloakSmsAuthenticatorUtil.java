@@ -72,12 +72,12 @@ public class KeycloakSmsAuthenticatorUtil {
     }
 
     public static String setDefaultCountryCodeIfZero(String mobileNumber) {
-        if (mobileNumber.startsWith("0")) {
-            mobileNumber = "+91" + mobileNumber.substring(1);
-        } else if (mobileNumber.startsWith("+91")) {
+        if (mobileNumber.startsWith(KeycloakSmsAuthenticatorConstants.DEFAULT_COUNTRY_CODE)) {
+            mobileNumber = KeycloakSmsAuthenticatorConstants.COUNTRY_CODE + mobileNumber.substring(1);
+        } else if (mobileNumber.startsWith(KeycloakSmsAuthenticatorConstants.COUNTRY_CODE)) {
             mobileNumber = mobileNumber;
         } else {
-            mobileNumber = "+91" + mobileNumber;
+            mobileNumber = KeycloakSmsAuthenticatorConstants.COUNTRY_CODE + mobileNumber;
         }
 
         return mobileNumber;
@@ -94,7 +94,7 @@ public class KeycloakSmsAuthenticatorUtil {
         try {
             PublishResult send_result = new SnsNotificationService().send(setDefaultCountryCodeIfZero(mobileNumber), smsText, smsUsr, smsPwd);
             return true;
-       } catch(Exception e) {
+        } catch (Exception e) {
             //Just like pokemon
             return false;
         }
@@ -113,7 +113,6 @@ public class KeycloakSmsAuthenticatorUtil {
 
     public static boolean validateTelephoneNumber(String telephoneNumber) {
         String pattern = "\\d{10}|(?:\\d{3}-){2}\\d{4}|\\(\\d{3}\\)\\d{3}-?\\d{4}";
-//        return telephoneNumber.matches("^(?:(?:\\(?(?:0(?:0|11)\\)?[\\s-]?\\(?|\\+)44\\)?[\\s-]?(?:\\(?0\\)?[\\s-]?)?)|(?:\\(?0))(?:(?:\\d{5}\\)?[\\s-]?\\d{4,5})|(?:\\d{4}\\)?[\\s-]?(?:\\d{5}|\\d{3}[\\s-]?\\d{3}))|(?:\\d{3}\\)?[\\s-]?\\d{3}[\\s-]?\\d{3,4})|(?:\\d{2}\\)?[\\s-]?\\d{4}[\\s-]?\\d{4}))(?:[\\s-]?(?:x|ext\\.?|\\#)\\d{3,4})?$");
         return telephoneNumber.matches(pattern);
     }
 }
