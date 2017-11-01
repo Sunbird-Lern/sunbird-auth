@@ -3,6 +3,7 @@ package org.sunbird.keycloak;
 /**
  * Created by joris on 18/11/2016.
  */
+// TODO(shriharshs): Move strings for mobile, smsCode, countryCode, defaultCountry code to configuration
 public class KeycloakSmsAuthenticatorConstants {
     public static final String ATTR_MOBILE = "mobile";
     public static final String ANSW_SMS_CODE = "smsCode";
