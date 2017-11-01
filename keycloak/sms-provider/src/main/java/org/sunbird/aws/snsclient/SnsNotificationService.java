@@ -10,6 +10,7 @@ import java.util.Map;
 /**
  * Created by nickpack on 09/08/2017.
  */
+// TODO(shriharshs): Add interface for SMS Notification services.
 public class SnsNotificationService {
 
     public PublishResult send(String phoneNumber, String message, String clientToken, String clientSecret) {
