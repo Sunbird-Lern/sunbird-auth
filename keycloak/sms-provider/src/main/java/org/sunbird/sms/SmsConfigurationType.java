@@ -3,7 +3,9 @@ package org.sunbird.sms;
 public interface SmsConfigurationType {
     String CONF_SMS_TOKEN = "token";
     String CONF_SMS_SECRET = "secret";
-    String CONF_SMS_URL = "sms_url";
+    String CONF_SMS_BASE_URL = "sms_base_url";
+    String CONF_SMS_GET_URL = "sms_get_url";
+    String CONF_SMS_POST_URL = "sms_post_url";
     String CONF_SMS_METHOD_TYPE = "sms_method_type";
     String CONF_SMS_USERNAME = "sms_username";
     String CONF_SMS_PASSWORD = "sms_password";

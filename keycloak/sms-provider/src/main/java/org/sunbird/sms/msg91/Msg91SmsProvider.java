@@ -16,15 +16,19 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.jboss.logging.Logger;
+import org.sunbird.keycloak.KeycloakSmsAuthenticatorUtil;
 import org.sunbird.sms.SMSAuthenticatorUtil;
 import org.sunbird.sms.SmsConfigurationType;
 import org.sunbird.sms.provider.ISmsProvider;
+import org.sunbird.utils.JsonUtil;
 
 import javax.ws.rs.HttpMethod;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class Msg91SmsProvider implements ISmsProvider {
@@ -47,12 +51,15 @@ public class Msg91SmsProvider implements ISmsProvider {
         // Send an SMS
         logger.debug("Msg91SmsProvider@Sending " + smsText + "  to mobileNumber " + mobileNumber);
 
-        String gateWayUrl = SMSAuthenticatorUtil.getConfigString(configurations, SmsConfigurationType.CONF_SMS_URL);
+        String gateWayUrl = SMSAuthenticatorUtil.getConfigString(configurations, SmsConfigurationType.CONF_SMS_BASE_URL);
         String authKey = SMSAuthenticatorUtil.getConfigString(configurations, SmsConfigurationType.CONF_AUTH_KEY);
         String sender = SMSAuthenticatorUtil.getConfigString(configurations, SmsConfigurationType.CONF_SMS_SENDER);
         String country = SMSAuthenticatorUtil.getConfigString(configurations, SmsConfigurationType.CONF_SMS_COUNTRY);
         String smsMethodType = SMSAuthenticatorUtil.getConfigString(configurations, SmsConfigurationType.CONF_SMS_METHOD_TYPE);
         String smsRoute = SMSAuthenticatorUtil.getConfigString(configurations, SmsConfigurationType.CONF_SMS_ROUTE);
+        String httpMethod = SMSAuthenticatorUtil.getConfigString(configurations, SmsConfigurationType.CONF_SMS_METHOD_TYPE);
+        String getUrlPoint = SMSAuthenticatorUtil.getConfigString(configurations, SmsConfigurationType.CONF_SMS_GET_URL);
+        String getPostPoint = SMSAuthenticatorUtil.getConfigString(configurations, SmsConfigurationType.CONF_SMS_POST_URL);
 
         logger.debug("Msg91SmsProvider@SMS Provider parameters \n" +
                 "Gateway - " + gateWayUrl + "\n" +
@@ -80,19 +87,67 @@ public class Msg91SmsProvider implements ISmsProvider {
             if (!StringUtils.isNullOrEmpty(gateWayUrl) && !StringUtils.isNullOrEmpty(sender) && !StringUtils.isNullOrEmpty(smsRoute)
                     && !StringUtils.isNullOrEmpty(mobileNumber) && !StringUtils.isNullOrEmpty(authKey) && !StringUtils.isNullOrEmpty(country)
                     && !StringUtils.isNullOrEmpty(smsText)) {
-                path = getCompletePath(gateWayUrl, sender, smsRoute, mobileNumber, authKey, country, smsText);
 
-                logger.debug("Msg91SmsProvider -Executing request - " + path);
+                if (httpMethod.equals(HttpMethod.GET)) {
+                    logger.debug("Inside GET");
+                    path = getCompletePath(gateWayUrl + getUrlPoint, sender, smsRoute, KeycloakSmsAuthenticatorUtil.setDefaultCountryCodeIfZero(mobileNumber), authKey, country, URLEncoder.encode(smsText, "UTF-8"));
 
-                HttpGet httpGet = new HttpGet(path);
+                    logger.debug("Msg91SmsProvider -Executing request - " + path);
 
-                CloseableHttpResponse response = httpClient.execute(httpGet);
-                StatusLine sl = response.getStatusLine();
-                response.close();
-                if (sl.getStatusCode() != 200) {
-                    logger.error("SMS code for " + mobileNumber + " could not be sent: " + sl.getStatusCode() + " - " + sl.getReasonPhrase());
+                    HttpGet httpGet = new HttpGet(path);
+
+                    CloseableHttpResponse response = httpClient.execute(httpGet);
+                    StatusLine sl = response.getStatusLine();
+                    response.close();
+                    if (sl.getStatusCode() != 200) {
+                        logger.error("SMS code for " + mobileNumber + " could not be sent: " + sl.getStatusCode() + " - " + sl.getReasonPhrase());
+                    }
+                    return sl.getStatusCode() == 200;
+                } else if (httpMethod.equals(HttpMethod.POST)) {
+                    logger.debug("Inside POST");
+
+                    path = gateWayUrl + getPostPoint;
+                    logger.debug("Msg91SmsProvider -Executing request - " + path);
+
+                    HttpPost httpPost = new HttpPost(path);
+
+                    //add content-type headers
+                    httpPost.setHeader("content-type", "application/json");
+
+                    //add authkey header
+                    httpPost.setHeader("authkey", authKey);
+
+                    List<String> mobileNumbers = new ArrayList<>();
+                    mobileNumbers.add(mobileNumber);
+
+                    //create sms
+                    Sms sms = new Sms(URLEncoder.encode(smsText, "UTF-8"), mobileNumbers);
+
+                    List<Sms> smsList = new ArrayList<>();
+                    smsList.add(sms);
+
+                    //create body
+                    ProviderDetails providerDetails = new ProviderDetails(sender, smsRoute, country, smsList);
+
+                    String providerDetailsString = JsonUtil.toJson(providerDetails);
+
+                    if (!StringUtils.isNullOrEmpty(providerDetailsString)) {
+                        logger.debug("Msg91SmsProvider - Body - " + providerDetailsString);
+
+                        HttpEntity entity = new ByteArrayEntity(providerDetailsString.getBytes("UTF-8"));
+                        httpPost.setEntity(entity);
+
+                        CloseableHttpResponse response = httpClient.execute(httpPost);
+                        StatusLine sl = response.getStatusLine();
+                        response.close();
+                        if (sl.getStatusCode() != 200) {
+                            logger.error("SMS code for " + mobileNumber + " could not be sent: " + sl.getStatusCode() + " - " + sl.getReasonPhrase());
+                        }
+                        return sl.getStatusCode() == 200;
+                    } else {
+                        return false;
+                    }
                 }
-                return sl.getStatusCode() == 200;
 
             } else {
                 logger.debug("Msg91SmsProvider - Some mandatory parameters are empty!");
@@ -110,7 +165,7 @@ public class Msg91SmsProvider implements ISmsProvider {
                 }
             }
         }
-
+        return false;
     }
 
     private String getCompletePath(String gateWayUrl, String sender, String smsRoute, String mobileNumber, String authKey, String country, String smsText) {
@@ -129,7 +184,7 @@ public class Msg91SmsProvider implements ISmsProvider {
         // Send an SMS
         logger.debug("Sending " + smsText + "  to mobileNumber " + mobileNumber);
 
-        String smsUrl = SMSAuthenticatorUtil.getConfigString(configurations, SmsConfigurationType.CONF_SMS_URL);
+        String smsUrl = SMSAuthenticatorUtil.getConfigString(configurations, SmsConfigurationType.CONF_SMS_BASE_URL);
         String smsUsr = SMSAuthenticatorUtil.getConfigString(configurations, SmsConfigurationType.CONF_SMS_USERNAME);
         String smsPwd = SMSAuthenticatorUtil.getConfigString(configurations, SmsConfigurationType.CONF_SMS_PASSWORD);
 

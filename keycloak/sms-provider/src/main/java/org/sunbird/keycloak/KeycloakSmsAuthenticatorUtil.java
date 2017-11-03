@@ -91,10 +91,10 @@ public class KeycloakSmsAuthenticatorUtil {
         String smsText = createMessage(code, mobileNumber, config);
         logger.debug("KeycloakSmsAuthenticatorUtil@sendSmsCode : smsText - " + smsText);
 
-        Boolean amazonSmsProviderStatus = msgViaAmazonSns(mobileNumber, smsText);
-        if (amazonSmsProviderStatus != null) return amazonSmsProviderStatus;
+//        Boolean amazonSmsProviderStatus = msgViaAmazonSns(mobileNumber, smsText);
+//        if (amazonSmsProviderStatus != null) return amazonSmsProviderStatus;
 
-        Boolean msg91SmsProviderStatus = sendViaMsg91(mobileNumber, code);
+        Boolean msg91SmsProviderStatus = sendViaMsg91(mobileNumber, smsText);
         if (msg91SmsProviderStatus != null) return msg91SmsProviderStatus;
 
         return false;
@@ -128,7 +128,7 @@ public class KeycloakSmsAuthenticatorUtil {
             ISmsProvider msg91SmsProvider = MessageProviderFactory.getMsg91SmsProvider(configurations);
 
             if (msg91SmsProvider != null) {
-                return msg91SmsProvider.send(setDefaultCountryCodeIfZero(mobileNumber), code);
+                return msg91SmsProvider.send(mobileNumber, code);
             }
         }
         return null;
