@@ -88,12 +88,20 @@ public class KeycloakSmsAuthenticatorUtil {
     }
 
     static boolean sendSmsCode(String mobileNumber, String code, AuthenticatorConfigModel config) {
-        // Send an SMS
-
         String smsText = createMessage(code, mobileNumber, config);
         logger.debug("KeycloakSmsAuthenticatorUtil@sendSmsCode : smsText - " + smsText);
 
-        String filePath = new File(KeycloakSmsAuthenticatorConstants.SMS_PROVIDER_CONFIGURATIONS_PATH).getAbsolutePath();
+        Boolean amazonSmsProviderStatus = msgViaAmazonSns(mobileNumber, smsText);
+        if (amazonSmsProviderStatus != null) return amazonSmsProviderStatus;
+
+        Boolean msg91SmsProviderStatus = sendViaMsg91(mobileNumber, code);
+        if (msg91SmsProviderStatus != null) return msg91SmsProviderStatus;
+
+        return false;
+    }
+
+    private static Boolean msgViaAmazonSns(String mobileNumber, String smsText) {
+        String filePath = new File(KeycloakSmsAuthenticatorConstants.AMAZON_SNS_PROVIDER_CONFIGURATIONS_PATH).getAbsolutePath();
         logger.debug("KeycloakSmsAuthenticatorUtil@sendSmsCode : filePath - " + filePath);
 
         if (!StringUtils.isNullOrEmpty(filePath)) {
@@ -106,8 +114,24 @@ public class KeycloakSmsAuthenticatorUtil {
                 return amazonSmsProvider.send(setDefaultCountryCodeIfZero(mobileNumber), smsText);
             }
         }
+        return null;
+    }
 
-        return false;
+    private static Boolean sendViaMsg91(String mobileNumber, String code) {
+        String filePath = new File(KeycloakSmsAuthenticatorConstants.MSG91_SMS_PROVIDER_CONFIGURATIONS_PATH).getAbsolutePath();
+        logger.debug("KeycloakSmsAuthenticatorUtil@sendSmsCode : filePath - " + filePath);
+
+        if (!StringUtils.isNullOrEmpty(filePath)) {
+            Map<String, String> configurations = JsonUtil.readFromJson(filePath);
+            logger.debug("KeycloakSmsAuthenticatorUtil@sendSmsCode : configurations - " + configurations);
+
+            ISmsProvider msg91SmsProvider = MessageProviderFactory.getMsg91SmsProvider(configurations);
+
+            if (msg91SmsProvider != null) {
+                return msg91SmsProvider.send(setDefaultCountryCodeIfZero(mobileNumber), code);
+            }
+        }
+        return null;
     }
 
     static String getSmsCode(long nrOfDigits) {

@@ -1,4 +1,8 @@
 {
-  "token": "AKIAI4XIRSGGFIW5VOKQ",
-  "secret": "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"
+  "auth_key": "181585AvzynW0NSmU59f84bd6",
+  "sender": "TestSunbird",
+  "country": "91",
+  "route": "4",
+  "sms_method_type": "GET",
+  "sms_url": "http://api.msg91.com/api/sendhttp.php?"
 }

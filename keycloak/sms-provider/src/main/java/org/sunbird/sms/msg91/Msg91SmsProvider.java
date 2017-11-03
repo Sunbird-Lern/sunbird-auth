@@ -1,5 +1,6 @@
 package org.sunbird.sms.msg91;
 
+import com.amazonaws.util.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.StatusLine;
@@ -39,8 +40,90 @@ public class Msg91SmsProvider implements ISmsProvider {
 
     @Override
     public boolean send(String phoneNumber, String smsText) {
-       return sendSmsCode(phoneNumber, smsText);
+        return sendSms(phoneNumber, smsText);
     }
+
+    private boolean sendSms(String mobileNumber, String smsText) {
+        // Send an SMS
+        logger.debug("Msg91SmsProvider@Sending " + smsText + "  to mobileNumber " + mobileNumber);
+
+        String gateWayUrl = SMSAuthenticatorUtil.getConfigString(configurations, SmsConfigurationType.CONF_SMS_URL);
+        String authKey = SMSAuthenticatorUtil.getConfigString(configurations, SmsConfigurationType.CONF_AUTH_KEY);
+        String sender = SMSAuthenticatorUtil.getConfigString(configurations, SmsConfigurationType.CONF_SMS_SENDER);
+        String country = SMSAuthenticatorUtil.getConfigString(configurations, SmsConfigurationType.CONF_SMS_COUNTRY);
+        String smsMethodType = SMSAuthenticatorUtil.getConfigString(configurations, SmsConfigurationType.CONF_SMS_METHOD_TYPE);
+        String smsRoute = SMSAuthenticatorUtil.getConfigString(configurations, SmsConfigurationType.CONF_SMS_ROUTE);
+
+        logger.debug("Msg91SmsProvider@SMS Provider parameters \n" +
+                "Gateway - " + gateWayUrl + "\n" +
+                "authKey - " + authKey + "\n" +
+                "sender - " + sender + "\n" +
+                "country - " + country + "\n" +
+                "smsMethodType - " + smsMethodType + "\n" +
+                "smsRoute - " + smsRoute + "\n"
+        );
+
+
+        CloseableHttpClient httpClient = null;
+        try {
+            URL smsURL = (gateWayUrl != null && gateWayUrl.length() > 0) ? new URL(gateWayUrl) : null;
+
+            if (smsURL == null) {
+                logger.error("Msg91SmsProvider@ SMS gateway URL is not configured.");
+                return false;
+            }
+
+            httpClient = HttpClients.createDefault();
+
+            String path = null;
+
+            if (!StringUtils.isNullOrEmpty(gateWayUrl) && !StringUtils.isNullOrEmpty(sender) && !StringUtils.isNullOrEmpty(smsRoute)
+                    && !StringUtils.isNullOrEmpty(mobileNumber) && !StringUtils.isNullOrEmpty(authKey) && !StringUtils.isNullOrEmpty(country)
+                    && !StringUtils.isNullOrEmpty(smsText)) {
+                path = getCompletePath(gateWayUrl, sender, smsRoute, mobileNumber, authKey, country, smsText);
+
+                logger.debug("Msg91SmsProvider -Executing request - " + path);
+
+                HttpGet httpGet = new HttpGet(path);
+
+                CloseableHttpResponse response = httpClient.execute(httpGet);
+                StatusLine sl = response.getStatusLine();
+                response.close();
+                if (sl.getStatusCode() != 200) {
+                    logger.error("SMS code for " + mobileNumber + " could not be sent: " + sl.getStatusCode() + " - " + sl.getReasonPhrase());
+                }
+                return sl.getStatusCode() == 200;
+
+            } else {
+                logger.debug("Msg91SmsProvider - Some mandatory parameters are empty!");
+                return false;
+            }
+        } catch (IOException e) {
+            logger.error(e);
+            return false;
+        } finally {
+            if (httpClient != null) {
+                try {
+                    httpClient.close();
+                } catch (IOException ignore) {
+                    // Ignore ...
+                }
+            }
+        }
+
+    }
+
+    private String getCompletePath(String gateWayUrl, String sender, String smsRoute, String mobileNumber, String authKey, String country, String smsText) {
+        String completeUrl = gateWayUrl
+                + "sender=" + sender
+                + "&route=" + smsRoute
+                + "&mobiles=" + mobileNumber
+                + "&authkey=" + authKey
+                + "&country=" + country
+                + "&message=" + smsText;
+        return completeUrl;
+    }
+
 
     private boolean sendSmsCode(String mobileNumber, String smsText) {
         // Send an SMS
@@ -166,7 +249,7 @@ public class Msg91SmsProvider implements ISmsProvider {
 
     private String getPath(String mobileNumber, URL smsURL, String smsText) throws UnsupportedEncodingException {
         String path = smsURL.getPath();
-        if(smsURL.getQuery() != null && smsURL.getQuery().length() > 0) {
+        if (smsURL.getQuery() != null && smsURL.getQuery().length() > 0) {
             path += smsURL.getQuery();
         }
         path = path.replaceFirst("\\{message\\}", URLEncoder.encode(smsText, "UTF-8"));

@@ -14,4 +14,8 @@ public interface SmsConfigurationType {
     String CONF_SMS_PROXY_PASSWORD = "sms_proxy_password";
     String CONF_AUTH_METHOD_BASIC = "basic_authentication";
     String CONF_AUTH_METHOD_INMESSAGE = "in_message_authentication";
+    String CONF_AUTH_KEY = "auth_key";
+    String CONF_SMS_SENDER = "sender";
+    String CONF_SMS_COUNTRY = "country";
+    String CONF_SMS_ROUTE = "route";
 }
