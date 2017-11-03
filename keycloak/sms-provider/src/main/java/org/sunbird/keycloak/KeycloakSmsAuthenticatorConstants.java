@@ -21,4 +21,8 @@ public class KeycloakSmsAuthenticatorConstants {
     // User credentials (used to persist the sent sms code + expiration time cluster wide)
     public static final String USR_CRED_MDL_SMS_CODE = "sms-auth.code";
     public static final String USR_CRED_MDL_SMS_EXP_TIME = "sms-auth.exp-time";
+
+    public static final String SMS_PROVIDER_CONFIGURATIONS_PATH = "sms-provider/awsSnsCreds.json";
+
+
 }
