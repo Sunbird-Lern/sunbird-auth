@@ -2,10 +2,7 @@ package org.sunbird.sms;
 
 import java.util.Map;
 
-/**
- * Created by joris on 18/11/2016.
- */
-public class SMSAuthenticatorUtil {
+public class SMSConfigurationUtil {
 
     public static String getConfigString(Map<String, String> config, String configName) {
         return getConfigString(config, configName, null);

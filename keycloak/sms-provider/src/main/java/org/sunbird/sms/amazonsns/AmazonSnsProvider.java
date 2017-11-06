@@ -4,8 +4,8 @@ import com.amazonaws.services.sns.model.MessageAttributeValue;
 import com.amazonaws.services.sns.model.PublishRequest;
 import org.jboss.logging.Logger;
 import org.sunbird.aws.snsclient.SnsClientFactory;
-import org.sunbird.sms.SMSAuthenticatorUtil;
-import org.sunbird.sms.SmsConfigurationType;
+import org.sunbird.sms.SMSConfigurationUtil;
+import org.sunbird.sms.SmsConfigurationConstants;
 import org.sunbird.sms.provider.ISmsProvider;
 
 import java.util.HashMap;
@@ -26,8 +26,8 @@ public class AmazonSnsProvider implements ISmsProvider {
                 .withStringValue("HomeOffice")
                 .withDataType("String"));
 
-        String clientToken = SMSAuthenticatorUtil.getConfigString(configurations, SmsConfigurationType.CONF_SMS_TOKEN);
-        String clientSecret = SMSAuthenticatorUtil.getConfigString(configurations, SmsConfigurationType.CONF_SMS_SECRET);
+        String clientToken = SMSConfigurationUtil.getConfigString(configurations, SmsConfigurationConstants.CONF_SMS_TOKEN);
+        String clientSecret = SMSConfigurationUtil.getConfigString(configurations, SmsConfigurationConstants.CONF_SMS_SECRET);
 
         logger.debug("AmazonSnsProvider@send : clientToken - " + clientToken + " & clientSecret - " + clientSecret);
 

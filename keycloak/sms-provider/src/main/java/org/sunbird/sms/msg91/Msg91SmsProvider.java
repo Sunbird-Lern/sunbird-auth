@@ -17,8 +17,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.jboss.logging.Logger;
 import org.sunbird.keycloak.KeycloakSmsAuthenticatorUtil;
-import org.sunbird.sms.SMSAuthenticatorUtil;
-import org.sunbird.sms.SmsConfigurationType;
+import org.sunbird.sms.SMSConfigurationUtil;
+import org.sunbird.sms.SmsConfigurationConstants;
 import org.sunbird.sms.provider.ISmsProvider;
 import org.sunbird.utils.JsonUtil;
 
@@ -51,15 +51,15 @@ public class Msg91SmsProvider implements ISmsProvider {
         // Send an SMS
         logger.debug("Msg91SmsProvider@Sending " + smsText + "  to mobileNumber " + mobileNumber);
 
-        String gateWayUrl = SMSAuthenticatorUtil.getConfigString(configurations, SmsConfigurationType.CONF_SMS_BASE_URL);
-        String authKey = SMSAuthenticatorUtil.getConfigString(configurations, SmsConfigurationType.CONF_AUTH_KEY);
-        String sender = SMSAuthenticatorUtil.getConfigString(configurations, SmsConfigurationType.CONF_SMS_SENDER);
-        String country = SMSAuthenticatorUtil.getConfigString(configurations, SmsConfigurationType.CONF_SMS_COUNTRY);
-        String smsMethodType = SMSAuthenticatorUtil.getConfigString(configurations, SmsConfigurationType.CONF_SMS_METHOD_TYPE);
-        String smsRoute = SMSAuthenticatorUtil.getConfigString(configurations, SmsConfigurationType.CONF_SMS_ROUTE);
-        String httpMethod = SMSAuthenticatorUtil.getConfigString(configurations, SmsConfigurationType.CONF_SMS_METHOD_TYPE);
-        String getUrlPoint = SMSAuthenticatorUtil.getConfigString(configurations, SmsConfigurationType.CONF_SMS_GET_URL);
-        String getPostPoint = SMSAuthenticatorUtil.getConfigString(configurations, SmsConfigurationType.CONF_SMS_POST_URL);
+        String gateWayUrl = SMSConfigurationUtil.getConfigString(configurations, SmsConfigurationConstants.CONF_SMS_BASE_URL);
+        String authKey = SMSConfigurationUtil.getConfigString(configurations, SmsConfigurationConstants.CONF_AUTH_KEY);
+        String sender = SMSConfigurationUtil.getConfigString(configurations, SmsConfigurationConstants.CONF_SMS_SENDER);
+        String country = SMSConfigurationUtil.getConfigString(configurations, SmsConfigurationConstants.CONF_SMS_COUNTRY);
+        String smsMethodType = SMSConfigurationUtil.getConfigString(configurations, SmsConfigurationConstants.CONF_SMS_METHOD_TYPE);
+        String smsRoute = SMSConfigurationUtil.getConfigString(configurations, SmsConfigurationConstants.CONF_SMS_ROUTE);
+        String httpMethod = SMSConfigurationUtil.getConfigString(configurations, SmsConfigurationConstants.CONF_SMS_METHOD_TYPE);
+        String getUrlPoint = SMSConfigurationUtil.getConfigString(configurations, SmsConfigurationConstants.CONF_SMS_GET_URL);
+        String getPostPoint = SMSConfigurationUtil.getConfigString(configurations, SmsConfigurationConstants.CONF_SMS_POST_URL);
 
         logger.debug("Msg91SmsProvider@SMS Provider parameters \n" +
                 "Gateway - " + gateWayUrl + "\n" +
@@ -184,14 +184,14 @@ public class Msg91SmsProvider implements ISmsProvider {
         // Send an SMS
         logger.debug("Sending " + smsText + "  to mobileNumber " + mobileNumber);
 
-        String smsUrl = SMSAuthenticatorUtil.getConfigString(configurations, SmsConfigurationType.CONF_SMS_BASE_URL);
-        String smsUsr = SMSAuthenticatorUtil.getConfigString(configurations, SmsConfigurationType.CONF_SMS_USERNAME);
-        String smsPwd = SMSAuthenticatorUtil.getConfigString(configurations, SmsConfigurationType.CONF_SMS_PASSWORD);
+        String smsUrl = SMSConfigurationUtil.getConfigString(configurations, SmsConfigurationConstants.CONF_SMS_BASE_URL);
+        String smsUsr = SMSConfigurationUtil.getConfigString(configurations, SmsConfigurationConstants.CONF_SMS_USERNAME);
+        String smsPwd = SMSConfigurationUtil.getConfigString(configurations, SmsConfigurationConstants.CONF_SMS_PASSWORD);
 
-        String proxyUrl = SMSAuthenticatorUtil.getConfigString(configurations, SmsConfigurationType.CONF_SMS_PROXY_URL);
-        String proxyUsr = SMSAuthenticatorUtil.getConfigString(configurations, SmsConfigurationType.CONF_SMS_PROXY_USERNAME);
-        String proxyPwd = SMSAuthenticatorUtil.getConfigString(configurations, SmsConfigurationType.CONF_SMS_PROXY_PASSWORD);
-        String contentType = SMSAuthenticatorUtil.getConfigString(configurations, SmsConfigurationType.CONF_SMS_CONTENT_TYPE);
+        String proxyUrl = SMSConfigurationUtil.getConfigString(configurations, SmsConfigurationConstants.CONF_SMS_PROXY_URL);
+        String proxyUsr = SMSConfigurationUtil.getConfigString(configurations, SmsConfigurationConstants.CONF_SMS_PROXY_USERNAME);
+        String proxyPwd = SMSConfigurationUtil.getConfigString(configurations, SmsConfigurationConstants.CONF_SMS_PROXY_PASSWORD);
+        String contentType = SMSConfigurationUtil.getConfigString(configurations, SmsConfigurationConstants.CONF_SMS_CONTENT_TYPE);
 
         CloseableHttpClient httpClient = null;
         try {
@@ -205,7 +205,7 @@ public class Msg91SmsProvider implements ISmsProvider {
 
 
             CredentialsProvider credsProvider;
-            if (SMSAuthenticatorUtil.getConfigString(configurations, SmsConfigurationType.CONF_SMS_AUTHTYPE, "").equals(SmsConfigurationType.CONF_AUTH_METHOD_INMESSAGE)) {
+            if (SMSConfigurationUtil.getConfigString(configurations, SmsConfigurationConstants.CONF_SMS_AUTHTYPE, "").equals(SmsConfigurationConstants.CONF_AUTH_METHOD_INMESSAGE)) {
                 credsProvider = getCredentialsProvider(null, null, proxyUsr, proxyPwd, smsURL, proxyURL);
             } else {
                 credsProvider = getCredentialsProvider(smsUsr, smsPwd, proxyUsr, proxyPwd, smsURL, proxyURL);
@@ -223,7 +223,7 @@ public class Msg91SmsProvider implements ISmsProvider {
                     .setProxy(proxy)
                     .build();
 
-            String httpMethod = SMSAuthenticatorUtil.getConfigString(configurations, SmsConfigurationType.CONF_SMS_METHOD_TYPE);
+            String httpMethod = SMSConfigurationUtil.getConfigString(configurations, SmsConfigurationConstants.CONF_SMS_METHOD_TYPE);
             if (httpMethod.equals(HttpMethod.GET)) {
 
                 String path = getPath(mobileNumber, smsURL, smsText);

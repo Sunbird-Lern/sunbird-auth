@@ -4,7 +4,7 @@ import com.amazonaws.util.StringUtils;
 import org.jboss.logging.Logger;
 import org.keycloak.models.AuthenticatorConfigModel;
 import org.keycloak.models.UserModel;
-import org.sunbird.sms.MessageProviderFactory;
+import org.sunbird.sms.msg91.Msg91SmsProviderFactory;
 import org.sunbird.sms.provider.ISmsProvider;
 import org.sunbird.utils.JsonUtil;
 
@@ -91,33 +91,13 @@ public class KeycloakSmsAuthenticatorUtil {
         String smsText = createMessage(code, mobileNumber, config);
         logger.debug("KeycloakSmsAuthenticatorUtil@sendSmsCode : smsText - " + smsText);
 
-//        Boolean amazonSmsProviderStatus = msgViaAmazonSns(mobileNumber, smsText);
-//        if (amazonSmsProviderStatus != null) return amazonSmsProviderStatus;
-
-        Boolean msg91SmsProviderStatus = sendViaMsg91(mobileNumber, smsText);
+        Boolean msg91SmsProviderStatus = send(mobileNumber, smsText);
         if (msg91SmsProviderStatus != null) return msg91SmsProviderStatus;
 
         return false;
     }
 
-    private static Boolean msgViaAmazonSns(String mobileNumber, String smsText) {
-        String filePath = new File(KeycloakSmsAuthenticatorConstants.AMAZON_SNS_PROVIDER_CONFIGURATIONS_PATH).getAbsolutePath();
-        logger.debug("KeycloakSmsAuthenticatorUtil@sendSmsCode : filePath - " + filePath);
-
-        if (!StringUtils.isNullOrEmpty(filePath)) {
-            Map<String, String> configurations = JsonUtil.readFromJson(filePath);
-            logger.debug("KeycloakSmsAuthenticatorUtil@sendSmsCode : configurations - " + configurations);
-
-            ISmsProvider amazonSmsProvider = MessageProviderFactory.getSnsClient(configurations);
-
-            if (amazonSmsProvider != null) {
-                return amazonSmsProvider.send(setDefaultCountryCodeIfZero(mobileNumber), smsText);
-            }
-        }
-        return null;
-    }
-
-    private static Boolean sendViaMsg91(String mobileNumber, String code) {
+    private static Boolean send(String mobileNumber, String code) {
         String filePath = new File(KeycloakSmsAuthenticatorConstants.MSG91_SMS_PROVIDER_CONFIGURATIONS_PATH).getAbsolutePath();
         logger.debug("KeycloakSmsAuthenticatorUtil@sendSmsCode : filePath - " + filePath);
 
@@ -125,7 +105,9 @@ public class KeycloakSmsAuthenticatorUtil {
             Map<String, String> configurations = JsonUtil.readFromJson(filePath);
             logger.debug("KeycloakSmsAuthenticatorUtil@sendSmsCode : configurations - " + configurations);
 
-            ISmsProvider msg91SmsProvider = MessageProviderFactory.getMsg91SmsProvider(configurations);
+            Msg91SmsProviderFactory msg91SmsProviderFactory = new Msg91SmsProviderFactory();
+
+            ISmsProvider msg91SmsProvider = msg91SmsProviderFactory.create(configurations);
 
             if (msg91SmsProvider != null) {
                 return msg91SmsProvider.send(mobileNumber, code);

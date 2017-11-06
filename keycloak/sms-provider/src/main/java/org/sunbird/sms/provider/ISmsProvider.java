@@ -1,6 +1,10 @@
 package org.sunbird.sms.provider;
 
-public interface ISmsProvider extends ISmsProviderConfigurations {
+import java.util.Map;
+
+public interface ISmsProvider {
+
+    void configure(Map<String, String> configurations);
 
     boolean send(String phoneNumber, String smsText);
 }
