@@ -34,6 +34,9 @@ import java.util.Map;
 public class Msg91SmsProvider implements ISmsProvider {
 
     private static Logger logger = Logger.getLogger(Msg91SmsProvider.class);
+    private static String BASE_URL = "http://api.msg91.com/";
+    private static String GET_URL = "api/sendhttp.php?";
+    private static String POST_URL = "api/v2/sendsms";
 
     private Map<String, String> configurations;
 
@@ -51,18 +54,15 @@ public class Msg91SmsProvider implements ISmsProvider {
         // Send an SMS
         logger.debug("Msg91SmsProvider@Sending " + smsText + "  to mobileNumber " + mobileNumber);
 
-        String gateWayUrl = SMSConfigurationUtil.getConfigString(configurations, SmsConfigurationConstants.CONF_SMS_BASE_URL);
         String authKey = SMSConfigurationUtil.getConfigString(configurations, SmsConfigurationConstants.CONF_AUTH_KEY);
         String sender = SMSConfigurationUtil.getConfigString(configurations, SmsConfigurationConstants.CONF_SMS_SENDER);
         String country = SMSConfigurationUtil.getConfigString(configurations, SmsConfigurationConstants.CONF_SMS_COUNTRY);
         String smsMethodType = SMSConfigurationUtil.getConfigString(configurations, SmsConfigurationConstants.CONF_SMS_METHOD_TYPE);
         String smsRoute = SMSConfigurationUtil.getConfigString(configurations, SmsConfigurationConstants.CONF_SMS_ROUTE);
         String httpMethod = SMSConfigurationUtil.getConfigString(configurations, SmsConfigurationConstants.CONF_SMS_METHOD_TYPE);
-        String getUrlPoint = SMSConfigurationUtil.getConfigString(configurations, SmsConfigurationConstants.CONF_SMS_GET_URL);
-        String getPostPoint = SMSConfigurationUtil.getConfigString(configurations, SmsConfigurationConstants.CONF_SMS_POST_URL);
 
         logger.debug("Msg91SmsProvider@SMS Provider parameters \n" +
-                "Gateway - " + gateWayUrl + "\n" +
+                "Gateway - " + BASE_URL + "\n" +
                 "authKey - " + authKey + "\n" +
                 "sender - " + sender + "\n" +
                 "country - " + country + "\n" +
@@ -73,24 +73,18 @@ public class Msg91SmsProvider implements ISmsProvider {
 
         CloseableHttpClient httpClient = null;
         try {
-            URL smsURL = (gateWayUrl != null && gateWayUrl.length() > 0) ? new URL(gateWayUrl) : null;
-
-            if (smsURL == null) {
-                logger.error("Msg91SmsProvider@ SMS gateway URL is not configured.");
-                return false;
-            }
 
             httpClient = HttpClients.createDefault();
 
             String path = null;
 
-            if (!StringUtils.isNullOrEmpty(gateWayUrl) && !StringUtils.isNullOrEmpty(sender) && !StringUtils.isNullOrEmpty(smsRoute)
+            if (!StringUtils.isNullOrEmpty(sender) && !StringUtils.isNullOrEmpty(smsRoute)
                     && !StringUtils.isNullOrEmpty(mobileNumber) && !StringUtils.isNullOrEmpty(authKey) && !StringUtils.isNullOrEmpty(country)
                     && !StringUtils.isNullOrEmpty(smsText)) {
 
                 if (httpMethod.equals(HttpMethod.GET)) {
                     logger.debug("Inside GET");
-                    path = getCompletePath(gateWayUrl + getUrlPoint, sender, smsRoute, KeycloakSmsAuthenticatorUtil.setDefaultCountryCodeIfZero(mobileNumber), authKey, country, URLEncoder.encode(smsText, "UTF-8"));
+                    path = getCompletePath(BASE_URL + GET_URL, sender, smsRoute, KeycloakSmsAuthenticatorUtil.setDefaultCountryCodeIfZero(mobileNumber), authKey, country, URLEncoder.encode(smsText, "UTF-8"));
 
                     logger.debug("Msg91SmsProvider -Executing request - " + path);
 
@@ -106,7 +100,7 @@ public class Msg91SmsProvider implements ISmsProvider {
                 } else if (httpMethod.equals(HttpMethod.POST)) {
                     logger.debug("Inside POST");
 
-                    path = gateWayUrl + getPostPoint;
+                    path = BASE_URL + POST_URL;
                     logger.debug("Msg91SmsProvider -Executing request - " + path);
 
                     HttpPost httpPost = new HttpPost(path);
