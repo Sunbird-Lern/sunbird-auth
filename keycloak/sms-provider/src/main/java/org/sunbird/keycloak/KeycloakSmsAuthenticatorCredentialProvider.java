@@ -1,5 +1,6 @@
 package org.sunbird.keycloak;
 
+import org.jboss.logging.Logger;
 import org.keycloak.common.util.Time;
 import org.keycloak.credential.*;
 import org.keycloak.models.KeycloakSession;
@@ -18,6 +19,8 @@ import java.util.Set;
  * Created by nickpack on 09/08/2017.
  */
 public class KeycloakSmsAuthenticatorCredentialProvider implements CredentialProvider, CredentialInputValidator, CredentialInputUpdater, OnUserCache {
+    private static Logger logger = Logger.getLogger(KeycloakSmsAuthenticatorCredentialProvider.class);
+
     private static final String CACHE_KEY = KeycloakSmsAuthenticatorCredentialProvider.class.getName() + "." + KeycloakSmsAuthenticatorConstants.USR_CRED_MDL_SMS_CODE;
 
     private final KeycloakSession session;
@@ -42,6 +45,8 @@ public class KeycloakSmsAuthenticatorCredentialProvider implements CredentialPro
 
     @Override
     public boolean updateCredential(RealmModel realm, UserModel user, CredentialInput input) {
+        logger.debug("KeycloakSmsAuthenticatorCredentialProvider@action called ... for User = " + user.getUsername());
+
         if (!KeycloakSmsAuthenticatorConstants.USR_CRED_MDL_SMS_CODE.equals(input.getType())) return false;
         if (!(input instanceof UserCredentialModel)) return false;
         UserCredentialModel credInput = (UserCredentialModel) input;
@@ -52,9 +57,12 @@ public class KeycloakSmsAuthenticatorCredentialProvider implements CredentialPro
             secret.setValue(credInput.getValue());
             secret.setCreatedDate(Time.currentTimeMillis());
             session.userCredentialManager().createCredential(realm, user, secret);
+            logger.debug("KeycloakSmsAuthenticatorCredentialProvider@action New Credentials added for User = " + user.getUsername());
+
         } else {
             creds.get(0).setValue(credInput.getValue());
             session.userCredentialManager().updateCredential(realm, user, creds.get(0));
+            logger.debug("KeycloakSmsAuthenticatorCredentialProvider@action Credentials updated for User = " + user.getUsername());
         }
         session.userCache().evict(realm, user);
         return true;
