@@ -83,6 +83,8 @@ public class Msg91SmsProvider implements ISmsProvider {
 
                 mobileNumber = removePlusFromMobileNumber(mobileNumber);
 
+                logger.debug("Msg91SmsProvider - after removePlusFromMobileNumber " + mobileNumber);
+
                 if (httpMethod.equals(HttpMethod.GET)) {
                     logger.debug("Inside GET");
                     path = getCompletePath(BASE_URL + GET_URL, sender, smsRoute, mobileNumber, authKey, country, URLEncoder.encode(smsText, "UTF-8"));
@@ -164,6 +166,8 @@ public class Msg91SmsProvider implements ISmsProvider {
     }
 
     private String removePlusFromMobileNumber(String mobileNumber) {
+        logger.debug("Msg91SmsProvider - removePlusFromMobileNumber " + mobileNumber);
+
         if (mobileNumber.startsWith("+")){
             return mobileNumber.substring(1);
         }
