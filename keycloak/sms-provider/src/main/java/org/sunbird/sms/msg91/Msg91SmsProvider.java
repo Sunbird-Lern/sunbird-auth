@@ -16,7 +16,6 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.jboss.logging.Logger;
-import org.sunbird.keycloak.KeycloakSmsAuthenticatorUtil;
 import org.sunbird.sms.SMSConfigurationUtil;
 import org.sunbird.sms.SmsConfigurationConstants;
 import org.sunbird.sms.provider.ISmsProvider;
@@ -82,9 +81,11 @@ public class Msg91SmsProvider implements ISmsProvider {
                     && !StringUtils.isNullOrEmpty(mobileNumber) && !StringUtils.isNullOrEmpty(authKey) && !StringUtils.isNullOrEmpty(country)
                     && !StringUtils.isNullOrEmpty(smsText)) {
 
+                mobileNumber = removePlusFromMobileNumber(mobileNumber);
+
                 if (httpMethod.equals(HttpMethod.GET)) {
                     logger.debug("Inside GET");
-                    path = getCompletePath(BASE_URL + GET_URL, sender, smsRoute, KeycloakSmsAuthenticatorUtil.setDefaultCountryCodeIfZero(mobileNumber), authKey, country, URLEncoder.encode(smsText, "UTF-8"));
+                    path = getCompletePath(BASE_URL + GET_URL, sender, smsRoute, mobileNumber, authKey, country, URLEncoder.encode(smsText, "UTF-8"));
 
                     logger.debug("Msg91SmsProvider -Executing request - " + path);
 
@@ -160,6 +161,13 @@ public class Msg91SmsProvider implements ISmsProvider {
             }
         }
         return false;
+    }
+
+    private String removePlusFromMobileNumber(String mobileNumber) {
+        if (mobileNumber.startsWith("+")){
+            return mobileNumber.substring(1);
+        }
+        return mobileNumber;
     }
 
     private String getCompletePath(String gateWayUrl, String sender, String smsRoute, String mobileNumber, String authKey, String country, String smsText) {
