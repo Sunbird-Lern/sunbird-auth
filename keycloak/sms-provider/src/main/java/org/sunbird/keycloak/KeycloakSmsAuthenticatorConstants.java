@@ -14,14 +14,9 @@ public class KeycloakSmsAuthenticatorConstants {
     public static final String CONF_PRP_SMS_CODE_LENGTH = "sms-auth.code.length";
     public static final String CONF_PRP_SMS_TEXT = "sms-auth.msg.text";
 
-    // AWS
-    public static final String CONF_PRP_SMS_CLIENTTOKEN = "sms-auth.sms.clienttoken";
-    public static final String CONF_PRP_SMS_CLIENTSECRET = "sms-auth.sms.clientsecret";
-
     // User credentials (used to persist the sent sms code + expiration time cluster wide)
     public static final String USR_CRED_MDL_SMS_CODE = "sms-auth.code";
     public static final String USR_CRED_MDL_SMS_EXP_TIME = "sms-auth.exp-time";
 
-//    public static final String AMAZON_SNS_PROVIDER_CONFIGURATIONS_PATH = "sms-provider/awsSnsCreds.json";
     public static final String MSG91_SMS_PROVIDER_CONFIGURATIONS_PATH = "sms-provider/Msg91Creds.json";
 }

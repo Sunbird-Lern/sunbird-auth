@@ -57,22 +57,6 @@ public class KeycloakSmsAuthenticatorFactory implements AuthenticatorFactory, Co
         property.setType(ProviderConfigProperty.STRING_TYPE);
         property.setHelpText("Use %sms-code% as placeholder for the generated SMS code. Use %user% and %password% as placeholder when 'In message' authentication is used.");
         configProperties.add(property);
-
-        // SMS Gateway
-
-        property = new ProviderConfigProperty();
-        property.setName(KeycloakSmsAuthenticatorConstants.CONF_PRP_SMS_CLIENTTOKEN);
-        property.setLabel("AWS Client Token");
-        property.setType(ProviderConfigProperty.STRING_TYPE);
-        property.setHelpText("AWS Client Token.");
-        configProperties.add(property);
-
-        property = new ProviderConfigProperty();
-        property.setName(KeycloakSmsAuthenticatorConstants.CONF_PRP_SMS_CLIENTSECRET);
-        property.setLabel("AWS Client Secret");
-        property.setHelpText("AWS Client Secret");
-        property.setType(ProviderConfigProperty.STRING_TYPE);
-        configProperties.add(property);
     }
 
     public String getId() {
