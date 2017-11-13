@@ -69,6 +69,7 @@ public class KeycloakSmsAuthenticatorUtil {
 
     public static String createMessage(String code, String mobileNumber, AuthenticatorConfigModel config) {
         String text = KeycloakSmsAuthenticatorUtil.getConfigString(config, KeycloakSmsAuthenticatorConstants.CONF_PRP_SMS_TEXT);
+        logger.debug("KeycloakSmsAuthenticatorUtil@createMessage : templateText - " + text);
         text = text.replaceAll("%sms-code%", code);
         text = text.replaceAll("%phonenumber%", mobileNumber);
 
