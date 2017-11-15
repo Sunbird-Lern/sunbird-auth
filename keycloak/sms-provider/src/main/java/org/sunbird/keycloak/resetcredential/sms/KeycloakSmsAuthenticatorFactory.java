@@ -1,4 +1,4 @@
-package org.sunbird.keycloak;
+package org.sunbird.keycloak.resetcredential.sms;
 
 import org.jboss.logging.Logger;
 import org.keycloak.Config;

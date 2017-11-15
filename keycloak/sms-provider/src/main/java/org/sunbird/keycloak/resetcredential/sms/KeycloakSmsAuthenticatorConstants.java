@@ -1,11 +1,11 @@
-package org.sunbird.keycloak;
+package org.sunbird.keycloak.resetcredential.sms;
 
 /**
  * Created by joris on 18/11/2016.
  */
 // TODO(shriharshs): Move strings for mobile, smsCode, countryCode, defaultCountry code to configuration
 public class KeycloakSmsAuthenticatorConstants {
-    public static final String ATTR_MOBILE = "mobile";
+    public static final String ATTR_MOBILE = "phone";
     public static final String ANSW_SMS_CODE = "smsCode";
     public static final String COUNTRY_CODE = "+91";
     public static final String DEFAULT_COUNTRY_CODE = "0";
