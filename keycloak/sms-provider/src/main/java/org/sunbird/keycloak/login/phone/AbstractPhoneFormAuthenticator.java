@@ -183,13 +183,12 @@ public abstract class AbstractPhoneFormAuthenticator extends AbstractFormAuthent
                 logger.error("AbstractPhoneFormAuthenticator@getUser : Users List - " + userModels.size());
                 logger.error("AbstractPhoneFormAuthenticator@getUser : First User - " + userModels.get(0).getUsername());
                 return userModels.get(0);
+            } else {
+                return KeycloakModelUtils.findUserByNameOrEmail(context.getSession(), context.getRealm(), username);
             }
         } else {
             return KeycloakModelUtils.findUserByNameOrEmail(context.getSession(), context.getRealm(), username);
         }
-
-        logger.error("AbstractPhoneFormAuthenticator@getUser : No user found!");
-        return null;
     }
 
     public boolean validatePassword(AuthenticationFlowContext context, UserModel user, MultivaluedMap<String, String> inputData) {
