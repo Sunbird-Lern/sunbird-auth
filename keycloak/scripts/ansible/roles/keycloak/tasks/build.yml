@@ -1,44 +1,68 @@
 - name: Create sunbird auth directory
   file:
-    path: sunbird_auth_{{sunbird_auth_version}}
+    path: sunbird_auth_{{sunbird_auth_version}}/providers
     state: directory
     mode: 0755
 
 - name: get the keycloak tarball
-  get_url: url={{keycloak_pkg_src}} dest=sunbird_auth_{{sunbird_auth_version}} force=no owner={{wildfly_user}} group={{wildfly_group}}
+  get_url: url={{keycloak_pkg_src}} dest=sunbird_auth_{{sunbird_auth_version}}/ force=no
+
+- name: Extract keycloak-3.2.0.Final.tar.gz
+  shell: cd sunbird_auth_{{sunbird_auth_version}} && tar -xvf keycloak-3.2.0.Final.tar.gz --strip 1
+
+- name: Create sunbird auth directory
+  file:
+    path: sunbird_auth_{{sunbird_auth_version}}/modules/system/layers/keycloak/org/postgresql/main
+    state: directory
+    mode: 0755
 
 - name: get the postgresql driver
-  get_url: url={{postgresql_driver_src}} dest=sunbird_auth_{{sunbird_auth_version}}/modules/system/layers/keycloak/org/postgresql/main force=no owner={{wildfly_user}} group={{wildfly_group}}
-
-- name: Clone sunbird auth repo
-  git:
-    repo: https://github.com/project-sunbird/sunbird-auth.git
-    dest: sunbird-auth
-    refspec: refs/heads/master
+  get_url: url={{postgresql_driver_src}} dest="sunbird_auth_{{sunbird_auth_version}}/modules/system/layers/keycloak/org/postgresql/main/" force=no
 
 - name: Build provider package
-  shell: cd sunbird-auth/keycloak/sms-provider && mvn package
+  shell: cd  ../../sms-provider && mvn package
 
 - name: Copy SMS OTP jar file to providers dir
-  copy: src=sunbird-auth/keycloak/sms-provider/target/keycloak-email-phone-autthenticator-1.0-SNAPSHOT.jar dest="sunbird_auth_{{sunbird_auth_version}}/providers"
+  copy: src="../../sms-provider/target/keycloak-email-phone-autthenticator-1.0-SNAPSHOT.jar" dest="sunbird_auth_{{sunbird_auth_version}}/providers/"
+
+- name: Create sunbird auth directory
+  file:
+    path: sunbird_auth_{{sunbird_auth_version}}/themes/sunbird/login/
+    state: directory
+    mode: 0755
 
 - name: Copy Custom Validation theme html to sunbird login theme
-  copy: src=sunbird-auth/keycloak/sms-provider/templates dest=sunbird_auth_{{sunbird_auth_version}}/themes/sunbird/login
-
-- name: Copy configuration templates to Keycloak
-  copy: src=sunbird-auth/keycloak/scripts/ansible/roles/keycloak/templates/ dest="sunbird_auth_{{sunbird_auth_version}}/standalone/configuration/standalone-ha.xml"
+  copy: src="../../sms-provider/templates/" dest="sunbird_auth_{{sunbird_auth_version}}/themes/sunbird/login/" force="yes"
 
 - name: XML file
   template:
-    src: sunbird-auth/keycloak/scripts/ansible/roles/keycloak/templates/standalone-ha.xml
+    src: "roles/keycloak/templates/standalone-ha.xml"
     dest: "sunbird_auth_{{sunbird_auth_version}}/standalone/configuration/standalone-ha.xml"
+    mode: 0750
 
 - name: Copy module.xml
   template:
-    src: sunbird-auth/keycloak/scripts/ansible/roles/keycloak/templates/module.xml.j2
+    src: roles/keycloak/templates/module.xml.j2
     dest: "sunbird_auth_{{sunbird_auth_version}}/modules/system/layers/keycloak/org/postgresql/main/module.xml"
+    mode: 0750
+
+- name: Create sunbird auth directory
+  file:
+    path: sunbird_auth_{{sunbird_auth_version}}/bin/sms-provider
+    state: directory
+    mode: 0755
 
 - name: Create SMS provider configuration file
   template:
-    src: "sunbird-auth/keycloak/scripts/ansible/roles/keycloak/Msg91Creds.json.j2"
+    src: "roles/keycloak/templates/Msg91Creds.json.j2"
     dest: "sunbird_auth_{{sunbird_auth_version}}/bin/sms-provider/Msg91Creds.json"
+    mode: 0750
+
+- name: remove the Keycloak zip
+  become: yes
+  file: path="sunbird_auth_{{sunbird_auth_version}}/keycloak-3.2.0.Final.tar.gz" state=absent
+
+- archive:
+    path: sunbird_auth_{{sunbird_auth_version}}
+    dest: "/home/ttpllt23/Desktop/sunbird_auth_{{sunbird_auth_version}}"
+    format: zip
