@@ -7,8 +7,8 @@
 - name: get the keycloak tarball
   get_url: url={{keycloak_pkg_src}} dest=sunbird_auth_{{sunbird_auth_version}}/ force=no
 
-- name: Extract keycloak-3.2.0.Final.tar.gz
-  shell: cd sunbird_auth_{{sunbird_auth_version}} && tar -xvf keycloak-3.2.0.Final.tar.gz --strip 1
+- name: Extract {{keycloak_pkg_file}}
+  shell: cd sunbird_auth_{{sunbird_auth_version}} && tar -xvf {{keycloak_pkg_file}} --strip 1
 
 - name: Create sunbird auth directory
   file:
@@ -23,7 +23,7 @@
   shell: cd  ../../sms-provider && mvn package
 
 - name: Copy SMS OTP jar file to providers dir
-  copy: src="../../sms-provider/target/keycloak-email-phone-autthenticator-1.0-SNAPSHOT.jar" dest="sunbird_auth_{{sunbird_auth_version}}/providers/"
+  copy: src="../../sms-provider/target/{{keycloak_sms_provider_build}}" dest="sunbird_auth_{{sunbird_auth_version}}/providers/"
 
 - name: Create sunbird auth directory
   file:
@@ -60,9 +60,9 @@
 
 - name: remove the Keycloak zip
   become: yes
-  file: path="sunbird_auth_{{sunbird_auth_version}}/keycloak-3.2.0.Final.tar.gz" state=absent
+  file: path="sunbird_auth_{{sunbird_auth_version}}/{{keycloak_pkg_file}}" state=absent
 
 - archive:
     path: sunbird_auth_{{sunbird_auth_version}}
-    dest: "/home/ttpllt23/Desktop/sunbird_auth_{{sunbird_auth_version}}"
+    dest: "sunbird_auth_{{sunbird_auth_version}}.zip"
     format: zip
