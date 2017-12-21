@@ -2,21 +2,27 @@
 
 node('build-slave') {
 
-    currentBuild.result = "SUCCESS"
+	currentBuild.result = "SUCCESS"
 
-    try {
+	try {
 
-      stage('Build'){
-          sh('cd sunbird-auth/keycloak/scripts/ansible && ansible-playbook -i inventories/dev  keycloak.yml --tags build --vault-password-file  /run/secrets/vault-pass')
-      }
+		stage('checkout')
+		{
+			sh('rm -rf sunbird-auth')
+			sh('git clone https://github.com/ahghatol/sunbird-auth.git')
+		}
 
-      stage('Archive'){
-         // archiveArtifacts 'keycloak_build/login.tar.gz'
-         // archiveArtifacts 'keycloak_build.tar.gz'
-      }
-    }
-    catch (err) {
-        currentBuild.result = "FAILURE"
-        throw err
-    }
+		stage('Build'){
+			sh('ls')
+			sh('cd sunbird-auth/keycloak/scripts/ansible && ansible-playbook -i inventories/dev  keycloak.yml --tags build --vault-password-file /home/ops/vault -vvv')
+		}
+
+		stage('Archive'){
+			archiveArtifacts 'sunbird-auth/keycloak/scripts/ansible/sunbird_auth_1.0v.zip'
+		}
+	}
+	catch (err) {
+		currentBuild.result = "FAILURE"
+		throw err
+	}
 }
