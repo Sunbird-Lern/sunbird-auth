@@ -18,7 +18,8 @@ node('build-slave') {
 		}
 
 		stage('Archive'){
-			archiveArtifacts 'sunbird-auth/keycloak/scripts/ansible/sunbird_auth_1.0v.zip'
+			sh('cp sunbird-auth/keycloak/scripts/ansible/sunbird_auth_1.0v.zip .')
+			archiveArtifacts 'sunbird_auth_1.0v.zip'
 		}
 	}
 	catch (err) {
