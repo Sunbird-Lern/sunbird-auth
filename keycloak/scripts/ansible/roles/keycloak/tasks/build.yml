@@ -10,19 +10,19 @@
 - name: Extract {{keycloak_pkg_file}}
   shell: cd sunbird_auth_{{sunbird_auth_version}} && tar -xvf {{keycloak_pkg_file}} --strip 1
 
-- name: Create sunbird auth directory
+- name: Create directory for postgresql driver
   file:
     path: sunbird_auth_{{sunbird_auth_version}}/modules/system/layers/keycloak/org/postgresql/main
     state: directory
     mode: 0755
 
-- name: get the postgresql driver
+- name: Get the postgresql driver
   get_url: url={{postgresql_driver_src}} dest="sunbird_auth_{{sunbird_auth_version}}/modules/system/layers/keycloak/org/postgresql/main/" force=no
 
-- name: Build provider package
+- name: Build SMS provider package
   shell: cd  ../../sms-provider && mvn package
 
-- name: Copy SMS OTP jar file to providers dir
+- name: Copy SMS OTP jar file to providers directory
   copy: src="../../sms-provider/target/{{keycloak_sms_provider_build}}" dest="sunbird_auth_{{sunbird_auth_version}}/providers/"
 
 - name: Create sunbird auth directory
@@ -34,7 +34,7 @@
 - name: Copy Custom Validation theme html to sunbird login theme
   copy: src="../../sms-provider/templates/" dest="sunbird_auth_{{sunbird_auth_version}}/themes/sunbird/login/" force="yes"
 
-- name: XML file
+- name: Keycloak configuration XML file
   template:
     src: "roles/keycloak/templates/standalone-ha.xml"
     dest: "sunbird_auth_{{sunbird_auth_version}}/standalone/configuration/standalone-ha.xml"
@@ -58,7 +58,7 @@
     dest: "sunbird_auth_{{sunbird_auth_version}}/bin/sms-provider/Msg91Creds.json"
     mode: 0750
 
-- name: remove the Keycloak zip
+- name: Remove the Keycloak zip
   become: yes
   file: path="sunbird_auth_{{sunbird_auth_version}}/{{keycloak_pkg_file}}" state=absent
 
