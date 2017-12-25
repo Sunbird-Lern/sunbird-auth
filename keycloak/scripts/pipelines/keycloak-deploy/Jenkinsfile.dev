@@ -15,8 +15,8 @@ node('general-dev') {
 		stage('Build'){
 
 			step ([$class: 'CopyArtifact',
-				projectName: 'Dev/Keycloak_Deploy',
-				filter: 'keycloak_build.tar.gz',
+				projectName: 'New_Build/Sunbird_Auth_Build',
+				filter: 'sunbird_auth_1.0v.zip',
 				target: 'sunbird-auth/keycloak/scripts/ansible' ]
 			);
 
