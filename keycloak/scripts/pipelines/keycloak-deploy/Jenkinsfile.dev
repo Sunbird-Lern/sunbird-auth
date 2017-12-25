@@ -20,8 +20,7 @@ node('general-dev') {
 				target: 'sunbird-auth/keycloak/scripts/ansible' ]
 			);
 
-			sh('ls')
-			sh('cd sunbird-auth/keycloak/scripts/ansible && ansible-playbook -i inventories/dev  keycloak.yml --tags deploy --vault-password-file /run/secrets/vault-pass -vvv')
+			sh('cd sunbird-auth/keycloak/scripts/ansible && ansible-playbook -i inventories/dev  keycloak.yml --limit keycloak --tags deploy --vault-password-file /run/secrets/vault-pass -vvv')
 		}
 
 		stage('Archive'){
