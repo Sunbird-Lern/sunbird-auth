@@ -5,3 +5,7 @@
 - include: deploy.yml
   tags:
     - deploy
+
+- include: deploy-conf.yml
+  tags:
+    - deploy-conf
