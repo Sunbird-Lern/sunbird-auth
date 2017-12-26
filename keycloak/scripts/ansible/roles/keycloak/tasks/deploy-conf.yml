@@ -10,7 +10,7 @@
     dest:"{{keycloak_home}}/modules/system/layers/keycloak/org/postgresql/main/module.xml"
     mode:0750
 
-- name: Create directory for sms provider configuration
+- name: Create a directory for SMS provider configuration
   file:
     path:"{{keycloak_home}}/bin/sms-provider"
     state:directory
