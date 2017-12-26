@@ -27,7 +27,7 @@
 
 - name: Create sunbird auth directory
   file:
-    path: sunbird_auth_{{sunbird_auth_version}}/themes/sunbird/login/
+    path: sunbird_auth_{{sunbird_auth_version}}/themes/sunbird/login
     state: directory
     mode: 0755
 
