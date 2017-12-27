@@ -44,7 +44,7 @@ public class PhonePasswordForm extends AbstractPhoneFormAuthenticator implements
 
     @Override
     public void action(AuthenticationFlowContext context) {
-        logger.error("PhonePasswordForm@action - called");
+        logger.debug("PhonePasswordForm@action - called");
         MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
         if (formData.containsKey("cancel")) {
             context.cancelLogin();
@@ -57,7 +57,7 @@ public class PhonePasswordForm extends AbstractPhoneFormAuthenticator implements
     }
 
     protected boolean validateForm(AuthenticationFlowContext context, MultivaluedMap<String, String> formData) {
-        logger.error("PhonePasswordForm@validateForm - called");
+        logger.debug("PhonePasswordForm@validateForm - called");
         return validateUserAndPassword(context, formData);
     }
 

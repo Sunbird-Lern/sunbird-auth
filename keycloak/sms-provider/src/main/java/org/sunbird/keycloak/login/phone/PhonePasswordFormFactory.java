@@ -43,7 +43,7 @@ public class PhonePasswordFormFactory implements AuthenticatorFactory {
 
     @Override
     public Authenticator create(KeycloakSession session) {
-        logger.error("PhonePasswordFormFactory@create - PhonePasswordFormFactory is created");
+        logger.debug("PhonePasswordFormFactory@create - PhonePasswordFormFactory is created");
         return SINGLETON;
     }
 

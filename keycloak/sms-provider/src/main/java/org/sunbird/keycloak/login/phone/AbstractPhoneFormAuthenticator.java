@@ -42,7 +42,7 @@ public abstract class AbstractPhoneFormAuthenticator extends AbstractUsernameFor
 
     public boolean validateUserAndPassword(AuthenticationFlowContext context, MultivaluedMap<String, String> inputData) {
         String username = inputData.getFirst(AuthenticationManager.FORM_USERNAME);
-        logger.error("AbstractPhoneFormAuthenticator@validateUserAndPassword - Username -" + username);
+        logger.debug("AbstractPhoneFormAuthenticator@validateUserAndPassword - Username -" + username);
 
         if (username == null) {
             context.getEvent().error(Errors.USER_NOT_FOUND);
@@ -105,8 +105,6 @@ public abstract class AbstractPhoneFormAuthenticator extends AbstractUsernameFor
             List<UserModel> userModels = session.users().searchForUserByUserAttribute(KeycloakSmsAuthenticatorConstants.ATTR_MOBILE, username, context.getRealm());
 
             if (userModels != null && userModels.size() > 0) {
-                logger.error("AbstractPhoneFormAuthenticator@getUser : Users List - " + userModels.size());
-                logger.error("AbstractPhoneFormAuthenticator@getUser : First User - " + userModels.get(0).getUsername());
                 return userModels.get(0);
             } else {
                 return KeycloakModelUtils.findUserByNameOrEmail(context.getSession(), context.getRealm(), username);
