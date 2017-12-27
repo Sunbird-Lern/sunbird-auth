@@ -1,1 +1,2 @@
-org.sunbird.keycloak.KeycloakSmsAuthenticatorFactory
+org.sunbird.keycloak.resetcredential.sms.KeycloakSmsAuthenticatorFactory
+org.sunbird.keycloak.login.phone.PhonePasswordFormFactory
