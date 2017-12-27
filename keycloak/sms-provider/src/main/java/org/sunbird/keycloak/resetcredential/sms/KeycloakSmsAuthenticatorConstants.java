@@ -1,4 +1,4 @@
-package org.sunbird.keycloak;
+package org.sunbird.keycloak.resetcredential.sms;
 
 /**
  * Created by joris on 18/11/2016.
