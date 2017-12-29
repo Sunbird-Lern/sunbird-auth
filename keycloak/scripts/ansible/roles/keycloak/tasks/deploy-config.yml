@@ -36,3 +36,13 @@
     group: "{{wildfly_group}}"
     mode: 0755
     remote_src: yes
+
+- name: Delete config directory
+  file:
+    path: "/tmp/sunbird_auth_{{sunbird_auth_version}}.config"
+    state: absent
+
+- name: Delete config directory zip
+  file:
+    path: "/tmp/sunbird_auth_{{sunbird_auth_version}}.config.zip"
+    state: absent
