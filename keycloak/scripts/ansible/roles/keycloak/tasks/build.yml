@@ -61,17 +61,17 @@
     dest: "sunbird_auth_{{sunbird_auth_version}}/modules/system/layers/keycloak/org/postgresql/main/module.xml"
     mode: 0750
 
-- name: Create sunbird auth directory
-  file:
-    path: sunbird_auth_{{sunbird_auth_version}}/bin/sms-provider
-    state: directory
-    mode: 0755
+#~ - name: Create sunbird auth directory
+  #~ file:
+    #~ path: sunbird_auth_{{sunbird_auth_version}}/bin/sms-provider
+    #~ state: directory
+    #~ mode: 0755
 
-- name: Create SMS provider configuration file
-  template:
-    src: "roles/keycloak/templates/Msg91Creds.json.j2"
-    dest: "sunbird_auth_{{sunbird_auth_version}}/bin/sms-provider/Msg91Creds.json"
-    mode: 0750
+#~ - name: Create SMS provider configuration file
+  #~ template:
+    #~ src: "roles/keycloak/templates/Msg91Creds.json.j2"
+    #~ dest: "sunbird_auth_{{sunbird_auth_version}}/bin/sms-provider/Msg91Creds.json"
+    #~ mode: 0750
 
 - name: Remove the Keycloak zip
   become: yes
