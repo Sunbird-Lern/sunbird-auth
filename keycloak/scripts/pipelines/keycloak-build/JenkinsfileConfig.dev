@@ -14,7 +14,7 @@ node('build-slave') {
 
 		stage('Build'){
 			sh('ls')
-			sh('cd sunbird-auth/keycloak/scripts/ansible && ansible-playbook -i inventories/dev  keycloak.yml --limit localhost --tags build-conf --vault-password-file /home/ops/vault -vvv')
+			sh('cd sunbird-auth/keycloak/scripts/ansible && ansible-playbook -i inventories/dev  keycloak.yml --limit localhost --tags build-config --vault-password-file /home/ops/vault -vvv')
 		}
 
 		stage('Archive'){
