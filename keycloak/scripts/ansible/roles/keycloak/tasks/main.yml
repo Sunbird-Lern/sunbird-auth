@@ -6,6 +6,10 @@
   tags:
     - deploy
 
+- include: build-config.yml
+  tags:
+    - build-config
+
 - include: deploy-conf.yml
   tags:
     - deploy-conf
