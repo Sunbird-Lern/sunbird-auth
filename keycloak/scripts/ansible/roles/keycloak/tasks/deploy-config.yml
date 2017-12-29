@@ -1,12 +1,18 @@
+- name: Paste keycloak config package on server
+  copy: src="sunbird_auth_{{sunbird_auth_version}}.config.zip" dest="/opt/" force=no owner={{wildfly_user}} group={{wildfly_group}}
+
+- name: extarct the folder
+  unarchive: src="/opt/sunbird_auth_{{sunbird_auth_version}}.config.zip" dest=/opt/ copy=no owner={{wildfly_user}} group={{wildfly_group}}
+
 - name: Keycloak configuration XML file
   template:
-    src:"roles/keycloak/templates/templates/standalone-ha.xml"
+    src:"/opt/sunbird_auth_{{sunbird_auth_version}}.config/standalone-ha.xml"
     dest:"{{keycloak_home}}/standalone/configuration/standalone-ha.xml"
     mode:0750
 
 - name: Postgresql Configuration- module.xml
   template:
-    src:"roles/keycloak/templates/templates/module.xml.j2"
+    src:"/opt/sunbird_auth_{{sunbird_auth_version}}.config/module.xml.j2"
     dest:"{{keycloak_home}}/modules/system/layers/keycloak/org/postgresql/main/module.xml"
     mode:0750
 
@@ -18,7 +24,7 @@
 
 - name: SMS provider configuration file
   template:
-    src:"roles/keycloak/templates/templates/Msg91Creds.json.j2"
+    src:"/opt/sunbird_auth_{{sunbird_auth_version}}.config/Msg91Creds.json.j2"
     dest:"{{keycloak_home}}/bin/sms-provider/Msg91Creds.json"
     owner:"{{wildfly_user}}"
     group:"{{wildfly_group}}"
