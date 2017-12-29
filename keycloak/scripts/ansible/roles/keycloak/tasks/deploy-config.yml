@@ -6,26 +6,26 @@
 
 - name: Keycloak configuration XML file
   template:
-    src:"/opt/sunbird_auth_{{sunbird_auth_version}}.config/standalone-ha.xml"
-    dest:"{{keycloak_home}}/standalone/configuration/standalone-ha.xml"
-    mode:0750
+    src: "/opt/sunbird_auth_{{sunbird_auth_version}}.config/standalone-ha.xml"
+    dest: "{{keycloak_home}}/standalone/configuration/standalone-ha.xml"
+    mode: 0750
 
 - name: Postgresql Configuration- module.xml
   template:
-    src:"/opt/sunbird_auth_{{sunbird_auth_version}}.config/module.xml.j2"
-    dest:"{{keycloak_home}}/modules/system/layers/keycloak/org/postgresql/main/module.xml"
-    mode:0750
+    src: "/opt/sunbird_auth_{{sunbird_auth_version}}.config/module.xml.j2"
+    dest: "{{keycloak_home}}/modules/system/layers/keycloak/org/postgresql/main/module.xml"
+    mode: 0750
 
 - name: Create a directory for SMS provider configuration
   file:
-    path:"{{keycloak_home}}/bin/sms-provider"
-    state:directory
-    mode:0755
+    path: "{{keycloak_home}}/bin/sms-provider"
+    state: directory
+    mode: 0755
 
 - name: SMS provider configuration file
   template:
-    src:"/opt/sunbird_auth_{{sunbird_auth_version}}.config/Msg91Creds.json.j2"
-    dest:"{{keycloak_home}}/bin/sms-provider/Msg91Creds.json"
-    owner:"{{wildfly_user}}"
-    group:"{{wildfly_group}}"
-    mode:0755
+    src: "/opt/sunbird_auth_{{sunbird_auth_version}}.config/Msg91Creds.json.j2"
+    dest: "{{keycloak_home}}/bin/sms-provider/Msg91Creds.json"
+    owner: "{{wildfly_user}}"
+    group: "{{wildfly_group}}"
+    mode: 0755
