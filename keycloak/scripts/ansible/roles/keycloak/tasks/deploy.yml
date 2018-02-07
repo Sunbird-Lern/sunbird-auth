@@ -1,9 +1,14 @@
+- stat:
+    path: /etc/init.d/keycloak
+  register: keycloak_service
+
 - name: status service
   become: yes
   command: /etc/init.d/keycloak status
   register: keycloak
   poll: 5
   async: 10
+  when: keycloak_service.stat.islnk is defined
 
 - name: stop service
   become: yes
@@ -12,6 +17,7 @@
   poll: 5
   async: 10
   ignore_errors: yes
+  when: keycloak_service.stat.islnk is defined
 
 - name: remove keycloak
   become: yes
@@ -37,8 +43,8 @@
   file: path=/opt/sunbird_auth_{{sunbird_auth_version}} state=absent
 
 - name: Create management user
-  command: "{{ wildfly_dir }}/bin/add-user-keycloak.sh -r master -u {{ keycloak_management_user }} -p {{ keycloak_management_password }}"
   become_user: "{{ wildfly_user }}"
+  command: "{{ wildfly_dir }}/bin/add-user-keycloak.sh -r master -u {{ keycloak_management_user }} -p {{ keycloak_management_password }}"
   when: keycloak_management_user is defined and
         keycloak_management_password is defined
   ignore_errors: yes
@@ -48,3 +54,4 @@
   command: /etc/init.d/keycloak start
   poll: 5
   async: 5
+  when: keycloak_service.stat.islnk is defined
