@@ -1,6 +1,5 @@
 package org.sunbird.keycloak.resetcredential.chooseuser;
 
-import java.util.List;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import org.jboss.logging.Logger;
@@ -16,10 +15,9 @@ import org.keycloak.events.EventBuilder;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
-import org.keycloak.models.utils.KeycloakModelUtils;
 import org.keycloak.services.messages.Messages;
 import org.sunbird.keycloak.resetcredential.sms.KeycloakSmsAuthenticator;
-import org.sunbird.keycloak.resetcredential.sms.KeycloakSmsAuthenticatorConstants;
+import org.sunbird.utils.KeycloakUtil;
 
 
 /**
@@ -86,7 +84,7 @@ public class ResetCredentialChooseUserAuthenticator implements Authenticator {
       context.failureChallenge(AuthenticationFlowError.INVALID_USER, challenge);
       return;
     }
-    UserModel user = getUser(context, username);
+    UserModel user = KeycloakUtil.getUser(context, username);
 
     context.getAuthenticationSession()
         .setAuthNote(AbstractUsernameFormAuthenticator.ATTEMPTED_USERNAME, username);
@@ -104,25 +102,6 @@ public class ResetCredentialChooseUserAuthenticator implements Authenticator {
 
     context.success();
 
-  }
-
-  private UserModel getUser(AuthenticationFlowContext context, String username) {
-    String numberRegex = "\\d+";
-    KeycloakSession session = context.getSession();
-    logger.debug("KeycloakSmsAuthenticator@getUser " + username);
-    if (username.matches(numberRegex)) {
-      List<UserModel> userModels = session.users().searchForUserByUserAttribute(
-          KeycloakSmsAuthenticatorConstants.ATTR_MOBILE, username, context.getRealm());
-      if (userModels != null && !userModels.isEmpty()) {
-        return userModels.get(0);
-      } else {
-        return KeycloakModelUtils.findUserByNameOrEmail(context.getSession(), context.getRealm(),
-            username);
-      }
-    } else {
-      return KeycloakModelUtils.findUserByNameOrEmail(context.getSession(), context.getRealm(),
-          username);
-    }
   }
 
   @Override
