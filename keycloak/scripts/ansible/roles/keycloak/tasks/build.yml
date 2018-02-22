@@ -16,6 +16,7 @@
     state: directory
     mode: 0755
 
+
 - name: Get the postgresql driver
   get_url: url={{postgresql_driver_src}} dest="sunbird_auth_{{sunbird_auth_version}}/modules/system/layers/keycloak/org/postgresql/main/" force=no
 
@@ -44,10 +45,34 @@
     mode: 0755
 
 - name: Copy Sunbird login theme
-  copy: src="artifacts/sunbird/" dest="sunbird_auth_{{sunbird_auth_version}}/themes/sunbird/login/" force="yes"
+  copy: src="artifacts/sunbird/login/" dest="sunbird_auth_{{sunbird_auth_version}}/themes/sunbird/login/" force="yes"
 
 - name: Copy Custom Validation theme html to sunbird login theme
   copy: src="../../sms-provider/templates/" dest="sunbird_auth_{{sunbird_auth_version}}/themes/sunbird/login/" force="yes"
+
+- name: Create directory for sunbird email theme html folder
+  file:
+    path: sunbird_auth_{{sunbird_auth_version}}/themes/sunbird/email/html
+    state: directory
+    recurse: yes
+    mode: 0755
+
+- name: Create directory for sunbird email theme messages folder
+  file:
+    path: sunbird_auth_{{sunbird_auth_version}}/themes/sunbird/email/messages
+    state: directory
+    recurse: yes
+    mode: 0755
+
+- name: Create directory for sunbird email theme text folder
+  file:
+    path: sunbird_auth_{{sunbird_auth_version}}/themes/sunbird/email/text
+    state: directory
+    recurse: yes
+    mode: 0755
+
+- name: Copy Sunbird email theme
+  copy: src="artifacts/sunbird/email" dest="sunbird_auth_{{sunbird_auth_version}}/themes/sunbird/" force="yes"
 
 - name: Keycloak configuration XML file
   template:
