@@ -1,0 +1,15 @@
+- include: build.yml
+  tags:
+    - build
+
+- include: deploy.yml
+  tags:
+    - deploy
+
+- include: build-config.yml
+  tags:
+    - build-config
+
+- include: deploy-config.yml
+  tags:
+    - deploy-config
