@@ -1,5 +1,6 @@
 package org.sunbird.keycloak.resetcredential.chooseuser;
 
+import java.util.List;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import org.jboss.logging.Logger;
@@ -17,16 +18,16 @@ import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.services.messages.Messages;
 import org.sunbird.keycloak.resetcredential.sms.KeycloakSmsAuthenticator;
-import org.sunbird.utils.KeycloakUtil;
+import org.sunbird.utils.SunbirdAuthUtil;
 
 
 /**
  * 
  * @author Amit Kumar
  *
- * This class will override the choose user action for reset credential flow under
- * Authentication. Here we are overriding action method for getting user details by
- * attributes (i.e phone)
+ *         This class will override the choose user action for reset credential flow under
+ *         Authentication. Here we are overriding action method for getting user details by
+ *         attributes (i.e phone)
  */
 public class ResetCredentialChooseUserAuthenticator implements Authenticator {
 
@@ -84,15 +85,24 @@ public class ResetCredentialChooseUserAuthenticator implements Authenticator {
       context.failureChallenge(AuthenticationFlowError.INVALID_USER, challenge);
       return;
     }
-    UserModel user = KeycloakUtil.getUser(context, username);
-
+    List<UserModel> userModels = SunbirdAuthUtil.getUser(context, username);
+    UserModel user = null;
+    if (null != userModels && userModels.size() > 1) {
+      event.error(Messages.INVALID_USER);
+      Response challenge = context.form().setError("multiple users are associated with this phone.")
+          .createPasswordReset();
+      context.failureChallenge(AuthenticationFlowError.USER_CONFLICT, challenge);
+      return;
+    } else if (null != userModels && userModels.size() == 1) {
+      user = userModels.get(0);
+    }
     context.getAuthenticationSession()
         .setAuthNote(AbstractUsernameFormAuthenticator.ATTEMPTED_USERNAME, username);
 
     // we don't want people guessing usernames, so if there is a problem, just continue, but don't
     // set the user
     // a null user will notify further executions, that this was a failure.
-    if (user == null) {
+    if (user == null || userModels.size() > 1) {
       event.clone().detail(Details.USERNAME, username).error(Errors.USER_NOT_FOUND);
     } else if (!user.isEnabled()) {
       event.clone().detail(Details.USERNAME, username).user(user).error(Errors.USER_DISABLED);

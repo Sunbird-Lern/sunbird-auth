@@ -15,6 +15,7 @@
 
 package org.sunbird.keycloak.login.phone;
 
+import java.util.List;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import org.jboss.logging.Logger;
@@ -28,12 +29,13 @@ import org.keycloak.models.UserModel;
 import org.keycloak.services.ServicesLogger;
 import org.keycloak.services.managers.AuthenticationManager;
 import org.keycloak.services.messages.Messages;
-import org.sunbird.utils.KeycloakUtil;
+import org.sunbird.utils.SunbirdAuthUtil;
 
 public abstract class AbstractPhoneFormAuthenticator extends AbstractUsernameFormAuthenticator {
 
   private static final Logger logger = Logger.getLogger(AbstractPhoneFormAuthenticator.class);
 
+  @Override
   public boolean validateUserAndPassword(AuthenticationFlowContext context,
       MultivaluedMap<String, String> inputData) {
     String username = inputData.getFirst(AuthenticationManager.FORM_USERNAME);
@@ -54,8 +56,19 @@ public abstract class AbstractPhoneFormAuthenticator extends AbstractUsernameFor
         .setAuthNote(AbstractPhoneFormAuthenticator.ATTEMPTED_USERNAME, username);
 
     UserModel user = null;
+    List<UserModel> userModels = null;
     try {
-      user = KeycloakUtil.getUser(context, username);
+      userModels = SunbirdAuthUtil.getUser(context, username);
+      if (userModels.size() > 1) {
+        context.getEvent().error(Messages.INVALID_USER);
+        Response challenge =
+            context.form().setError("multiple users are associated with this phone.").createLogin();
+        context.failureChallenge(AuthenticationFlowError.USER_CONFLICT, challenge);
+        return false;
+      }
+      if (userModels.size() == 1) {
+        user = userModels.get(0);
+      }
     } catch (ModelDuplicateException mde) {
       ServicesLogger.LOGGER.modelDuplicateException(mde);
 
