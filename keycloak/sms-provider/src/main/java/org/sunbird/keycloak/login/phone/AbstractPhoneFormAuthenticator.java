@@ -60,7 +60,13 @@ public abstract class AbstractPhoneFormAuthenticator extends AbstractUsernameFor
     try {
       
       user = SunbirdModelUtils.getUserByNameEmailOrPhone(context, username);
-      
+      //user not found for provided username
+      if(user == null){
+        context.getEvent().error(Messages.INVALID_USER);
+        Response challenge = context.form().setError(Errors.INVALID_USER_CREDENTIALS).createLogin();
+        context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, challenge);
+        return false;
+      }
     } catch (ModelDuplicateException mde) {
       ServicesLogger.LOGGER.modelDuplicateException(mde);
 

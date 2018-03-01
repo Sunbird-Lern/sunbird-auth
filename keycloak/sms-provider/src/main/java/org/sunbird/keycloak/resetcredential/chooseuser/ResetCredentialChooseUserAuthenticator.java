@@ -92,7 +92,13 @@ public class ResetCredentialChooseUserAuthenticator implements Authenticator {
     try {
 
       user = SunbirdModelUtils.getUserByNameEmailOrPhone(context, username);
-
+    //user not found for provided username
+      if(user == null){
+        event.error(Messages.INVALID_USER);
+        Response challenge = context.form().setError(Errors.USER_NOT_FOUND).createPasswordReset();
+        context.failureChallenge(AuthenticationFlowError.INVALID_USER, challenge);
+        return;
+      }
     } catch (ModelDuplicateException mde) {
       ServicesLogger.LOGGER.modelDuplicateException(mde);
 
