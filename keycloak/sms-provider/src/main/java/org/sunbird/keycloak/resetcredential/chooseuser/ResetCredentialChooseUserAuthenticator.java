@@ -1,6 +1,5 @@
 package org.sunbird.keycloak.resetcredential.chooseuser;
 
-import java.util.List;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import org.jboss.logging.Logger;
@@ -14,11 +13,15 @@ import org.keycloak.events.Details;
 import org.keycloak.events.Errors;
 import org.keycloak.events.EventBuilder;
 import org.keycloak.models.KeycloakSession;
+import org.keycloak.models.ModelDuplicateException;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
+import org.keycloak.services.ServicesLogger;
 import org.keycloak.services.messages.Messages;
 import org.sunbird.keycloak.resetcredential.sms.KeycloakSmsAuthenticator;
-import org.sunbird.utils.SunbirdAuthUtil;
+import org.sunbird.keycloak.resetcredential.sms.KeycloakSmsAuthenticatorConstants;
+import org.sunbird.keycloak.utils.Constants;
+import org.sunbird.keycloak.utils.SunbirdModelUtils;
 
 
 /**
@@ -85,16 +88,30 @@ public class ResetCredentialChooseUserAuthenticator implements Authenticator {
       context.failureChallenge(AuthenticationFlowError.INVALID_USER, challenge);
       return;
     }
-    List<UserModel> userModels = SunbirdAuthUtil.getUser(context, username);
     UserModel user = null;
-    if (null != userModels && userModels.size() > 1) {
+    try {
+
+      user = SunbirdModelUtils.getUserByNameEmailOrPhone(context, username);
+
+    } catch (ModelDuplicateException mde) {
+      ServicesLogger.LOGGER.modelDuplicateException(mde);
+
+      // Could happen during federation import
+      String errMsg = "";
+      if (mde.getDuplicateFieldName() != null
+          && mde.getDuplicateFieldName().equals(UserModel.EMAIL)) {
+        errMsg = Constants.MULTIPLE_USER_ASSOCIATED_WITH_EMAIL;
+      } else if (mde.getDuplicateFieldName() != null
+          && mde.getDuplicateFieldName().equals(UserModel.USERNAME)) {
+        errMsg = Constants.MULTIPLE_USER_ASSOCIATED_WITH_USERNAME;
+      } else if (mde.getDuplicateFieldName() != null
+          && mde.getDuplicateFieldName().equals(KeycloakSmsAuthenticatorConstants.ATTR_MOBILE)) {
+        errMsg = Constants.MULTIPLE_USER_ASSOCIATED_WITH_PHONE;
+      }
       event.error(Messages.INVALID_USER);
-      Response challenge = context.form().setError("multiple users are associated with this phone.")
-          .createPasswordReset();
+      Response challenge = context.form().setError(errMsg).createPasswordReset();
       context.failureChallenge(AuthenticationFlowError.USER_CONFLICT, challenge);
       return;
-    } else if (null != userModels && userModels.size() == 1) {
-      user = userModels.get(0);
     }
     context.getAuthenticationSession()
         .setAuthNote(AbstractUsernameFormAuthenticator.ATTEMPTED_USERNAME, username);
@@ -102,7 +119,7 @@ public class ResetCredentialChooseUserAuthenticator implements Authenticator {
     // we don't want people guessing usernames, so if there is a problem, just continue, but don't
     // set the user
     // a null user will notify further executions, that this was a failure.
-    if (user == null || userModels.size() > 1) {
+    if (user == null) {
       event.clone().detail(Details.USERNAME, username).error(Errors.USER_NOT_FOUND);
     } else if (!user.isEnabled()) {
       event.clone().detail(Details.USERNAME, username).user(user).error(Errors.USER_DISABLED);

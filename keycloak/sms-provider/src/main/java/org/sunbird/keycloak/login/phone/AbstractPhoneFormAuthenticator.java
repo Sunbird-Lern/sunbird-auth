@@ -15,7 +15,6 @@
 
 package org.sunbird.keycloak.login.phone;
 
-import java.util.List;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import org.jboss.logging.Logger;
@@ -29,7 +28,9 @@ import org.keycloak.models.UserModel;
 import org.keycloak.services.ServicesLogger;
 import org.keycloak.services.managers.AuthenticationManager;
 import org.keycloak.services.messages.Messages;
-import org.sunbird.utils.SunbirdAuthUtil;
+import org.sunbird.keycloak.resetcredential.sms.KeycloakSmsAuthenticatorConstants;
+import org.sunbird.keycloak.utils.Constants;
+import org.sunbird.keycloak.utils.SunbirdModelUtils;
 
 public abstract class AbstractPhoneFormAuthenticator extends AbstractUsernameFormAuthenticator {
 
@@ -56,19 +57,10 @@ public abstract class AbstractPhoneFormAuthenticator extends AbstractUsernameFor
         .setAuthNote(AbstractPhoneFormAuthenticator.ATTEMPTED_USERNAME, username);
 
     UserModel user = null;
-    List<UserModel> userModels = null;
     try {
-      userModels = SunbirdAuthUtil.getUser(context, username);
-      if (userModels.size() > 1) {
-        context.getEvent().error(Messages.INVALID_USER);
-        Response challenge =
-            context.form().setError("multiple users are associated with this phone.").createLogin();
-        context.failureChallenge(AuthenticationFlowError.USER_CONFLICT, challenge);
-        return false;
-      }
-      if (userModels.size() == 1) {
-        user = userModels.get(0);
-      }
+      
+      user = SunbirdModelUtils.getUserByNameEmailOrPhone(context, username);
+      
     } catch (ModelDuplicateException mde) {
       ServicesLogger.LOGGER.modelDuplicateException(mde);
 
@@ -76,10 +68,15 @@ public abstract class AbstractPhoneFormAuthenticator extends AbstractUsernameFor
       if (mde.getDuplicateFieldName() != null
           && mde.getDuplicateFieldName().equals(UserModel.EMAIL)) {
         setDuplicateUserChallenge(context, Errors.EMAIL_IN_USE, Messages.EMAIL_EXISTS,
-            AuthenticationFlowError.INVALID_USER);
-      } else {
+            AuthenticationFlowError.USER_CONFLICT);
+      } else if (mde.getDuplicateFieldName() != null
+          && mde.getDuplicateFieldName().equals(UserModel.USERNAME)) {
         setDuplicateUserChallenge(context, Errors.USERNAME_IN_USE, Messages.USERNAME_EXISTS,
-            AuthenticationFlowError.INVALID_USER);
+            AuthenticationFlowError.USER_CONFLICT);
+      } else if (mde.getDuplicateFieldName() != null
+          && mde.getDuplicateFieldName().equals(KeycloakSmsAuthenticatorConstants.ATTR_MOBILE)) {
+        setDuplicateUserChallenge(context, Constants.MULTIPLE_USER_ASSOCIATED_WITH_PHONE,
+            Constants.MULTIPLE_USER_ASSOCIATED_WITH_PHONE, AuthenticationFlowError.USER_CONFLICT);
       }
 
       return false;
