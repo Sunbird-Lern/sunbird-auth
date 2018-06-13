@@ -36,8 +36,8 @@
 
                 <div id="kc-form-buttons" class="${properties.kcFormButtonsClass!}">
                     <div class="${properties.kcFormButtonsWrapperClass!}">
-                        <button class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonLargeClass!} ui primary right floated button buttonResizeClass" name="login" id="kc-login" type="submit" value="${msg("doLogIn")}">${msg("doLogIn")}</button>
-                        <button class="ui right floated button buttonResizeClass ${properties.kcButtonClass!} ${properties.kcButtonDefaultClass!} ${properties.kcButtonLargeClass!}" name="cancel" id="kc-cancel" type="submit" value="${msg("doCancel")}">${msg("doCancel")}</button>
+                        <button onclick="javascript:makeDivUnclickable()" class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonLargeClass!} ui primary right floated button buttonResizeClass" name="login" id="kc-login" type="submit" value="${msg("doLogIn")}">${msg("doLogIn")}</button>
+                        <button onclick="javascript:makeDivUnclickable()" class="ui right floated button buttonResizeClass ${properties.kcButtonClass!} ${properties.kcButtonDefaultClass!} ${properties.kcButtonLargeClass!}" name="cancel" id="kc-cancel" type="submit" value="${msg("doCancel")}">${msg("doCancel")}</button>
                     </div>
                 </div>
             </div>
@@ -48,7 +48,7 @@
         </div>
 
         <#if client?? && client.baseUrl?has_content>
-            <p class="content signin-contentPadding"><a id="backToApplication" href="${client.baseUrl}">${msg("backToApplication")}</a></p>
+            <p class="content signin-contentPadding"><a id="backToApplication" onclick="javascript:makeDivUnclickable()" href="${client.baseUrl}">${msg("backToApplication")}</a></p>
         </#if>
     </#if>
 </@layout.registrationLayout>

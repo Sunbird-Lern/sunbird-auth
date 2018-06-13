@@ -21,7 +21,7 @@
             </div>
         </form>
         <#if client?? && client.baseUrl?has_content>
-            <p><a id="backToApplication" href="${client.baseUrl}">${msg("backToApplication")}</a></p>
+            <p><a id="backToApplication" onclick="javascript:makeDivUnclickable()" href="${client.baseUrl}">${msg("backToApplication")}</a></p>
         </#if>
     </#if>
 </@layout.registrationLayout>
