@@ -49,10 +49,7 @@ public class RestResourceProvider implements RealmResourceProvider {
    * create a link on which the user can click to reset their password or verify email based on
    * action param value.
    *
-   * @param redirectUri redirect uri
-   * @param clientId client id
-   * @param action action type
-   * @param userName userName
+   * @param request Map<String,String> request object which contains details of redirectUri,client-id,action,userName
    * @return
    */
   @POST
@@ -113,6 +110,7 @@ public class RestResourceProvider implements RealmResourceProvider {
    * @param clientId Client id
    * @param lifespan Number of seconds after which the generated token expires
    * @param actions required actions the user needs to complete
+   * @param userName user name to generate the link for required actions
    * @return
    */
   public Response executeActions(String redirectUri, String clientId, Integer lifespan,
@@ -178,7 +176,7 @@ public class RestResourceProvider implements RealmResourceProvider {
     if (auth == null) {
       throw new NotAuthorizedException(Constants.BEARER);
     } else if (auth.getToken().getRealmAccess() == null
-        || !auth.getToken().getRealmAccess().isUserInRole("admin")) {
+        || !auth.getToken().getRealmAccess().isUserInRole(Constants.ADMIN)) {
       throw new ForbiddenException(Constants.DOES_NOT_HAVE_REALM_ADMIN_ROLE);
     }
   }

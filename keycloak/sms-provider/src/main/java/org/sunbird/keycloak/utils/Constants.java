@@ -28,5 +28,6 @@ public class Constants {
   public static final String FAILED_TO_CREATE_LINK = "Failed to create link";
   public static final String BEARER = "Bearer";
   public static final String ACCOUNT= "account";
+  public static final String ADMIN = "admin";
 
 }
