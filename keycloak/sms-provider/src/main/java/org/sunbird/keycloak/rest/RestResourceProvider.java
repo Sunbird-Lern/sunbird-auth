@@ -77,6 +77,7 @@ public class RestResourceProvider implements RealmResourceProvider {
       if(isAuthRequired){
         try
         {
+          //Validate the Authorization key in header
           checkRealmAdmin();
         }catch(NotAuthorizedException ex){
           return ErrorResponse.error(Constants.NOT_AUTHORIZED, Status.UNAUTHORIZED);
