@@ -26,6 +26,7 @@ import org.keycloak.services.managers.AppAuthManager;
 import org.keycloak.services.managers.AuthenticationManager.AuthResult;
 import org.keycloak.services.resource.RealmResourceProvider;
 import org.keycloak.services.resources.LoginActionsService;
+import org.sunbird.keycloak.utils.Constants;
 
 /**
  * 
@@ -55,32 +56,32 @@ public class RestResourceProvider implements RealmResourceProvider {
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   public Response generateLink(Map<String, String> request) {
-    String redirectUri = request.get("redirectUri");
-    String clientId = request.get("clientId");
-    String action = request.get("action");
-    String userName = request.get("userName");
+    String redirectUri = request.get(Constants.REDIRECT_URI);
+    String clientId = request.get(Constants.CLIENT_ID);
+    String action = request.get(Constants.ACTION);
+    String userName = request.get(Constants.USERNAME);
     Integer lifespan = null;
     try{
-      lifespan = Integer.parseInt(request.get("lifespan"));
+      lifespan = Integer.parseInt(request.get(Constants.LIFE_SPAN));
     }catch(Exception ex){
-      return ErrorResponse.error("Invalid lifespan value: " + lifespan, Status.BAD_REQUEST);
+      return ErrorResponse.error(Constants.INVALID_LIFESPAN_VALUE+ lifespan, Status.BAD_REQUEST);
     }
-    String authRequired = request.get("isAuthRequired");
+    String authRequired = request.get(Constants.IS_AUTH_REQUIRED);
     if(null != authRequired){
       Boolean isAuthRequired = null;
       try{
         isAuthRequired = Boolean.parseBoolean(authRequired);
       }catch(Exception ex){
-        return ErrorResponse.error("Invalid isAuthRequired value: " + authRequired, Status.BAD_REQUEST);
+        return ErrorResponse.error(Constants.INVALID_AUTH_REQRD_VALUE + authRequired, Status.BAD_REQUEST);
       }
       if(isAuthRequired){
         try
         {
           checkRealmAdmin();
         }catch(NotAuthorizedException ex){
-          return ErrorResponse.error("Not Authorized.", Status.UNAUTHORIZED);
+          return ErrorResponse.error(Constants.NOT_AUTHORIZED, Status.UNAUTHORIZED);
         }catch(ForbiddenException ex){
-          return ErrorResponse.error("Does not have realm admin role." , Status.FORBIDDEN);
+          return ErrorResponse.error(Constants.DOES_NOT_HAVE_REALM_ADMIN_ROLE , Status.FORBIDDEN);
         }
       }
     }
@@ -90,7 +91,7 @@ public class RestResourceProvider implements RealmResourceProvider {
     } else if(UserModel.RequiredAction.VERIFY_EMAIL.name().equalsIgnoreCase(action)){
       actions.add(UserModel.RequiredAction.VERIFY_EMAIL.name());
     } else{
-      return ErrorResponse.error("Invalid action type: " + action, Status.BAD_REQUEST);
+      return ErrorResponse.error(Constants.INVALID_ACTION + action, Status.BAD_REQUEST);
     }
     return executeActions(redirectUri, clientId, lifespan, actions,userName);
   }
@@ -116,27 +117,27 @@ public class RestResourceProvider implements RealmResourceProvider {
       Integer lifespan, List<String> actions, String userName ) {
     UserModel user = KeycloakModelUtils.findUserByNameOrEmail(session, session.getContext().getRealm(),userName);
     if (user == null) {
-      return ErrorResponse.error("Invalid userName : "+userName, Status.BAD_REQUEST);
+      return ErrorResponse.error(Constants.INVALID_USERNAME+userName, Status.BAD_REQUEST);
     }
    
     if (!user.isEnabled()) {
       throw new WebApplicationException(
-          ErrorResponse.error("User is disabled", Status.BAD_REQUEST));
+          ErrorResponse.error(Constants.USER_IS_DISABLED, Status.BAD_REQUEST));
     }
 
     if (redirectUri != null && clientId == null) {
       throw new WebApplicationException(
-          ErrorResponse.error("Client id missing", Status.BAD_REQUEST));
+          ErrorResponse.error(Constants.CLIENT_ID_MISSING, Status.BAD_REQUEST));
     }
 
     if (clientId == null) {
-      clientId = "account";
+      clientId = Constants.ACCOUNT;
     }
 
     ClientModel client = session.getContext().getRealm().getClientByClientId(clientId);
     if (client == null || !client.isEnabled()) {
       throw new WebApplicationException(
-          ErrorResponse.error(clientId + " not enabled", Status.BAD_REQUEST));
+          ErrorResponse.error(clientId + Constants.NOT_ENABLED, Status.BAD_REQUEST));
     }
 
     String redirect;
@@ -145,7 +146,7 @@ public class RestResourceProvider implements RealmResourceProvider {
           session.getContext().getRealm(), client);
       if (redirect == null) {
         throw new WebApplicationException(
-            ErrorResponse.error("Invalid redirect uri.", Status.BAD_REQUEST));
+            ErrorResponse.error(Constants.INVALID_REDIRECT_URI, Status.BAD_REQUEST));
       }
     }
 
@@ -158,29 +159,24 @@ public class RestResourceProvider implements RealmResourceProvider {
 
     try {
       UriBuilder builder = LoginActionsService.actionTokenProcessor(session.getContext().getUri());
-      builder.queryParam("key",
+      builder.queryParam(Constants.KEY,
           token.serialize(session, session.getContext().getRealm(), session.getContext().getUri()));
 
       String link = builder.build(session.getContext().getRealm().getName()).toString();
       Map<String,Object> response = new HashMap<>();
-      response.put("link", link);
+      response.put(Constants.LINK, link);
       return Response.ok(response).build();
     } catch (Exception e) {
-      return ErrorResponse.error("Failed to create link",
+      return ErrorResponse.error(Constants.FAILED_TO_CREATE_LINK,
           Status.INTERNAL_SERVER_ERROR);
     }
   }
   
   private void checkRealmAdmin() {
     if (auth == null) {
-      System.out.println("auth is null;");
-        throw new NotAuthorizedException("Bearer");
+        throw new NotAuthorizedException(Constants.BEARER);
     } else if (auth.getToken().getRealmAccess() == null || !auth.getToken().getRealmAccess().isUserInRole("admin")) {
-      System.out.println("auth.getToken() "+auth.getToken());
-      System.out.println("auth.getToken().getRealmAccess() "+auth.getToken().getRealmAccess());
-      System.out.println("auth.getToken().getRealmAccess().isUserInRole(admin) "+auth.getToken().getRealmAccess().isUserInRole("admin"));
-      System.out.println("auth.getToken() is null or auth.getToken().getRealmAccess() is null or auth.getToken().getRealmAccess().isUserInRole(admin) is null");
-      throw new ForbiddenException("Does not have realm admin role");
+      throw new ForbiddenException(Constants.DOES_NOT_HAVE_REALM_ADMIN_ROLE);
     }
 }
 
