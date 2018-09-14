@@ -37,14 +37,17 @@ public class RestResourceProvider implements RealmResourceProvider {
 
   private KeycloakSession session;
   private AuthResult auth;
+
   public RestResourceProvider(KeycloakSession session) {
     this.session = session;
-    this.auth = new AppAuthManager().authenticateBearerToken(session, session.getContext().getRealm());
-    
+    this.auth =
+        new AppAuthManager().authenticateBearerToken(session, session.getContext().getRealm());
+
   }
 
- /**
-   * create a link on which the user can click to reset their password or verify email based on action param value.
+  /**
+   * create a link on which the user can click to reset their password or verify email based on
+   * action param value.
    *
    * @param redirectUri redirect uri
    * @param clientId client id
@@ -61,50 +64,50 @@ public class RestResourceProvider implements RealmResourceProvider {
     String action = request.get(Constants.ACTION);
     String userName = request.get(Constants.USERNAME);
     Integer lifespan = null;
-    try{
+    try {
       lifespan = Integer.parseInt(request.get(Constants.LIFE_SPAN));
-    }catch(Exception ex){
-      return ErrorResponse.error(Constants.INVALID_LIFESPAN_VALUE+ lifespan, Status.BAD_REQUEST);
+    } catch (Exception ex) {
+      return ErrorResponse.error(Constants.INVALID_LIFESPAN_VALUE + lifespan, Status.BAD_REQUEST);
     }
     String authRequired = request.get(Constants.IS_AUTH_REQUIRED);
-    if(null != authRequired){
+    if (null != authRequired) {
       Boolean isAuthRequired = null;
-      try{
+      try {
         isAuthRequired = Boolean.parseBoolean(authRequired);
-      }catch(Exception ex){
-        return ErrorResponse.error(Constants.INVALID_AUTH_REQRD_VALUE + authRequired, Status.BAD_REQUEST);
+      } catch (Exception ex) {
+        return ErrorResponse.error(Constants.INVALID_AUTH_REQRD_VALUE + authRequired,
+            Status.BAD_REQUEST);
       }
-      if(isAuthRequired){
-        try
-        {
-          //Validate the Authorization key in header
+      if (isAuthRequired) {
+        try {
+          // Validate the Authorization key in header
           checkRealmAdmin();
-        }catch(NotAuthorizedException ex){
+        } catch (NotAuthorizedException ex) {
           return ErrorResponse.error(Constants.NOT_AUTHORIZED, Status.UNAUTHORIZED);
-        }catch(ForbiddenException ex){
-          return ErrorResponse.error(Constants.DOES_NOT_HAVE_REALM_ADMIN_ROLE , Status.FORBIDDEN);
+        } catch (ForbiddenException ex) {
+          return ErrorResponse.error(Constants.DOES_NOT_HAVE_REALM_ADMIN_ROLE, Status.FORBIDDEN);
         }
       }
     }
     List<String> actions = new LinkedList<>();
-    if(UserModel.RequiredAction.UPDATE_PASSWORD.name().equalsIgnoreCase(action)){
+    if (UserModel.RequiredAction.UPDATE_PASSWORD.name().equalsIgnoreCase(action)) {
       actions.add(UserModel.RequiredAction.UPDATE_PASSWORD.name());
-    } else if(UserModel.RequiredAction.VERIFY_EMAIL.name().equalsIgnoreCase(action)){
+    } else if (UserModel.RequiredAction.VERIFY_EMAIL.name().equalsIgnoreCase(action)) {
       actions.add(UserModel.RequiredAction.VERIFY_EMAIL.name());
-    } else{
+    } else {
       return ErrorResponse.error(Constants.INVALID_ACTION + action, Status.BAD_REQUEST);
     }
-    return executeActions(redirectUri, clientId, lifespan, actions,userName);
+    return executeActions(redirectUri, clientId, lifespan, actions, userName);
   }
 
 
   /**
    * create update password link
    *
-   * create a link on which the user can click to perform a set of required actions. The
-   * redirectUri and clientId parameters are optional. If no redirect is given, then there will be
-   * no link back to click after actions have completed. Redirect uri must be a valid uri for the
-   * particular clientId.
+   * create a link on which the user can click to perform a set of required actions. The redirectUri
+   * and clientId parameters are optional. If no redirect is given, then there will be no link back
+   * to click after actions have completed. Redirect uri must be a valid uri for the particular
+   * clientId.
    *
    * @param redirectUri Redirect uri
    * @param clientId Client id
@@ -112,15 +115,14 @@ public class RestResourceProvider implements RealmResourceProvider {
    * @param actions required actions the user needs to complete
    * @return
    */
-  public Response executeActions(
-      String redirectUri,
-      String clientId,
-      Integer lifespan, List<String> actions, String userName ) {
-    UserModel user = KeycloakModelUtils.findUserByNameOrEmail(session, session.getContext().getRealm(),userName);
+  public Response executeActions(String redirectUri, String clientId, Integer lifespan,
+      List<String> actions, String userName) {
+    UserModel user = KeycloakModelUtils.findUserByNameOrEmail(session,
+        session.getContext().getRealm(), userName);
     if (user == null) {
-      return ErrorResponse.error(Constants.INVALID_USERNAME+userName, Status.BAD_REQUEST);
+      return ErrorResponse.error(Constants.INVALID_USERNAME + userName, Status.BAD_REQUEST);
     }
-   
+
     if (!user.isEnabled()) {
       throw new WebApplicationException(
           ErrorResponse.error(Constants.USER_IS_DISABLED, Status.BAD_REQUEST));
@@ -164,22 +166,22 @@ public class RestResourceProvider implements RealmResourceProvider {
           token.serialize(session, session.getContext().getRealm(), session.getContext().getUri()));
 
       String link = builder.build(session.getContext().getRealm().getName()).toString();
-      Map<String,Object> response = new HashMap<>();
+      Map<String, Object> response = new HashMap<>();
       response.put(Constants.LINK, link);
       return Response.ok(response).build();
     } catch (Exception e) {
-      return ErrorResponse.error(Constants.FAILED_TO_CREATE_LINK,
-          Status.INTERNAL_SERVER_ERROR);
+      return ErrorResponse.error(Constants.FAILED_TO_CREATE_LINK, Status.INTERNAL_SERVER_ERROR);
     }
   }
-  
+
   private void checkRealmAdmin() {
     if (auth == null) {
-        throw new NotAuthorizedException(Constants.BEARER);
-    } else if (auth.getToken().getRealmAccess() == null || !auth.getToken().getRealmAccess().isUserInRole("admin")) {
+      throw new NotAuthorizedException(Constants.BEARER);
+    } else if (auth.getToken().getRealmAccess() == null
+        || !auth.getToken().getRealmAccess().isUserInRole("admin")) {
       throw new ForbiddenException(Constants.DOES_NOT_HAVE_REALM_ADMIN_ROLE);
     }
-}
+  }
 
   @Override
   public Object getResource() {

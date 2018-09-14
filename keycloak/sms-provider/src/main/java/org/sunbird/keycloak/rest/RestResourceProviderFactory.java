@@ -14,12 +14,12 @@ import org.keycloak.services.resource.RealmResourceProviderFactory;
 public class RestResourceProviderFactory implements RealmResourceProviderFactory {
 
   public static final String ID = "getlink";
-  
+
   @Override
   public String getId() {
     return ID;
   }
-  
+
   @Override
   public RealmResourceProvider create(KeycloakSession session) {
     return new RestResourceProvider(session);
@@ -27,17 +27,17 @@ public class RestResourceProviderFactory implements RealmResourceProviderFactory
 
   @Override
   public void init(Scope config) {
-    
+
   }
 
   @Override
   public void postInit(KeycloakSessionFactory factory) {
-    
+
   }
 
   @Override
   public void close() {
-    
+
   }
 
 }
