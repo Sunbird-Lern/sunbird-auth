@@ -56,6 +56,7 @@ public class RequiredActionLinkProvider implements RealmResourceProvider {
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   public Response generateRequiredActionLink(Map<String, String> request) {
+    logger.debug("RestResourceProvider:generateRequiredActionLink: called ");
     String redirectUri = request.get(Constants.REDIRECT_URI);
     String clientId = request.get(Constants.CLIENT_ID);
     String actionName = request.get(Constants.REQUIRED_ACTION);
@@ -89,6 +90,7 @@ public class RequiredActionLinkProvider implements RealmResourceProvider {
    */
   private Response executeAction(String redirectUri, String clientId, Integer expirationInSecs,
       String actionName, String userName) {
+    logger.debug("RestResourceProvider:executeAction: called ");
     UserModel user = getUserByUserName(userName);
     validateClientId(clientId);
     ClientModel client = session.getContext().getRealm().getClientByClientId(clientId);
