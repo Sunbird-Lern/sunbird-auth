@@ -142,6 +142,11 @@ public class RequiredActionLinkProvider implements RealmResourceProvider {
   }
 
   private List<String> getRequiredActions(String actionName) {
+    if (StringUtils.isBlank(actionName)) {
+      throw new WebApplicationException(ErrorResponse.error(
+          MessageFormat.format(Constants.INVALID_PARAMETER_VALUE, actionName, Constants.REQUIRED_ACTION),
+          Status.BAD_REQUEST));
+    }
     List<String> requiredActions = new ArrayList<>();
     switch (actionName) {
       case "UPDATE_PASSWORD":
