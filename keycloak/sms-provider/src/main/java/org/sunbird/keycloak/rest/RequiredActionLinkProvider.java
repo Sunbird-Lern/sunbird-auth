@@ -33,12 +33,12 @@ import org.sunbird.keycloak.utils.Constants;
  * @author Amit Kumar
  *
  */
-public class RestResourceProvider implements RealmResourceProvider {
+public class RequiredActionLinkProvider implements RealmResourceProvider {
 
   private KeycloakSession session;
   private AuthResult auth;
 
-  public RestResourceProvider(KeycloakSession session) {
+  public RequiredActionLinkProvider(KeycloakSession session) {
     this.session = session;
     this.auth =
         new AppAuthManager().authenticateBearerToken(session, session.getContext().getRealm());

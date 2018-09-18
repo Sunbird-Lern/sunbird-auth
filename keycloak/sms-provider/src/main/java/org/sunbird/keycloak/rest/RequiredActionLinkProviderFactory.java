@@ -1,5 +1,6 @@
 package org.sunbird.keycloak.rest;
 
+import org.jboss.logging.Logger;
 import org.keycloak.Config.Scope;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
@@ -11,13 +12,16 @@ import org.keycloak.services.resource.RealmResourceProviderFactory;
  * @author Amit Kumar
  *
  */
-public class RestResourceProviderFactory implements RealmResourceProviderFactory {
+public class RequiredActionLinkProviderFactory implements RealmResourceProviderFactory {
 
-  public static final String ID = "getlink";
+  private static Logger logger =
+      Logger.getLogger(RequiredActionLinkProviderFactory.class);
+  public static final String PROVIDER_ID = "get-required-action-link";
 
   @Override
   public String getId() {
-    return ID;
+    logger.debug("RestResourceProviderFactory:getId: called ");
+    return PROVIDER_ID;
   }
 
   @Override
