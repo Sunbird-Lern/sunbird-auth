@@ -26,7 +26,7 @@ public class RequiredActionLinkProviderFactory implements RealmResourceProviderF
 
   @Override
   public RealmResourceProvider create(KeycloakSession session) {
-    return new RestResourceProvider(session);
+    return new RequiredActionLinkProvider(session);
   }
 
   @Override

@@ -9,9 +9,9 @@ public class Constants {
   public static final String MULTIPLE_USER_ASSOCIATED_WITH_USERNAME = "Multiple users are associated with this username.";
   public static final String REDIRECT_URI = "redirectUri";
   public static final String CLIENT_ID = "clientId";
-  public static final String ACTION = "action";
+  public static final String REQUIRED_ACTION = "requiredAction";
   public static final String USERNAME = "userName";
-  public static final String LIFE_SPAN = "lifespan";
+  public static final String EXPIRATION_IN_SECS = "expirationInSecs";
   public static final String INVALID_LIFESPAN_VALUE = "Invalid lifespan value: ";
   public static final String IS_AUTH_REQUIRED = "isAuthRequired";
   public static final String INVALID_AUTH_REQRD_VALUE = "Invalid isAuthRequired value: ";
@@ -29,5 +29,7 @@ public class Constants {
   public static final String BEARER = "Bearer";
   public static final String ACCOUNT= "account";
   public static final String ADMIN = "admin";
+  public static final String INVALID_PARAMETER_VALUE = "Invalid value {0} for parameter {1}.";
+  public static final int DEFAULT_LINK_EXPIRATION_IN_SECS = 7200;
 
 }
