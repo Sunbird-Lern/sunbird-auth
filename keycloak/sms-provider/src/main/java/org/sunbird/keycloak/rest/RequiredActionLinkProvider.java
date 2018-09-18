@@ -14,6 +14,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
+import org.apache.commons.lang.StringUtils;
 import org.jboss.logging.Logger;
 import org.keycloak.authentication.actiontoken.execactions.ExecuteActionsActionToken;
 import org.keycloak.common.util.Time;
@@ -39,8 +40,6 @@ public class RequiredActionLinkProvider implements RealmResourceProvider {
   private static Logger logger =
       Logger.getLogger(RequiredActionLinkProvider.class);
   private KeycloakSession session;
-  private static final String UPDATE_PASSWORD = "UPDATE_PASSWORD";
-  private static final String VERIFY_EMAIL = "VERIFY_EMAIL";
 
   public RequiredActionLinkProvider(KeycloakSession session) {
     this.session = session;
@@ -69,29 +68,9 @@ public class RequiredActionLinkProvider implements RealmResourceProvider {
     } catch (Exception ex) {
       return ErrorResponse.error(Constants.INVALID_LIFESPAN_VALUE + request.get(Constants.EXPIRATION_IN_SECS), Status.BAD_REQUEST);
     }
-    String authRequired = request.get(Constants.IS_AUTH_REQUIRED);
-    if (null != authRequired) {
-      Boolean isAuthRequired = null;
-      try {
-        isAuthRequired = Boolean.parseBoolean(authRequired);
-      } catch (Exception ex) {
-        return ErrorResponse.error(Constants.INVALID_AUTH_REQRD_VALUE + authRequired,
-            Status.BAD_REQUEST);
-      }
-      if (isAuthRequired) {
-        try {
-          // Validate the Authorization key in header
-          checkRealmAdmin();
-        } catch (NotAuthorizedException ex) {
-          return ErrorResponse.error(Constants.NOT_AUTHORIZED, Status.UNAUTHORIZED);
-        } catch (ForbiddenException ex) {
-          return ErrorResponse.error(Constants.DOES_NOT_HAVE_REALM_ADMIN_ROLE, Status.FORBIDDEN);
-        }
-      }
-    }
+    validateAuth(request);
     return executeAction(redirectUri, clientId, expirationInSecs, actionName, userName);
   }
-
 
   /**
    * create update password link
@@ -110,41 +89,14 @@ public class RequiredActionLinkProvider implements RealmResourceProvider {
    */
   private Response executeAction(String redirectUri, String clientId, Integer expirationInSecs,
       String actionName, String userName) {
-    UserModel user = KeycloakModelUtils.findUserByNameOrEmail(session,
-        session.getContext().getRealm(), userName);
-    if (user == null) {
-      return ErrorResponse.error(Constants.INVALID_USERNAME + userName, Status.BAD_REQUEST);
-    }
-
-    if (!user.isEnabled()) {
-      throw new WebApplicationException(
-          ErrorResponse.error(Constants.USER_IS_DISABLED, Status.BAD_REQUEST));
-    }
-
-    if (redirectUri != null && clientId == null) {
-      throw new WebApplicationException(
-          ErrorResponse.error(Constants.CLIENT_ID_MISSING, Status.BAD_REQUEST));
-    }
-
-    if (clientId == null) {
-      clientId = Constants.ACCOUNT;
-    }
-
+    UserModel user = getUserByUserName(userName);
+    validateClientId(clientId);
     ClientModel client = session.getContext().getRealm().getClientByClientId(clientId);
     if (client == null || !client.isEnabled()) {
       throw new WebApplicationException(
           ErrorResponse.error(clientId + Constants.NOT_ENABLED, Status.BAD_REQUEST));
     }
-
-    String redirect;
-    if (redirectUri != null) {
-      redirect = RedirectUtils.verifyRedirectUri(session.getContext().getUri(), redirectUri,
-          session.getContext().getRealm(), client);
-      if (redirect == null) {
-        throw new WebApplicationException(
-            ErrorResponse.error(Constants.INVALID_REDIRECT_URI, Status.BAD_REQUEST));
-      }
-    }
+    validateRedirectUri(redirectUri,client);
 
     if (expirationInSecs == null) {
       expirationInSecs = Constants.DEFAULT_LINK_EXPIRATION_IN_SECS;
@@ -169,13 +121,27 @@ public class RequiredActionLinkProvider implements RealmResourceProvider {
     }
   }
 
+  private UserModel getUserByUserName(String userName) {
+    UserModel user = KeycloakModelUtils.findUserByNameOrEmail(session,
+        session.getContext().getRealm(), userName);
+    if (user == null) {
+      throw new WebApplicationException( ErrorResponse.error(Constants.INVALID_USERNAME + userName, Status.BAD_REQUEST));
+    }
+
+    if (!user.isEnabled()) {
+      throw new WebApplicationException(
+          ErrorResponse.error(Constants.USER_IS_DISABLED, Status.BAD_REQUEST));
+    }
+    return user;
+  }
+
   private List<String> getRequiredActions(String actionName) {
     List<String> requiredActions = new ArrayList<>();
     switch(actionName){    
-      case UPDATE_PASSWORD:    
+      case "UPDATE_PASSWORD":    
         requiredActions.add(UserModel.RequiredAction.UPDATE_PASSWORD.name());   
        break;    
-      case VERIFY_EMAIL:    
+      case "VERIFY_EMAIL":    
         requiredActions.add(UserModel.RequiredAction.VERIFY_EMAIL.name());   
        break;   
       default: 
@@ -195,12 +161,47 @@ public class RequiredActionLinkProvider implements RealmResourceProvider {
     }
   }
 
+  private void validateRedirectUri(String redirectUri,ClientModel client){
+    String redirect;
+    if (StringUtils.isNotBlank(redirectUri)) {
+      redirect = RedirectUtils.verifyRedirectUri(session.getContext().getUri(), redirectUri,
+          session.getContext().getRealm(), client);
+      if (redirect == null) {
+        throw new WebApplicationException(
+            ErrorResponse.error(Constants.INVALID_REDIRECT_URI, Status.BAD_REQUEST));
+      }
+    }
+  }
   
-  //validateAuth
-  //validateClientId
-  //validateRedirectUri
-  //getActionName
+  private void validateClientId(String clientId){
+    if (StringUtils.isBlank(clientId)) {
+      throw new WebApplicationException(
+          ErrorResponse.error(Constants.INVALID_REDIRECT_URI, Status.BAD_REQUEST));
+    }
+  }
   
+  private void validateAuth(Map<String, String> request) {
+    String authRequired = request.get(Constants.IS_AUTH_REQUIRED);
+    if (null != authRequired) {
+      Boolean isAuthRequired = null;
+      try {
+        isAuthRequired = Boolean.parseBoolean(authRequired);
+      } catch (Exception ex) {
+        throw new WebApplicationException( ErrorResponse.error(Constants.INVALID_AUTH_REQRD_VALUE + authRequired,
+            Status.BAD_REQUEST));
+      }
+      if (isAuthRequired) {
+        try {
+          // Validate the Authorization key in header
+          checkRealmAdmin();
+        } catch (NotAuthorizedException ex) {
+          throw new WebApplicationException( ErrorResponse.error(Constants.NOT_AUTHORIZED, Status.UNAUTHORIZED));
+        } catch (ForbiddenException ex) {
+          throw new WebApplicationException( ErrorResponse.error(Constants.DOES_NOT_HAVE_REALM_ADMIN_ROLE, Status.FORBIDDEN));
+        }
+      }
+    }
+  }
   
   @Override
   public Object getResource() {
