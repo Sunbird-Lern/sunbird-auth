@@ -29,11 +29,6 @@ import org.keycloak.services.resource.RealmResourceProvider;
 import org.keycloak.services.resources.LoginActionsService;
 import org.sunbird.keycloak.utils.Constants;
 
-/**
- * 
- * @author Amit Kumar
- *
- */
 public class RequiredActionLinkProvider implements RealmResourceProvider {
 
   private static Logger logger = Logger.getLogger(RequiredActionLinkProvider.class);
@@ -44,78 +39,55 @@ public class RequiredActionLinkProvider implements RealmResourceProvider {
   }
 
   /**
-   * create a link on which the user can click to reset their password or verify email based on
-   * action param value.
+   * Generate user required action link. The supported required actions links are for update password and verify email.
    *
-   * @param request Map<String,String> request object which contains details of
-   *        redirectUri,client-id,action,userName
-   * @return
+   * @param request Request to generate required action link. The request contains following attributes:
+   *                    redirectUri: Redirect URI after performing required action
+   *                    clientId: Client ID
+   *                    requiredAction: Either UPDATE_PASSWORD or VERIFY_EMAIL
+   *                    userName: User name
+   * 
+   * @return Response containing generated required action link or error in case of failure.
    */
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   public Response generateRequiredActionLink(Map<String, String> request) {
     logger.debug("RestResourceProvider:generateRequiredActionLink: called ");
-    // validate auth token for admin access.
+
     checkRealmAdminAccess();
+    
     String redirectUri = request.get(Constants.REDIRECT_URI);
     String clientId = request.get(Constants.CLIENT_ID);
     String actionName = request.get(Constants.REQUIRED_ACTION);
     String userName = request.get(Constants.USERNAME);
+    
     validateClientId(clientId);
-    Integer expirationInSecs = null;
-    try {
-      expirationInSecs = Integer.parseInt(request.get(Constants.EXPIRATION_IN_SECS));
-    } catch (Exception ex) {
-      return ErrorResponse.error(
-          MessageFormat.format(Constants.INVALID_PARAMETER_VALUE,
-              request.get(Constants.EXPIRATION_IN_SECS), Constants.EXPIRATION_IN_SECS),
-          Status.BAD_REQUEST);
-    }
-    return executeAction(redirectUri, clientId, expirationInSecs, actionName, userName);
-  }
-
-  /**
-   * create update password link
-   *
-   * create a link on which the user can click to perform a set of required actions. The redirectUri
-   * and clientId parameters are optional. If no redirect is given, then there will be no link back
-   * to click after actions have completed. Redirect uri must be a valid uri for the particular
-   * clientId.
-   *
-   * @param redirectUri Redirect uri
-   * @param clientId Client id
-   * @param lifespan Number of seconds after which the generated token expires
-   * @param actionName required action the user needs to complete
-   * @param userName user name to generate the link for required actions
-   * @return
-   */
-  private Response executeAction(String redirectUri, String clientId, Integer expirationInSecs,
-      String actionName, String userName) {
-    logger.debug("RestResourceProvider:executeAction: called ");
+   
     UserModel user = getUserByUserName(userName);
+    
     ClientModel client = session.getContext().getRealm().getClientByClientId(clientId);
     if (client == null || !client.isEnabled()) {
       throw new WebApplicationException(
           ErrorResponse.error(clientId + Constants.NOT_ENABLED, Status.BAD_REQUEST));
     }
+    
     validateRedirectUri(redirectUri, client);
 
-    if (expirationInSecs == null) {
-      expirationInSecs = Constants.DEFAULT_LINK_EXPIRATION_IN_SECS;
-    }
+    int expirationInSecs = getExpirationInSecs(request.get(Constants.EXPIRATION_IN_SECS));
     int expiration = Time.currentTime() + expirationInSecs;
-    List<String> requiredActions = getRequiredActions(actionName);
-
-    ExecuteActionsActionToken token = new ExecuteActionsActionToken(user.getId(), expiration,
-        requiredActions, redirectUri, clientId);
+    
+    List<String> requiredActionList = getRequiredActionList(actionName);
 
     try {
+      ExecuteActionsActionToken token = new ExecuteActionsActionToken(user.getId(), expiration,
+        requiredActions, redirectUri, clientId);
       UriBuilder builder = LoginActionsService.actionTokenProcessor(session.getContext().getUri());
       builder.queryParam(Constants.KEY,
           token.serialize(session, session.getContext().getRealm(), session.getContext().getUri()));
 
       String link = builder.build(session.getContext().getRealm().getName()).toString();
+      
       Map<String, Object> response = new HashMap<>();
       response.put(Constants.LINK, link);
       return Response.ok(response).build();
@@ -125,9 +97,11 @@ public class RequiredActionLinkProvider implements RealmResourceProvider {
   }
 
   private UserModel getUserByUserName(String userName) {
-    logger.debug("RestResourceProvider:getUserByUserName: called ");
+    logger.debug("RestResourceProvider: getUserByUserName called");
+    
     UserModel user = KeycloakModelUtils.findUserByNameOrEmail(session,
         session.getContext().getRealm(), userName);
+    
     if (user == null) {
       throw new WebApplicationException(ErrorResponse.error(
           MessageFormat.format(Constants.INVALID_PARAMETER_VALUE, userName, Constants.USERNAME),
@@ -138,35 +112,58 @@ public class RequiredActionLinkProvider implements RealmResourceProvider {
       throw new WebApplicationException(
           ErrorResponse.error(Constants.USER_IS_DISABLED, Status.BAD_REQUEST));
     }
+    
     return user;
   }
 
-  private List<String> getRequiredActions(String actionName) {
+  private List<String> getRequiredActionList(String actionName) {
     if (StringUtils.isBlank(actionName)) {
       throw new WebApplicationException(
           ErrorResponse.error(MessageFormat.format(Constants.INVALID_PARAMETER_VALUE, actionName,
               Constants.REQUIRED_ACTION), Status.BAD_REQUEST));
     }
-    List<String> requiredActions = new ArrayList<>();
+    
+    List<String> requiredActionList = new ArrayList<>();
     switch (actionName) {
-      case "UPDATE_PASSWORD":
-        requiredActions.add(UserModel.RequiredAction.UPDATE_PASSWORD.name());
+      case Constants.UPDATE_PASSWORD:
+        requiredActionList.add(UserModel.RequiredAction.UPDATE_PASSWORD.name());
         break;
-      case "VERIFY_EMAIL":
-        requiredActions.add(UserModel.RequiredAction.VERIFY_EMAIL.name());
+      case Constants.VERIFY_EMAIL:
+        requiredActionList.add(UserModel.RequiredAction.VERIFY_EMAIL.name());
         break;
       default:
         throw new WebApplicationException(
             ErrorResponse.error(MessageFormat.format(Constants.INVALID_PARAMETER_VALUE, actionName,
                 Constants.REQUIRED_ACTION), Status.BAD_REQUEST));
     }
-    return requiredActions;
+    
+    return requiredActionList;
+  }
+  
+  private int getExpirationInSecs(String expirationInSecsStr) {
+    int expirationInSecs;
+    
+    try {
+      if (StringUtils.isNotBlank(expirationInSecsStr)) {
+        expirationInSecs = Integer.parseInt(expirationInSecsStr);        
+      } else {
+        expirationInSecs = Constants.DEFAULT_LINK_EXPIRATION_IN_SECS;
+      }
+    } catch (Exception ex) {
+      throw new WebApplicationException(
+            ErrorResponse.error(MessageFormat.format(Constants.INVALID_PARAMETER_VALUE, expirationInSecsStr,
+                Constants.EXPIRATION_IN_SECS), Status.BAD_REQUEST));
+    }
+    
+    return expirationInSecs;
   }
 
   private void checkRealmAdminAccess() {
-    logger.debug("RestResourceProvider:checkRealmAdminAccess: called ");
+    logger.debug("RestResourceProvider: checkRealmAdminAccess called");
+    
     AuthResult authResult =
         new AppAuthManager().authenticateBearerToken(session, session.getContext().getRealm());
+    
     if (authResult == null) {
       throw new WebApplicationException(
           ErrorResponse.error(Constants.NOT_AUTHORIZED, Status.UNAUTHORIZED));
@@ -178,10 +175,10 @@ public class RequiredActionLinkProvider implements RealmResourceProvider {
   }
 
   private void validateRedirectUri(String redirectUri, ClientModel client) {
-    logger.debug("RestResourceProvider:validateRedirectUri: called ");
-    String redirect;
+    logger.debug("RestResourceProvider: validateRedirectUri called");
+    
     if (StringUtils.isNotBlank(redirectUri)) {
-      redirect = RedirectUtils.verifyRedirectUri(session.getContext().getUri(), redirectUri,
+      String redirect = RedirectUtils.verifyRedirectUri(session.getContext().getUri(), redirectUri,
           session.getContext().getRealm(), client);
       if (redirect == null) {
         throw new WebApplicationException(
