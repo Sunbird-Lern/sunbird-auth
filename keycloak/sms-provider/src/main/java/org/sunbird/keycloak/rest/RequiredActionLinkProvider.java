@@ -125,6 +125,7 @@ public class RequiredActionLinkProvider implements RealmResourceProvider {
   }
 
   private UserModel getUserByUserName(String userName) {
+    logger.debug("RestResourceProvider:getUserByUserName: called ");
     UserModel user = KeycloakModelUtils.findUserByNameOrEmail(session,
         session.getContext().getRealm(), userName);
     if (user == null) {
@@ -163,6 +164,7 @@ public class RequiredActionLinkProvider implements RealmResourceProvider {
   }
 
   private void checkRealmAdminAccess() {
+    logger.debug("RestResourceProvider:checkRealmAdminAccess: called ");
     AuthResult authResult =
         new AppAuthManager().authenticateBearerToken(session, session.getContext().getRealm());
     if (authResult == null) {
@@ -176,6 +178,7 @@ public class RequiredActionLinkProvider implements RealmResourceProvider {
   }
 
   private void validateRedirectUri(String redirectUri, ClientModel client) {
+    logger.debug("RestResourceProvider:validateRedirectUri: called ");
     String redirect;
     if (StringUtils.isNotBlank(redirectUri)) {
       redirect = RedirectUtils.verifyRedirectUri(session.getContext().getUri(), redirectUri,
