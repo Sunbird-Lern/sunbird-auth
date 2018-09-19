@@ -7,11 +7,6 @@ import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.services.resource.RealmResourceProvider;
 import org.keycloak.services.resource.RealmResourceProviderFactory;
 
-/**
- * 
- * @author Amit Kumar
- *
- */
 public class RequiredActionLinkProviderFactory implements RealmResourceProviderFactory {
 
   private static Logger logger =
@@ -20,7 +15,7 @@ public class RequiredActionLinkProviderFactory implements RealmResourceProviderF
 
   @Override
   public String getId() {
-    logger.debug("RestResourceProviderFactory:getId: called ");
+    logger.debug("RestResourceProviderFactory: getId called ");
     return PROVIDER_ID;
   }
 
