@@ -18,6 +18,8 @@ public class Constants {
   public static final String BEARER = "Bearer";
   public static final String ADMIN = "admin";
   public static final int DEFAULT_LINK_EXPIRATION_IN_SECS = 7200;
+  public static final String UPDATE_PASSWORD = "UPDATE_PASSWORD";
+  public static final String VERIFY_EMAIL = "VERIFY_EMAIL";
   
   public static final String ERROR_NOT_ENABLED = " not enabled";
   public static final String ERROR_NOT_AUTHORIZED = "Not Authorized.";
@@ -25,5 +27,6 @@ public class Constants {
   public static final String ERROR_CREATE_LINK = "Failed to create link";
   public static final String ERROR_REALM_ADMIN_ROLE_ACCESS = "Does not have realm admin role.";
   public static final String ERROR_INVALID_PARAMETER_VALUE = "Invalid value {0} for parameter {1}.";
+  public static final String ERROR_MANDATORY_PARAM_MISSING = "Mandatory parameter {0} is missing.";
 
 }
