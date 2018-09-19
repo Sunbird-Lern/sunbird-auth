@@ -6,8 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.ForbiddenException;
-import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
@@ -58,6 +56,8 @@ public class RequiredActionLinkProvider implements RealmResourceProvider {
   @Produces(MediaType.APPLICATION_JSON)
   public Response generateRequiredActionLink(Map<String, String> request) {
     logger.debug("RestResourceProvider:generateRequiredActionLink: called ");
+    // validate auth token for admin access.
+    checkRealmAdminAccess();
     String redirectUri = request.get(Constants.REDIRECT_URI);
     String clientId = request.get(Constants.CLIENT_ID);
     String actionName = request.get(Constants.REQUIRED_ACTION);
@@ -72,7 +72,6 @@ public class RequiredActionLinkProvider implements RealmResourceProvider {
               request.get(Constants.EXPIRATION_IN_SECS), Constants.EXPIRATION_IN_SECS),
           Status.BAD_REQUEST);
     }
-    validateAuth(request);
     return executeAction(redirectUri, clientId, expirationInSecs, actionName, userName);
   }
 
@@ -163,14 +162,16 @@ public class RequiredActionLinkProvider implements RealmResourceProvider {
     return requiredActions;
   }
 
-  private void checkRealmAdmin() {
+  private void checkRealmAdminAccess() {
     AuthResult authResult =
         new AppAuthManager().authenticateBearerToken(session, session.getContext().getRealm());
     if (authResult == null) {
-      throw new NotAuthorizedException(Constants.BEARER);
+      throw new WebApplicationException(
+          ErrorResponse.error(Constants.NOT_AUTHORIZED, Status.UNAUTHORIZED));
     } else if (authResult.getToken().getRealmAccess() == null
         || !authResult.getToken().getRealmAccess().isUserInRole(Constants.ADMIN)) {
-      throw new ForbiddenException(Constants.DOES_NOT_HAVE_REALM_ADMIN_ROLE);
+      throw new WebApplicationException(
+          ErrorResponse.error(Constants.DOES_NOT_HAVE_REALM_ADMIN_ROLE, Status.FORBIDDEN));
     }
   }
 
@@ -192,32 +193,6 @@ public class RequiredActionLinkProvider implements RealmResourceProvider {
       throw new WebApplicationException(ErrorResponse.error(
           MessageFormat.format(Constants.INVALID_PARAMETER_VALUE, clientId, Constants.CLIENT_ID),
           Status.BAD_REQUEST));
-    }
-  }
-
-  private void validateAuth(Map<String, String> request) {
-    String authRequired = request.get(Constants.IS_AUTH_REQUIRED);
-    if (null != authRequired) {
-      Boolean isAuthRequired = null;
-      try {
-        isAuthRequired = Boolean.parseBoolean(authRequired);
-      } catch (Exception ex) {
-        throw new WebApplicationException(
-            ErrorResponse.error(MessageFormat.format(Constants.INVALID_PARAMETER_VALUE,
-                authRequired, Constants.IS_AUTH_REQUIRED), Status.BAD_REQUEST));
-      }
-      if (isAuthRequired) {
-        try {
-          // Validate the Authorization key in header
-          checkRealmAdmin();
-        } catch (NotAuthorizedException ex) {
-          throw new WebApplicationException(
-              ErrorResponse.error(Constants.NOT_AUTHORIZED, Status.UNAUTHORIZED));
-        } catch (ForbiddenException ex) {
-          throw new WebApplicationException(
-              ErrorResponse.error(Constants.DOES_NOT_HAVE_REALM_ADMIN_ROLE, Status.FORBIDDEN));
-        }
-      }
     }
   }
 
