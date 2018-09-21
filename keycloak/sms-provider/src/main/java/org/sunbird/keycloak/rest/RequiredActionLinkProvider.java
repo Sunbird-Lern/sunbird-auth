@@ -62,22 +62,14 @@ public class RequiredActionLinkProvider implements RealmResourceProvider {
     String actionName = request.get(Constants.REQUIRED_ACTION);
     String userName = request.get(Constants.USERNAME);
     
-    validateClientId(clientId);
-   
-    UserModel user = getUserByUserName(userName);
-    
-    ClientModel client = session.getContext().getRealm().getClientByClientId(clientId);
-    if (client == null || !client.isEnabled()) {
-      throw new WebApplicationException(
-          ErrorResponse.error(clientId + Constants.ERROR_NOT_ENABLED, Status.BAD_REQUEST));
-    }
-    
+    UserModel user = getEnabledUserByUsernameOrError(userName);
+    ClientModel client = getClientByClientIdOrError(clientId);
     validateRedirectUri(redirectUri, client);
 
     int expirationInSecs = getExpirationInSecs(request.get(Constants.EXPIRATION_IN_SECS));
     int expiration = Time.currentTime() + expirationInSecs;
     
-    List<String> requiredActionList = getRequiredActionList(actionName);
+    List<String> requiredActionList = getRequiredActionListOrError(actionName);
 
     try {
       ExecuteActionsActionToken token = new ExecuteActionsActionToken(user.getId(), expiration,
@@ -96,8 +88,8 @@ public class RequiredActionLinkProvider implements RealmResourceProvider {
     }
   }
 
-  private UserModel getUserByUserName(String userName) {
-    logger.debug("RestResourceProvider: getUserByUserName called");
+  private UserModel getEnabledUserByUsernameOrError(String userName) {
+    logger.debug("RestResourceProvider: getEnabledUserByUsernameOrError called");
     if (StringUtils.isBlank(userName)) {
       throw new WebApplicationException(ErrorResponse.error(
           MessageFormat.format(Constants.ERROR_MANDATORY_PARAM_MISSING, userName, Constants.USERNAME),
@@ -120,7 +112,7 @@ public class RequiredActionLinkProvider implements RealmResourceProvider {
     return user;
   }
 
-  private List<String> getRequiredActionList(String actionName) {
+  private List<String> getRequiredActionListOrError(String actionName) {
     if (StringUtils.isBlank(actionName)) {
       throw new WebApplicationException(
           ErrorResponse.error(MessageFormat.format(Constants.ERROR_MANDATORY_PARAM_MISSING, actionName,
@@ -180,7 +172,6 @@ public class RequiredActionLinkProvider implements RealmResourceProvider {
 
   private void validateRedirectUri(String redirectUri, ClientModel client) {
     logger.debug("RestResourceProvider: validateRedirectUri called");
-    
     if (StringUtils.isNotBlank(redirectUri)) {
       String redirect = RedirectUtils.verifyRedirectUri(session.getContext().getUri(), redirectUri,
           session.getContext().getRealm(), client);
@@ -192,12 +183,24 @@ public class RequiredActionLinkProvider implements RealmResourceProvider {
     }
   }
 
-  private void validateClientId(String clientId) {
+  private ClientModel getClientByClientIdOrError(String clientId) {
+    logger.debug("RestResourceProvider: getClientByClientIdOrError called");
     if (StringUtils.isBlank(clientId)) {
       throw new WebApplicationException(ErrorResponse.error(
           MessageFormat.format(Constants.ERROR_MANDATORY_PARAM_MISSING, clientId, Constants.CLIENT_ID),
           Status.BAD_REQUEST));
     }
+    ClientModel client = session.getContext().getRealm().getClientByClientId(clientId);
+    if(client == null){
+      throw new WebApplicationException(
+          ErrorResponse.error(MessageFormat.format(Constants.ERROR_INVALID_PARAMETER_VALUE, clientId, Constants.CLIENT_ID),
+              Status.BAD_REQUEST));
+    }
+    if (!client.isEnabled()) {
+      throw new WebApplicationException(
+          ErrorResponse.error(clientId + Constants.ERROR_NOT_ENABLED, Status.BAD_REQUEST));
+    }
+    return client;
   }
 
   @Override
