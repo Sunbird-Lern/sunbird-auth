@@ -38,8 +38,8 @@ import org.sunbird.keycloak.utils.Constants;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({RequiredActionLinkProviderFactory.class, KeycloakSession.class,
     KeycloakContext.class, KeycloakModelUtils.class, RealmModel.class, RedirectUtils.class,
-    AppAuthManager.class, RequiredActionLinkProvider.class,UriInfo.class, AccessToken.class, Access.class,
-    AuthResult.class})
+    AppAuthManager.class, RequiredActionLinkProvider.class, UriInfo.class, AccessToken.class,
+    Access.class, AuthResult.class})
 @PowerMockIgnore({"javax.management.*", "javax.net.ssl.*", "javax.security.*"})
 public class RequiredActionLinkProviderTest {
 
@@ -305,7 +305,7 @@ public class RequiredActionLinkProviderTest {
           ((ErrorRepresentation) (expectedException.getResponse().getEntity())).getErrorMessage());
     }
   }
-  
+
   @Test
   public void verifyRedirectsUri() throws Exception {
     String userName = "amit";
@@ -330,11 +330,11 @@ public class RequiredActionLinkProviderTest {
     PowerMockito.when(client.isEnabled()).thenReturn(true);
     PowerMockito.mockStatic(RedirectUtils.class);
     PowerMockito.when(RedirectUtils.verifyRedirectUri(session.getContext().getUri(), redirectUri,
-          session.getContext().getRealm(), client)).thenReturn(null);
+        session.getContext().getRealm(), client)).thenReturn(null);
     RequiredActionLinkProvider provider = new RequiredActionLinkProvider(session);
     WebApplicationException expectedException = new WebApplicationException(
-        ErrorResponse.error(MessageFormat.format(Constants.ERROR_INVALID_PARAMETER_VALUE, redirectUri,
-            Constants.REDIRECT_URI), Status.BAD_REQUEST));
+        ErrorResponse.error(MessageFormat.format(Constants.ERROR_INVALID_PARAMETER_VALUE,
+            redirectUri, Constants.REDIRECT_URI), Status.BAD_REQUEST));
 
     try {
       Response response = provider.generateRequiredActionLink(request);
@@ -345,7 +345,7 @@ public class RequiredActionLinkProviderTest {
           ((ErrorRepresentation) (expectedException.getResponse().getEntity())).getErrorMessage());
     }
   }
-  
+
   @Test
   public void validateRequiredAction() throws Exception {
     String userName = "amit";
@@ -372,11 +372,11 @@ public class RequiredActionLinkProviderTest {
     PowerMockito.when(client.isEnabled()).thenReturn(true);
     PowerMockito.mockStatic(RedirectUtils.class);
     PowerMockito.when(RedirectUtils.verifyRedirectUri(session.getContext().getUri(), redirectUri,
-          session.getContext().getRealm(), client)).thenReturn("/login");
+        session.getContext().getRealm(), client)).thenReturn("/login");
     RequiredActionLinkProvider provider = new RequiredActionLinkProvider(session);
     WebApplicationException expectedException = new WebApplicationException(
-        ErrorResponse.error(MessageFormat.format(Constants.ERROR_MANDATORY_PARAM_MISSING, actionName,
-            Constants.REQUIRED_ACTION), Status.BAD_REQUEST));
+        ErrorResponse.error(MessageFormat.format(Constants.ERROR_MANDATORY_PARAM_MISSING,
+            actionName, Constants.REQUIRED_ACTION), Status.BAD_REQUEST));
 
     try {
       Response response = provider.generateRequiredActionLink(request);
@@ -387,7 +387,7 @@ public class RequiredActionLinkProviderTest {
           ((ErrorRepresentation) (expectedException.getResponse().getEntity())).getErrorMessage());
     }
   }
-  
+
   @Test
   public void invalidRequiredAction() throws Exception {
     String userName = "amit";
@@ -414,11 +414,11 @@ public class RequiredActionLinkProviderTest {
     PowerMockito.when(client.isEnabled()).thenReturn(true);
     PowerMockito.mockStatic(RedirectUtils.class);
     PowerMockito.when(RedirectUtils.verifyRedirectUri(session.getContext().getUri(), redirectUri,
-          session.getContext().getRealm(), client)).thenReturn("/login");
+        session.getContext().getRealm(), client)).thenReturn("/login");
     RequiredActionLinkProvider provider = new RequiredActionLinkProvider(session);
     WebApplicationException expectedException = new WebApplicationException(
-        ErrorResponse.error(MessageFormat.format(Constants.ERROR_INVALID_PARAMETER_VALUE, actionName,
-            Constants.REQUIRED_ACTION), Status.BAD_REQUEST));
+        ErrorResponse.error(MessageFormat.format(Constants.ERROR_INVALID_PARAMETER_VALUE,
+            actionName, Constants.REQUIRED_ACTION), Status.BAD_REQUEST));
 
     try {
       Response response = provider.generateRequiredActionLink(request);
