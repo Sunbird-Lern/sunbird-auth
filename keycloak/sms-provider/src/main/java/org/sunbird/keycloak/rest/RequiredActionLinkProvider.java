@@ -24,6 +24,7 @@ import org.keycloak.models.utils.KeycloakModelUtils;
 import org.keycloak.protocol.oidc.utils.RedirectUtils;
 import org.keycloak.services.ErrorResponse;
 import org.keycloak.services.managers.AppAuthManager;
+import org.keycloak.services.managers.AuthenticationManager;
 import org.keycloak.services.managers.AuthenticationManager.AuthResult;
 import org.keycloak.services.resource.RealmResourceProvider;
 import org.keycloak.services.resources.LoginActionsService;
@@ -73,10 +74,15 @@ public class RequiredActionLinkProvider implements RealmResourceProvider {
     try {
       ExecuteActionsActionToken token = new ExecuteActionsActionToken(user.getId(), expiration,
           requiredActionList, redirectUri, clientId);
+      
+      if (StringUtils.isNotBlank(redirectUri)) {
+        token.setNote(AuthenticationManager.SET_REDIRECT_URI_AFTER_REQUIRED_ACTIONS, "true");
+      }
       UriBuilder builder = LoginActionsService.actionTokenProcessor(session.getContext().getUri());
+      
+      token.setRedirectUri(redirectUri);
       builder.queryParam(Constants.KEY,
           token.serialize(session, session.getContext().getRealm(), session.getContext().getUri()));
-
       String link = builder.build(session.getContext().getRealm().getName()).toString();
 
       Map<String, Object> response = new HashMap<>();
@@ -155,10 +161,10 @@ public class RequiredActionLinkProvider implements RealmResourceProvider {
 
   private void checkRealmAdminAccess() {
     logger.debug("RestResourceProvider: checkRealmAdminAccess called");
-
+    
     AuthResult authResult =
         new AppAuthManager().authenticateBearerToken(session, session.getContext().getRealm());
-
+    
     if (authResult == null) {
       throw new WebApplicationException(
           ErrorResponse.error(Constants.ERROR_NOT_AUTHORIZED, Status.UNAUTHORIZED));
