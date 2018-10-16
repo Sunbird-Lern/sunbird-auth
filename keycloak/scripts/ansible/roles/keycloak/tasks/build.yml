@@ -50,8 +50,8 @@
     #~ state: directory
     #~ mode: 0755
 
-- name: Copy Sunbird login theme
-  copy: src="artifacts/sunbird/" dest="sunbird_auth_{{sunbird_auth_version}}/themes/sunbird" force="yes"
+- name: Copy Sunbird themes
+  copy: src="./artifacts/sunbird/" dest="./sunbird_auth_{{sunbird_auth_version}}/themes/sunbird" force="yes"
 
 - name: Copy Custom Validation theme html to sunbird login theme
   copy: src="../../sms-provider/templates/" dest="sunbird_auth_{{sunbird_auth_version}}/themes/sunbird/login/" force="yes"
