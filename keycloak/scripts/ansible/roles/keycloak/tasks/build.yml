@@ -26,32 +26,33 @@
 - name: Copy SMS OTP jar file to providers directory
   copy: src="../../sms-provider/target/{{keycloak_sms_provider_build}}" dest="sunbird_auth_{{sunbird_auth_version}}/providers/"
 
-#~ - name: Create directory for sunbird login messages
-  #~ file:
-    #~ path: sunbird_auth_{{sunbird_auth_version}}/themes/sunbird/login/messages
-    #~ state: directory
-    #~ mode: 0755
+- name: Create directory for sunbird login messages
+  file:
+    path: sunbird_auth_{{sunbird_auth_version}}/themes/sunbird/login/messages
+    state: directory
+    mode: 0755
 
-#~ - name: Create directory for sunbird login css resources
-  #~ file:
-    #~ path: sunbird_auth_{{sunbird_auth_version}}/themes/sunbird/login/resources/css
-    #~ state: directory
-    #~ mode: 0755
+- name: Create directory for sunbird login css resources
+  file:
+    path: sunbird_auth_{{sunbird_auth_version}}/themes/sunbird/login/resources/css
+    state: directory
+    mode: 0755
 
-#~ - name: Create directory for sunbird login img resources
-  #~ file:
-    #~ path: sunbird_auth_{{sunbird_auth_version}}/themes/sunbird/login/resources/img
-    #~ state: directory
-    #~ mode: 0755
+- name: Create directory for sunbird login img resources
+  file:
+    path: sunbird_auth_{{sunbird_auth_version}}/themes/sunbird/login/resources/img
+    state: directory
+    mode: 0755
 
-#~ - name: Create directory for sunbird login js resources
-  #~ file:
-    #~ path: sunbird_auth_{{sunbird_auth_version}}/themes/sunbird/login/resources/js
-    #~ state: directory
-    #~ mode: 0755
+- name: Create directory for sunbird login js resources
+  file:
+    path: sunbird_auth_{{sunbird_auth_version}}/themes/sunbird/login/resources/js
+    state: directory
+    mode: 0755
 
-- name: Copy Sunbird themes
-  copy: src="./artifacts/sunbird/" dest="./sunbird_auth_{{sunbird_auth_version}}/themes/sunbird" force="yes"
+
+- name: Copy Sunbird login theme
+  copy: src="artifacts/sunbird/login/" dest="sunbird_auth_{{sunbird_auth_version}}/themes/sunbird/login/" force="yes"
 
 - name: Copy Custom Validation theme html to sunbird login theme
   copy: src="../../sms-provider/templates/" dest="sunbird_auth_{{sunbird_auth_version}}/themes/sunbird/login/" force="yes"
