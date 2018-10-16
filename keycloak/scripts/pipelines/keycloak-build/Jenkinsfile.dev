@@ -8,25 +8,11 @@ node('build-slave') {
 
 		stage('checkout')
 		{
-			// sh('git clone https://github.com/ahghatol/sunbird-auth.git')
-			sh('ls')
-
+			sh('git clone https://github.com/ahghatol/sunbird-auth.git')
 		}
 
 		stage('Build'){
-			dir('sunbird-auth')
-			{
-				sh("ls");
-				sh("echo sunbird-auth");
-				sh('cat keycloak/scripts/pipelines/keycloak-build/Jenkinsfile.dev');
-			}
-
-			dir('scripts'){
-				sh('ls');
-				sh("echo in script");
-				sh('cat pipelines/keycloak-build/Jenkinsfile.dev');
-				//sh('cd ansible && ansible-playbook -i inventories/dev  keycloak.yml --limit localhost --tags build --vault-password-file /home/ops/vault -vvv')
-			}
+			sh('cd sunbird-auth/keycloak/scripts/ansible && ansible-playbook -i inventories/dev  keycloak.yml --limit localhost --tags build --vault-password-file /home/ops/vault -vvv')
 		}
 
 		stage('Archive'){
