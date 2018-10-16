@@ -8,9 +8,13 @@ node('build-slave') {
 
 		stage('checkout')
 		{
+			// sh('rm -rf sunbird-auth')
+			// sh('git clone https://github.com/ahghatol/sunbird-auth.git')
+			sh('ls')
 		}
 
 		stage('Build'){
+			sh('ls')
 			dir('scripts'){
 				sh('ls')
 				sh('cd ansible && ansible-playbook -i inventories/dev  keycloak.yml --limit localhost --tags build --vault-password-file /home/ops/vault -vvv')
