@@ -14,10 +14,18 @@ node('build-slave') {
 		}
 
 		stage('Build'){
-			sh('ls')
+			dir('sunbird-auth')
+			{
+				sh("ls");
+				sh("echo sunbird-auth");
+				sh('cat keycloak/scripts/pipelines/keycloak-build/Jenkinsfile.dev');
+			}
+
 			dir('scripts'){
-				sh('ls')
-				sh('cd ansible && ansible-playbook -i inventories/dev  keycloak.yml --limit localhost --tags build --vault-password-file /home/ops/vault -vvv')
+				sh('ls');
+				sh("echo in script");
+				sh('cat pipelines/keycloak-build/Jenkinsfile.dev');
+				//sh('cd ansible && ansible-playbook -i inventories/dev  keycloak.yml --limit localhost --tags build --vault-password-file /home/ops/vault -vvv')
 			}
 		}
 
