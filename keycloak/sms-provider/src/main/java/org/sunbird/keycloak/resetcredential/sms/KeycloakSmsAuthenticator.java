@@ -65,21 +65,21 @@ public class KeycloakSmsAuthenticator implements Authenticator {
             mobileNumber = mobileNumberCreds.get(0);
         }
 
-        if(StringUtils.isNotBlank(mobileNumber) || StringUtils.isNotBlank(userEmail)){
+        if (StringUtils.isNotBlank(mobileNumber) || StringUtils.isNotBlank(userEmail)) {
           if (StringUtils.isNotBlank(mobileNumber)) {
-              logger.debug("KeycloakSmsAuthenticator@authenticate - Sending SMS - " + mobileNumber);
-              sendSMS(context, mobileNumber);
-          } 
+            logger.debug("KeycloakSmsAuthenticator@authenticate - Sending SMS - " + mobileNumber);
+            sendSMS(context, mobileNumber);
+          }
           if (StringUtils.isNotBlank(userEmail)) {
-              logger.debug("KeycloakSmsAuthenticator@authenticate - Sending Email - " + userEmail);
-              sendEmail(context);
-          } 
+            logger.debug("KeycloakSmsAuthenticator@authenticate - Sending Email - " + userEmail);
+            sendEmail(context);
+          }
         } else {
-            // The mobile number is NOT configured --> complain
-            Response challenge = context.form()
-                    .setError("Missing mobile number and email!")
-                    .createForm("sms-validation-error.ftl");
-            context.failureChallenge(AuthenticationFlowError.CLIENT_CREDENTIALS_SETUP_REQUIRED, challenge);
+          // The mobile number is NOT configured --> complain
+          Response challenge = context.form().setError("Missing mobile number and email!")
+              .createForm("sms-validation-error.ftl");
+          context.failureChallenge(AuthenticationFlowError.CLIENT_CREDENTIALS_SETUP_REQUIRED,
+              challenge);
         }
     }
 
