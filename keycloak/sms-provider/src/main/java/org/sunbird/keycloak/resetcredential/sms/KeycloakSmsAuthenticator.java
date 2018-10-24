@@ -1,6 +1,13 @@
 package org.sunbird.keycloak.resetcredential.sms;
 
-import org.apache.http.util.TextUtils;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
+import org.apache.commons.lang3.StringUtils;
 import org.jboss.logging.Logger;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.AuthenticationFlowError;
@@ -16,19 +23,15 @@ import org.keycloak.events.Details;
 import org.keycloak.events.Errors;
 import org.keycloak.events.EventBuilder;
 import org.keycloak.events.EventType;
-import org.keycloak.models.*;
+import org.keycloak.models.AuthenticationExecutionModel;
+import org.keycloak.models.KeycloakSession;
+import org.keycloak.models.RealmModel;
+import org.keycloak.models.UserCredentialModel;
+import org.keycloak.models.UserModel;
 import org.keycloak.models.utils.FormMessage;
 import org.keycloak.services.ServicesLogger;
 import org.keycloak.services.messages.Messages;
 import org.keycloak.sessions.AuthenticationSessionModel;
-
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by joris on 11/11/2016.
@@ -46,6 +49,7 @@ public class KeycloakSmsAuthenticator implements Authenticator {
     }
 
 
+    @Override
     public void authenticate(AuthenticationFlowContext context) {
         logger.debug("KeycloakSmsAuthenticator@authenticate called ... context = " + context);
 
@@ -61,18 +65,21 @@ public class KeycloakSmsAuthenticator implements Authenticator {
             mobileNumber = mobileNumberCreds.get(0);
         }
 
-        if (mobileNumber != null) {
+        if (StringUtils.isNotBlank(mobileNumber) || StringUtils.isNotBlank(userEmail)) {
+          if (StringUtils.isNotBlank(mobileNumber)) {
             logger.debug("KeycloakSmsAuthenticator@authenticate - Sending SMS - " + mobileNumber);
             sendSMS(context, mobileNumber);
-        } else if (!TextUtils.isEmpty(userEmail)) {
+          }
+          if (StringUtils.isNotBlank(userEmail)) {
             logger.debug("KeycloakSmsAuthenticator@authenticate - Sending Email - " + userEmail);
             sendEmail(context);
+          }
         } else {
-            // The mobile number is NOT configured --> complain
-            Response challenge = context.form()
-                    .setError("Missing mobile number and email!")
-                    .createForm("sms-validation-error.ftl");
-            context.failureChallenge(AuthenticationFlowError.CLIENT_CREDENTIALS_SETUP_REQUIRED, challenge);
+          // The mobile number is NOT configured --> complain
+          Response challenge = context.form().setError("Missing mobile number and email!")
+              .createForm("sms-validation-error.ftl");
+          context.failureChallenge(AuthenticationFlowError.CLIENT_CREDENTIALS_SETUP_REQUIRED,
+              challenge);
         }
     }
 
@@ -174,6 +181,7 @@ public class KeycloakSmsAuthenticator implements Authenticator {
     }
 
 
+    @Override
     public void action(AuthenticationFlowContext context) {
         logger.debug("action called ... context = " + context);
         logger.debug("KeycloakSmsAuthenticator@action called ... for User = " + context.getUser().getUsername());
@@ -269,20 +277,24 @@ public class KeycloakSmsAuthenticator implements Authenticator {
         return result;
     }
 
+    @Override
     public boolean requiresUser() {
         logger.debug("requiresUser called ... returning true");
         return true;
     }
 
+    @Override
     public boolean configuredFor(KeycloakSession session, RealmModel realm, UserModel user) {
         logger.debug("KeycloakSmsAuthenticator@validateCode configuredFor called ... session=" + session + ", realm=" + realm + ", user=" + user);
         return true;
     }
 
+    @Override
     public void setRequiredActions(KeycloakSession session, RealmModel realm, UserModel user) {
         logger.debug("KeycloakSmsAuthenticator@validateCode - setRequiredActions called ... session=" + session + ", realm=" + realm + ", user=" + user);
     }
 
+    @Override
     public void close() {
         logger.debug("close called ...");
     }
