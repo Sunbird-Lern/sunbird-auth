@@ -66,13 +66,13 @@ public class KeycloakSmsAuthenticator implements Authenticator {
         }
 
         if (StringUtils.isNotBlank(mobileNumber) || StringUtils.isNotBlank(userEmail)) {
-          if (StringUtils.isNotBlank(mobileNumber)) {
-            logger.debug("KeycloakSmsAuthenticator@authenticate - Sending SMS - " + mobileNumber);
-            sendSMS(context, mobileNumber);
-          }
           if (StringUtils.isNotBlank(userEmail)) {
             logger.debug("KeycloakSmsAuthenticator@authenticate - Sending Email - " + userEmail);
             sendEmail(context);
+          }
+          if (StringUtils.isNotBlank(mobileNumber)) {
+            logger.debug("KeycloakSmsAuthenticator@authenticate - Sending SMS - " + mobileNumber);
+            sendSMS(context, mobileNumber);
           }
         } else {
           // The mobile number is NOT configured --> complain
