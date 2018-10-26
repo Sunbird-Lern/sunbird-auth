@@ -123,6 +123,7 @@ public class KeycloakSmsAuthenticator implements Authenticator {
         }
 
         String actionTokenUserId = authenticationSession.getAuthNote(DefaultActionTokenKey.ACTION_TOKEN_USER_ID);
+        authenticationSession.addRequiredAction(UserModel.RequiredAction.UPDATE_PASSWORD.name());
         if (actionTokenUserId != null && Objects.equals(user.getId(), actionTokenUserId)) {
             logger.debugf("Forget-password triggered when reauthenticating user after authentication via action token. Skipping " + CREDENTIAL_TYPE + " screen and using user '%s' ", user.getUsername());
             context.success();
