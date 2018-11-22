@@ -1,7 +1,11 @@
 package org.sunbird.keycloak.resetcredential.sms;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import javax.ws.rs.core.MultivaluedMap;
@@ -32,6 +36,8 @@ import org.keycloak.models.utils.FormMessage;
 import org.keycloak.services.ServicesLogger;
 import org.keycloak.services.messages.Messages;
 import org.keycloak.sessions.AuthenticationSessionModel;
+import org.sunbird.keycloak.utils.Constants;
+import org.sunbird.keycloak.utils.HttpClient;
 
 /**
  * Created by joris on 11/11/2016.
@@ -66,13 +72,19 @@ public class KeycloakSmsAuthenticator implements Authenticator {
         }
 
         if (StringUtils.isNotBlank(mobileNumber) || StringUtils.isNotBlank(userEmail)) {
-          if (StringUtils.isNotBlank(userEmail)) {
+          if (StringUtils.isBlank(mobileNumber) && StringUtils.isNotBlank(userEmail)) {
             logger.debug("KeycloakSmsAuthenticator@authenticate - Sending Email - " + userEmail);
             sendEmail(context);
-          }
-          if (StringUtils.isNotBlank(mobileNumber)) {
-            logger.debug("KeycloakSmsAuthenticator@authenticate - Sending SMS - " + mobileNumber);
-            sendSMS(context, mobileNumber);
+          }else{
+            Map<String,Object> otpRespone = null;
+            if (StringUtils.isNotBlank(mobileNumber)) {
+              logger.debug("KeycloakSmsAuthenticator@authenticate - Sending SMS - " + mobileNumber);
+              otpRespone = sendSMS(context, mobileNumber);
+            }
+            if (StringUtils.isNotBlank(userEmail)) {
+              logger.debug("KeycloakSmsAuthenticator@authenticate - Sending Email via sunbird - " + userEmail);
+              sendEmailViaSunbird(otpRespone,userEmail);
+            }
           }
         } else {
           // The mobile number is NOT configured --> complain
@@ -83,7 +95,26 @@ public class KeycloakSmsAuthenticator implements Authenticator {
         }
     }
 
-    private void sendSMS(AuthenticationFlowContext context, String mobileNumber) {
+  private void sendEmailViaSunbird(Map<String, Object> otpResponse, String userEmail) {
+    if(null != otpResponse){
+    List<String> emails = new ArrayList<>(Arrays.asList(userEmail));
+    otpResponse.put(Constants.RECIPIENT_EMAILS, emails);
+    otpResponse.put(Constants.SUBJECT, Constants.MAIL_SUBJECT);
+    otpResponse.put(Constants.ORG_NAME, System.getenv(Constants.SUNBIRD_INSTALLATION_DISPLAY_NAME));
+    otpResponse.put(Constants.EMAIL_TEMPLATE_TYPE, Constants.RESET_PASSWORD_EMAIL_TEMPLATE);
+    otpResponse.put(Constants.BODY, Constants.BODY);
+    
+    logger.debug("KeycloakSmsAuthenticator@sendEmailViaSunbird - Sending Email - " + userEmail);
+    Map<String,Object> request = new HashMap<>();
+    request.put(Constants.REQUEST, otpResponse);
+    
+    HttpClient.post(request,
+        (Constants.SUNBIRD_WEB_URL + Constants.SEND_NOTIFICATION_URI),
+        System.getenv(Constants.SUNBIRD_LMS_AUTHORIZATION));
+    }
+  }
+
+    private Map<String,Object> sendSMS(AuthenticationFlowContext context, String mobileNumber) {
         // The mobile number is configured --> send an SMS
         long nrOfDigits = KeycloakSmsAuthenticatorUtil.getConfigLong(context.getAuthenticatorConfig(), KeycloakSmsAuthenticatorConstants.CONF_PRP_SMS_CODE_LENGTH, 8L);
         logger.debug("Using nrOfDigits " + nrOfDigits);
@@ -93,19 +124,21 @@ public class KeycloakSmsAuthenticator implements Authenticator {
         long ttl = KeycloakSmsAuthenticatorUtil.getConfigLong(context.getAuthenticatorConfig(), KeycloakSmsAuthenticatorConstants.CONF_PRP_SMS_CODE_TTL, 10 * 60L); // 10 minutes in s
 
         logger.debug("Using ttl " + ttl + " (s)");
-
+        Map<String,Object> response = new HashMap<>();
         String code = KeycloakSmsAuthenticatorUtil.getSmsCode(nrOfDigits);
-
         storeSMSCode(context, code, new Date().getTime() + (ttl * 1000)); // s --> ms
         if (KeycloakSmsAuthenticatorUtil.sendSmsCode(mobileNumber, code, context.getAuthenticatorConfig())) {
             Response challenge = context.form().createForm("sms-validation.ftl");
             context.challenge(challenge);
+            response.put(Constants.OTP, code);
+            response.put(Constants.TTL, (ttl/60));
         } else {
             Response challenge = context.form()
                     .setError("SMS could not be sent.")
                     .createForm("sms-validation-error.ftl");
             context.failureChallenge(AuthenticationFlowError.INTERNAL_ERROR, challenge);
         }
+        return response;
     }
 
     private void sendEmail(AuthenticationFlowContext context) {
