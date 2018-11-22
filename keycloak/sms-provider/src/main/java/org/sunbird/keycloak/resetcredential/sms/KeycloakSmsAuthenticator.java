@@ -109,7 +109,7 @@ public class KeycloakSmsAuthenticator implements Authenticator {
     request.put(Constants.REQUEST, otpResponse);
     
     HttpClient.post(request,
-        (Constants.SUNBIRD_WEB_URL + Constants.SEND_NOTIFICATION_URI),
+        (System.getenv(Constants.SUNBIRD_WEB_URL) + Constants.SEND_NOTIFICATION_URI),
         System.getenv(Constants.SUNBIRD_LMS_AUTHORIZATION));
     }
   }
