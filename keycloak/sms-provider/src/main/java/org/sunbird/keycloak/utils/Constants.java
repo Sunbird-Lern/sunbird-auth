@@ -39,7 +39,7 @@ public class Constants {
   public static final String EMAIL_TEMPLATE_TYPE = "emailTemplateType";
   public static final String REALM_NAME = "realmName";
   public static final String SEND_NOTIFICATION_URI = "/user/v1/notification/email";
-  public static final String SUNBIRD_WEB_URL = "sunbird_web_url";
+  public static final String SUNBIRD_LMS_BASE_URL = "sunbird_lms_base_url";
   public static final String BODY = "body";
   public static final String RECIPIENT_EMAILS = "recipientEmails";
   public static final String FORGOT_PASSWORD_EMAIL_TEMPLATE = "forgotPasswordWithOTP";
