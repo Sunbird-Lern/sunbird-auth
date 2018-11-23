@@ -19,14 +19,14 @@ public class HttpClient {
 
   public static HttpResponse post(Map<String, Object> requestBody, String uri,
       String authorizationKey) {
-    logger.debug("HttpClient:post - post method called ");
+    logger.debug("HttpClient: post called");
     try (CloseableHttpClient client = HttpClients.createDefault()) {
       ObjectMapper mapper = new ObjectMapper();
       HttpPost httpPost = new HttpPost(uri);
-      logger.debug("HttpClient:post: uri :" + uri);
+      logger.debug("HttpClient:post: uri = " + uri);
       String authKey = Constants.BEARER + " " + authorizationKey;
       StringEntity entity = new StringEntity(mapper.writeValueAsString(requestBody));
-      logger.debug("HttpClient:post: request entity :" + entity);
+      logger.debug("HttpClient:post: request entity = " + entity);
       httpPost.setEntity(entity);
       httpPost.setHeader(Constants.ACCEPT, Constants.APPLICATION_JSON);
       httpPost.setHeader(Constants.CONTENT_TYPE, Constants.APPLICATION_JSON);
@@ -34,12 +34,12 @@ public class HttpClient {
         httpPost.setHeader(Constants.AUTHORIZATION, authKey);
       }
       CloseableHttpResponse response = client.execute(httpPost);
-      logger.debug("HttpClient:post: statusCode :" + response.getStatusLine().getStatusCode());
+      logger.debug("HttpClient:post: statusCode = " + response.getStatusLine().getStatusCode());
       return response;
     } catch (Exception e) {
-      logger.error("HttpClient:post : Exception occurred :" + e);
+      logger.error("HttpClient:post: Exception occurred = " + e);
     }
     return null;
-
   }
+
 }
