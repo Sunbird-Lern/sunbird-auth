@@ -76,10 +76,9 @@ public class KeycloakSmsAuthenticator implements Authenticator {
         sendEmail(context);
       } else {
         Map<String, Object> otpResponse = null;
-        if (StringUtils.isNotBlank(mobileNumber)) {
-          logger.debug("KeycloakSmsAuthenticator@authenticate - Sending SMS - " + mobileNumber);
-          otpResponse = sendSMS(context, mobileNumber);
-        }
+        logger.debug("KeycloakSmsAuthenticator@authenticate - Sending SMS - " + mobileNumber);
+        otpResponse = sendSMS(context, mobileNumber);
+        
         if (StringUtils.isNotBlank(userEmail)) {
           logger.debug(
               "KeycloakSmsAuthenticator@authenticate - Sending Email via sunbird - " + userEmail);
