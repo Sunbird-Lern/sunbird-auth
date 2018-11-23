@@ -101,7 +101,7 @@ public class KeycloakSmsAuthenticator implements Authenticator {
       List<String> emails = new ArrayList<>(Arrays.asList(userEmail));
       otpResponse.put(Constants.RECIPIENT_EMAILS, emails);
       otpResponse.put(Constants.SUBJECT, Constants.MAIL_SUBJECT);
-      otpResponse.put(Constants.ORG_NAME, realmName);
+      otpResponse.put(Constants.REALM_NAME, realmName);
       otpResponse.put(Constants.EMAIL_TEMPLATE_TYPE, Constants.FORGOT_PASSWORD_EMAIL_TEMPLATE);
       otpResponse.put(Constants.BODY, Constants.BODY);
 

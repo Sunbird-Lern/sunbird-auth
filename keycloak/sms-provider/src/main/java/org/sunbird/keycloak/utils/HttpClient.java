@@ -33,7 +33,7 @@ public class HttpClient {
       httpPost.setHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON);
       httpPost.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
       if (StringUtils.isNotBlank(authKey)) {
-        httpPost.setHeader(Constants.AUTHORIZATION, authKey);
+        httpPost.setHeader(HttpHeaders.AUTHORIZATION, authKey);
       }
       CloseableHttpResponse response = client.execute(httpPost);
       logger.debug("HttpClient:post: statusCode = " + response.getStatusLine().getStatusCode());
