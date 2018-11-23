@@ -75,15 +75,17 @@ public class KeycloakSmsAuthenticator implements Authenticator {
         logger.debug("KeycloakSmsAuthenticator@authenticate - Sending Email - " + userEmail);
         sendEmail(context);
       } else {
-        Map<String, Object> otpRespone = null;
+        Map<String, Object> otpResponse = null;
         if (StringUtils.isNotBlank(mobileNumber)) {
           logger.debug("KeycloakSmsAuthenticator@authenticate - Sending SMS - " + mobileNumber);
-          otpRespone = sendSMS(context, mobileNumber);
+          otpResponse = sendSMS(context, mobileNumber);
         }
         if (StringUtils.isNotBlank(userEmail)) {
           logger.debug(
               "KeycloakSmsAuthenticator@authenticate - Sending Email via sunbird - " + userEmail);
-          sendEmailViaSunbird(otpRespone, userEmail);
+          logger.debug(
+              "KeycloakSmsAuthenticator@authenticate - realmName - " + context.getRealm().getDisplayName());
+          sendEmailViaSunbird(otpResponse, userEmail, context.getRealm().getDisplayName());
         }
       }
     } else {
@@ -95,14 +97,13 @@ public class KeycloakSmsAuthenticator implements Authenticator {
     }
   }
 
-  private void sendEmailViaSunbird(Map<String, Object> otpResponse, String userEmail) {
+  private void sendEmailViaSunbird(Map<String, Object> otpResponse, String userEmail, String realmName) {
     if (null != otpResponse) {
       List<String> emails = new ArrayList<>(Arrays.asList(userEmail));
       otpResponse.put(Constants.RECIPIENT_EMAILS, emails);
       otpResponse.put(Constants.SUBJECT, Constants.MAIL_SUBJECT);
-      otpResponse.put(Constants.ORG_NAME,
-          System.getenv(Constants.SUNBIRD_INSTALLATION_DISPLAY_NAME));
-      otpResponse.put(Constants.EMAIL_TEMPLATE_TYPE, Constants.RESET_PASSWORD_EMAIL_TEMPLATE);
+      otpResponse.put(Constants.ORG_NAME, realmName);
+      otpResponse.put(Constants.EMAIL_TEMPLATE_TYPE, Constants.FORGOT_PASSWORD_EMAIL_TEMPLATE);
       otpResponse.put(Constants.BODY, Constants.BODY);
 
       logger.debug("KeycloakSmsAuthenticator@sendEmailViaSunbird - Sending Email - " + userEmail);

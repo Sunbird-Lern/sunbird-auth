@@ -2,6 +2,8 @@ package org.sunbird.keycloak.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -28,8 +30,8 @@ public class HttpClient {
       StringEntity entity = new StringEntity(mapper.writeValueAsString(requestBody));
       logger.debug("HttpClient:post: request entity = " + entity);
       httpPost.setEntity(entity);
-      httpPost.setHeader(Constants.ACCEPT, Constants.APPLICATION_JSON);
-      httpPost.setHeader(Constants.CONTENT_TYPE, Constants.APPLICATION_JSON);
+      httpPost.setHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON);
+      httpPost.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
       if (StringUtils.isNotBlank(authKey)) {
         httpPost.setHeader(Constants.AUTHORIZATION, authKey);
       }
