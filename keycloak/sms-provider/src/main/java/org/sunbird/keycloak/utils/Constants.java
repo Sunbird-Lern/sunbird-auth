@@ -33,7 +33,6 @@ public class Constants {
   public static final String TTL = "ttl";
   public static final String SUNBIRD_LMS_AUTHORIZATION = "sunbird_authorization";
   
-  public static final String SUNBIRD_INSTALLATION_DISPLAY_NAME = "sunbird_installation_display_name";
   public static final String MAIL_SUBJECT = "Reset password";
   public static final String SUBJECT = "subject";
   public static final String EMAIL_TEMPLATE_TYPE = "emailTemplateType";
