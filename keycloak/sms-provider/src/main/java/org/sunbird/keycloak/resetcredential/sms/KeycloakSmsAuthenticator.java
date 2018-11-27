@@ -33,6 +33,7 @@ import org.keycloak.services.ServicesLogger;
 import org.keycloak.services.messages.Messages;
 import org.keycloak.sessions.AuthenticationSessionModel;
 
+
 /**
  * Created by joris on 11/11/2016.
  */
