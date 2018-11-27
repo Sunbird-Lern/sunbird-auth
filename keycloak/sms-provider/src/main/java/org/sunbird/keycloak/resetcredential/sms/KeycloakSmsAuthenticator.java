@@ -193,7 +193,7 @@ public class KeycloakSmsAuthenticator implements Authenticator {
 
         }
     }
-
+    
     // Store the code + expiration time in a UserCredential. Keycloak will persist these in the DB.
     // When the code is validated on another node (in a clustered environment) the other nodes have access to it's values too.
     private void storeSMSCode(AuthenticationFlowContext context, String code, Long expiringAt) {
