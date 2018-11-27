@@ -1,27 +1,37 @@
 package org.sunbird.keycloak.resetcredential.sms;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpResponse;
 import org.jboss.logging.Logger;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.AuthenticationFlowError;
 import org.keycloak.authentication.Authenticator;
+import org.keycloak.authentication.actiontoken.DefaultActionTokenKey;
+import org.keycloak.authentication.actiontoken.resetcred.ResetCredentialsActionToken;
+import org.keycloak.authentication.authenticators.browser.AbstractUsernameFormAuthenticator;
+import org.keycloak.common.util.Time;
 import org.keycloak.credential.CredentialModel;
+import org.keycloak.email.EmailException;
+import org.keycloak.email.EmailTemplateProvider;
+import org.keycloak.events.Details;
+import org.keycloak.events.Errors;
+import org.keycloak.events.EventBuilder;
+import org.keycloak.events.EventType;
 import org.keycloak.models.AuthenticationExecutionModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserCredentialModel;
 import org.keycloak.models.UserModel;
-import org.sunbird.keycloak.utils.Constants;
-import org.sunbird.keycloak.utils.HttpClient;
+import org.keycloak.models.utils.FormMessage;
+import org.keycloak.services.ServicesLogger;
+import org.keycloak.services.messages.Messages;
+import org.keycloak.sessions.AuthenticationSessionModel;
 
 /**
  * Created by joris on 11/11/2016.
@@ -55,18 +65,14 @@ public class KeycloakSmsAuthenticator implements Authenticator {
             mobileNumber = mobileNumberCreds.get(0);
         }
 
-        Map<String, Object> otpResponse = generateOtp(context);
         if (StringUtils.isNotBlank(mobileNumber) || StringUtils.isNotBlank(userEmail)) {
-          logger.debug("KeycloakSmsAuthenticator@authenticate - Sending SMS - " + mobileNumber);
-          if (StringUtils.isNotBlank(mobileNumber)) {
-            sendSMS(otpResponse, context, mobileNumber);
-          }
           if (StringUtils.isNotBlank(userEmail)) {
-            logger.debug(
-                "KeycloakSmsAuthenticator@authenticate - Sending Email via sunbird - " + userEmail);
-            logger.debug("KeycloakSmsAuthenticator@authenticate - realmName - "
-                + context.getRealm().getDisplayName());
-            sendEmailViaSunbird(otpResponse, context, userEmail);
+            logger.debug("KeycloakSmsAuthenticator@authenticate - Sending Email - " + userEmail);
+            sendEmail(context);
+          }
+          if (StringUtils.isNotBlank(mobileNumber)) {
+            logger.debug("KeycloakSmsAuthenticator@authenticate - Sending SMS - " + mobileNumber);
+            sendSMS(context, mobileNumber);
           }
         } else {
           // The mobile number is NOT configured --> complain
@@ -77,70 +83,103 @@ public class KeycloakSmsAuthenticator implements Authenticator {
         }
     }
 
-    private Map<String, Object> generateOtp(AuthenticationFlowContext context) {
-      // The mobile number is configured --> send an SMS
-      long nrOfDigits = KeycloakSmsAuthenticatorUtil.getConfigLong(context.getAuthenticatorConfig(),
-          KeycloakSmsAuthenticatorConstants.CONF_PRP_SMS_CODE_LENGTH, 8L);
-      logger.debug("Using nrOfDigits " + nrOfDigits);
+    private void sendSMS(AuthenticationFlowContext context, String mobileNumber) {
+        // The mobile number is configured --> send an SMS
+        long nrOfDigits = KeycloakSmsAuthenticatorUtil.getConfigLong(context.getAuthenticatorConfig(), KeycloakSmsAuthenticatorConstants.CONF_PRP_SMS_CODE_LENGTH, 8L);
+        logger.debug("Using nrOfDigits " + nrOfDigits);
 
-      logger.debug("KeycloakSmsAuthenticator@sendSMS");
+        logger.debug("KeycloakSmsAuthenticator@sendSMS");
 
-      long ttl = KeycloakSmsAuthenticatorUtil.getConfigLong(context.getAuthenticatorConfig(),
-          KeycloakSmsAuthenticatorConstants.CONF_PRP_SMS_CODE_TTL, 10 * 60L); // 10 minutes in s
+        long ttl = KeycloakSmsAuthenticatorUtil.getConfigLong(context.getAuthenticatorConfig(), KeycloakSmsAuthenticatorConstants.CONF_PRP_SMS_CODE_TTL, 10 * 60L); // 10 minutes in s
 
-      logger.debug("Using ttl " + ttl + " (s)");
-      String code = KeycloakSmsAuthenticatorUtil.getSmsCode(nrOfDigits);
-      storeSMSCode(context, code, new Date().getTime() + (ttl * 1000)); // s --> ms
-      Map<String, Object> response = new HashMap<>();
-      response.put(Constants.OTP, code);
-      response.put(Constants.TTL, (ttl / 60));
-      return response;
-    }
-    
-    private void sendSMS(Map<String, Object> otpResponse, AuthenticationFlowContext context,
-        String mobileNumber) {
-      if (KeycloakSmsAuthenticatorUtil.sendSmsCode(mobileNumber,
-          (String) otpResponse.get(Constants.OTP), context.getAuthenticatorConfig())) {
-        setEnterOTPPage(context, true);
-      } else {
-        setEnterOTPPage(context, false);
-      }
+        logger.debug("Using ttl " + ttl + " (s)");
+
+        String code = KeycloakSmsAuthenticatorUtil.getSmsCode(nrOfDigits);
+
+        storeSMSCode(context, code, new Date().getTime() + (ttl * 1000)); // s --> ms
+        if (KeycloakSmsAuthenticatorUtil.sendSmsCode(mobileNumber, code, context.getAuthenticatorConfig())) {
+            Response challenge = context.form().createForm("sms-validation.ftl");
+            context.challenge(challenge);
+        } else {
+            Response challenge = context.form()
+                    .setError("SMS could not be sent.")
+                    .createForm("sms-validation-error.ftl");
+            context.failureChallenge(AuthenticationFlowError.INTERNAL_ERROR, challenge);
+        }
     }
 
-    private void setEnterOTPPage(AuthenticationFlowContext context, Boolean flag) {
-      if (flag) {
-        Response challenge = context.form().createForm("sms-validation.ftl");
-        context.challenge(challenge);
-      } else {
-        Response challenge =
-            context.form().setError("OTP could not be sent.").createForm("sms-validation-error.ftl");
-        context.failureChallenge(AuthenticationFlowError.INTERNAL_ERROR, challenge);
-      }
-    }
-    
-    private void sendEmailViaSunbird(Map<String, Object> otpResponse,
-        AuthenticationFlowContext context, String userEmail) {
-      List<String> emails = new ArrayList<>(Arrays.asList(userEmail));
-      otpResponse.put(Constants.RECIPIENT_EMAILS, emails);
-      otpResponse.put(Constants.SUBJECT, Constants.MAIL_SUBJECT);
-      otpResponse.put(Constants.REALM_NAME, context.getRealm().getDisplayName());
-      otpResponse.put(Constants.EMAIL_TEMPLATE_TYPE, Constants.FORGOT_PASSWORD_EMAIL_TEMPLATE);
-      otpResponse.put(Constants.BODY, Constants.BODY);
+    private void sendEmail(AuthenticationFlowContext context) {
+        logger.debug("KeycloakSmsAuthenticator@sendEmail");
 
-      logger.debug("KeycloakSmsAuthenticator@sendEmailViaSunbird - Sending Email - " + userEmail);
-      Map<String, Object> request = new HashMap<>();
-      request.put(Constants.REQUEST, otpResponse);
+        UserModel user = context.getUser();
+        AuthenticationSessionModel authenticationSession = context.getAuthenticationSession();
+        String username = authenticationSession.getAuthNote(AbstractUsernameFormAuthenticator.ATTEMPTED_USERNAME);
 
-      HttpResponse response = HttpClient.post(request,
-          (System.getenv(Constants.SUNBIRD_LMS_BASE_URL) + Constants.SEND_NOTIFICATION_URI),
-          System.getenv(Constants.SUNBIRD_LMS_AUTHORIZATION));
-      int statusCode = response.getStatusLine().getStatusCode();
-      if (statusCode == 200) {
-        setEnterOTPPage(context, true);
-      } else {
-        setEnterOTPPage(context, false);
-      }
+        // we don't want people guessing usernames, so if there was a problem obtaining the user, the user will be null.
+        // just reset login for with a success message
+        if (user == null) {
+            context.forkWithSuccessMessage(new FormMessage(Messages.EMAIL_SENT));
+            return;
+        }
+
+        String actionTokenUserId = authenticationSession.getAuthNote(DefaultActionTokenKey.ACTION_TOKEN_USER_ID);
+        if (actionTokenUserId != null && Objects.equals(user.getId(), actionTokenUserId)) {
+            logger.debugf("Forget-password triggered when reauthenticating user after authentication via action token. Skipping " + CREDENTIAL_TYPE + " screen and using user '%s' ", user.getUsername());
+            context.success();
+            return;
+        }
+
+
+        EventBuilder event = context.getEvent();
+        // we don't want people guessing usernames, so if there is a problem, just continuously challenge
+        if (user.getEmail() == null || user.getEmail().trim().length() == 0) {
+            event.user(user)
+                    .detail(Details.USERNAME, username)
+                    .error(Errors.INVALID_EMAIL);
+
+            context.forkWithSuccessMessage(new FormMessage(Messages.EMAIL_SENT));
+            return;
+        }
+
+        int validityInSecs = context.getRealm().getActionTokenGeneratedByUserLifespan();
+        int absoluteExpirationInSecs = Time.currentTime() + validityInSecs;
+
+        // We send the secret in the email in a link as a query param.
+        ResetCredentialsActionToken token = new ResetCredentialsActionToken(user.getId(), absoluteExpirationInSecs, authenticationSession.getId());
+        String link = UriBuilder
+                .fromUri(context.getActionTokenUrl(token.serialize(context.getSession(), context.getRealm(), context.getUriInfo())))
+                .build()
+                .toString();
+        long expirationInMinutes = TimeUnit.SECONDS.toMinutes(validityInSecs);
+        try {
+            logger.debug("sendEmail - Reset Link : " + link);
+
+            context.getSession().getProvider(EmailTemplateProvider.class).setRealm(context.getRealm()).setUser(user).sendPasswordReset(link, expirationInMinutes);
+
+            event.clone().event(EventType.SEND_RESET_PASSWORD)
+                    .user(user)
+                    .detail(Details.USERNAME, username)
+                    .detail(Details.EMAIL, user.getEmail()).detail(Details.CODE_ID, authenticationSession.getId()).success();
+            context.forkWithSuccessMessage(new FormMessage(Messages.EMAIL_SENT));
+
+
+            Response challenge = context.form()
+                    .createForm("password-reset-email.ftl");
+            context.failureChallenge(AuthenticationFlowError.UNKNOWN_USER, challenge);
+
+        } catch (EmailException e) {
+            event.clone().event(EventType.SEND_RESET_PASSWORD)
+                    .detail(Details.USERNAME, username)
+                    .user(user)
+                    .error(Errors.EMAIL_SEND_FAILED);
+            ServicesLogger.LOGGER.failedToSendPwdResetEmail(e);
+            Response challenge = context.form()
+                    .setError(Messages.EMAIL_SENT_ERROR)
+                    .createErrorPage();
+            context.failure(AuthenticationFlowError.INTERNAL_ERROR, challenge);
+        }
     }
+
 
     @Override
     public void action(AuthenticationFlowContext context) {
