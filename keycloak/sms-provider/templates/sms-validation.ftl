@@ -18,7 +18,7 @@
             <div class="${properties.kcFormGroupClass!}">
                 <div class="field">
                         <div class="${properties.kcLabelWrapperClass!}">
-                            <lable for="totp" class="${properties.kcLabelClass!}">Enter the code we sent to your device</label>
+                            <lable for="totp" class="${properties.kcLabelClass!}">Please enter the OTP that has been sent to you</label>
                         </div>
                       <div class="${properties.kcInputWrapperClass!}">
                             <input id="totp" name="smsCode" type="text" class="${properties.kcInputClass!}" />
