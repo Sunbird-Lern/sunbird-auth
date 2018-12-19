@@ -12,7 +12,7 @@
                     <div class="signInHead mt-27">${msg("emailForgotTitle")}</div>
                 </div>
                 <div class="ui content textCenter mb-28">
-                    Enter the code we sent to your device
+                    ${msg("enterCode")}
                 </div>
                 <div class="ui content textCenter mt-8 mb-28">
                     <#if message?has_content>
