@@ -28,5 +28,19 @@ public class Constants {
   public static final String ERROR_REALM_ADMIN_ROLE_ACCESS = "Does not have realm admin role.";
   public static final String ERROR_INVALID_PARAMETER_VALUE = "Invalid value {0} for parameter {1}.";
   public static final String ERROR_MANDATORY_PARAM_MISSING = "Mandatory parameter {0} is missing.";
-
+  public static final String OTP = "otp";
+  public static final String EMAIL = "email";
+  public static final String TTL = "ttl";
+  public static final String SUNBIRD_LMS_AUTHORIZATION = "sunbird_authorization";
+  
+  public static final String MAIL_SUBJECT = "Reset password";
+  public static final String SUBJECT = "subject";
+  public static final String EMAIL_TEMPLATE_TYPE = "emailTemplateType";
+  public static final String REALM_NAME = "realmName";
+  public static final String SEND_NOTIFICATION_URI = "/user/v1/notification/email";
+  public static final String SUNBIRD_LMS_BASE_URL = "sunbird_lms_base_url";
+  public static final String BODY = "body";
+  public static final String RECIPIENT_EMAILS = "recipientEmails";
+  public static final String FORGOT_PASSWORD_EMAIL_TEMPLATE = "forgotPasswordWithOTP";
+  public static final String REQUEST = "request";
 }
