@@ -6,7 +6,7 @@
     <div class="ui raised shadow container segment fullpage-background-image">
         <div class="ui three column grid stackable">
             <div class="ui column tablet only computer only"></div>
-            <div class="ui column">
+            <div class="ui column height-fix">
                 <div class="ui header centered">
                     <img class="w-100" src="${url.resourcesPath}/img/diksha_gov_logo.svg">
                     <div class="signInHead mt-27">${msg("emailForgotTitle")}</div>
@@ -28,18 +28,16 @@
                     <div class="field">
                         <button onclick="javascript:makeDivUnclickable()" class="ui fluid submit button" name="login" id="login" type="submit" value="${msg("doLogIn")}">${msg("doSubmit")}</button>
                     </div>
-                    <#if client?? && client.baseUrl?has_content>
-                    <div class="field">
-                        <div class="${properties.kcFormOptionsWrapperClass!} mb-56 mt-45 textCenter">
-                            <span>
-                                <a id="backToApplication" onclick="javascript:makeDivUnclickable()" class="backToLogin" href="${client.baseUrl}">
-                                    <span class="fs-14"><< </span>${msg("backToLogin")}
-                                </a>
-                            </span>
-                        </div>
-                    </div>
-                    </#if>
                 </form>
+                <#if client?? && client.baseUrl?has_content>
+                    <div class="${properties.kcFormOptionsWrapperClass!} signUpMsg mb-56 mt-45 textCenter">
+                        <span>
+                            <a id="backToApplication" onclick="javascript:makeDivUnclickable()" class="backToLogin" href="${client.baseUrl}">
+                                <span class="fs-14"><< </span>${msg("backToLogin")}
+                            </a>
+                        </span>
+                    </div>
+                </#if>
             </div>
             <div class="ui column tablet only computer only"></div>
         </div>
