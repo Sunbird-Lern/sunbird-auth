@@ -3,7 +3,6 @@
     <#if section = "title">
         ${msg("loginTitle",realm.name)}
     <#elseif section = "form">
-    <meta content="width=device-width, initial-scale=1" name="viewport" />
     <div class="ui raised shadow container segment fullpage-background-image">
         <div class="ui three column grid stackable">
             <div class="ui column tablet only computer only"></div>
@@ -12,10 +11,10 @@
                     <img class="w-100" src="${url.resourcesPath}/img/diksha_gov_logo.svg">
                     <div class="signInHead mt-27">${msg("emailForgotTitle")}</div>
                 </div>
-                <div class="ui content center justfy textCenter mb-28">
+                <div class="ui content textCenter mb-28">
                     Enter the code we sent to your device
                 </div>
-                <div class="ui content center justfy textCenter mt-8 mb-28">
+                <div class="ui content textCenter mt-8 mb-28">
                     <#if message?has_content>
                     <div class="ui text ${message.type}">
                         ${message.summary}
