@@ -8,7 +8,7 @@
             <div class="ui column tablet only computer only"></div>
             <div class="ui column height-fix">
                 <div class="ui header centered">
-                    <img class="w-100" src="${url.resourcesPath}/img/diksha_gov_logo.svg">
+                    <img class="logo-image" id="stateImage" onerror="this.onerror=null;this.src='${url.resourcesPath}/img/diksha_gov_logo.svg';" alt="Logo">
                     <div class="signInHead mt-27">${msg("emailForgotTitle")}</div>
                 </div>
                 <div class="ui content textCenter mb-28">
