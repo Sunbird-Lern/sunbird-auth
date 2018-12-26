@@ -8,7 +8,7 @@
             <div class="ui column tablet only computer only"></div>
             <div class="ui column height-fix">
                 <div class="ui header centered">
-                    <img class="logo-image" id="stateImage" onerror="this.onerror=null;this.src='${url.resourcesPath}/img/diksha_gov_logo.svg';" alt="Logo">
+                    <img onerror="" alt="">
                     <div class="signInHead mt-27">${msg("emailForgotTitle")}</div>
                 </div>
                 <div class="ui content textCenter mb-28">
@@ -33,7 +33,7 @@
                     <div class="${properties.kcFormOptionsWrapperClass!} signUpMsg mb-56 mt-45 textCenter">
                         <span>
                             <a id="backToApplication" onclick="javascript:makeDivUnclickable()" class="backToLogin" href="${client.baseUrl}">
-                                <span class="fs-14"><< </span>${msg("backToLogin")}
+                                <span class="fs-14"><< </span>${msg("backToApplication")}
                             </a>
                         </span>
                     </div>
