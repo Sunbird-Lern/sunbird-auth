@@ -9,7 +9,7 @@ node('build-slave') {
 		stage('checkout')
 		{
 			sh('rm -rf sunbird-auth')
-			sh('git clone git@github.com:project-sunbird/sunbird-auth.git -b release-1.14')
+			sh('git clone https://github.com/project-sunbird/sunbird-auth.git -b jenkins-pipeline')
 		}
 
 		stage('Build'){
