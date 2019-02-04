@@ -1,1 +1,1 @@
-${msg("passwordResetBody",link, linkExpiration, realmName)}
+${msg("passwordResetBodyHtml",link,(linkExpiration/60)?string["0"],realmName)}
