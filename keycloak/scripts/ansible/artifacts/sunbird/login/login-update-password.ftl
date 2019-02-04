@@ -18,12 +18,9 @@
                         </div>
                         <div class="content signin-contentPadding">
                             <form id="kc-passwd-update-form" class="ui form pre-signin" action="${url.loginAction}" method="post">
-                            <input type="text" readonly value="this is not a login form" style="display: none;">
-                            <input type="password" readonly value="this is not a login form" style="display: none;">
-
                             <div class="field">
                                 <label for="password-new">${msg("passwordNew")}</label>
-                                <input type="password" id="password-new" name="password-new" autofocus autocomplete="off" />
+                                <input type="password" id="password-new" name="password-new" autocomplete="off" />
                             </div>
 
                             <div class="field">
@@ -31,14 +28,14 @@
                                 <input type="password" id="password-confirm" name="password-confirm" autocomplete="off" />
                             </div>
 
-                            <div class="ui grid margin-top2em">
+                            <div class="margin-top2em">
                                 <div id="kc-form-options" class="${properties.kcFormOptionsClass!}">
                                     <div class="${properties.kcFormOptionsWrapperClass!}">
                                     </div>
                                 </div>
 
                                 <div id="kc-form-buttons" class="${properties.kcFormButtonsClass!}">
-                                    <button class="ui primary right floated button buttonResizeClass" type="submit">${msg("doSubmit")}</button>
+                                    <button class="ui primary right floated button buttonResizeClass" onclick="javascript:makeDivUnclickable()" type="submit">${msg("doSubmit")}</button>
                                 </div>
                             </div>
                             </form>
