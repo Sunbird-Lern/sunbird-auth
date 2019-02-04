@@ -2,48 +2,57 @@
 <@layout.registrationLayout displayInfo=true; section>
     <#if section = "title">
         ${msg("emailForgotTitle")}
-    <#elseif section = "header">
-        ${msg("emailForgotTitle")}
     <#elseif section = "form">
-        <div class="page-login">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-            <div class="ui centered grid container">
-                <div class="ten wide column signInGridAlign">
-                    <div class="ui fluid card">
-                        <div class="ui centered medium image signInLogo margin-top3em">
-                            <img src="${url.resourcesPath}/img/logo.png">
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <div class="ui raised shadow container segment fullpage-background-image">
+        <div class="ui three column grid stackable">
+            <div class="ui column tablet only computer only"></div>
+            <div class="ui column height-fix">
+                <div class="ui header centered">
+                    <img onerror="" alt="">
+                    <div class="signInHead mt-27">${msg("emailForgotTitle")}</div>
+                </div>
+                <div class="ui content center justfy textCenter">
+                    ${msg("enterEmailPhonenumberToGetCode")}
+                </div>
+                <div class="ui content center justfy textCenter mt-8 mb-28">
+                    <#if message?has_content>
+                        <div class="ui text ${message.type}">
+                            ${message.summary}
                         </div>
-                        <div class="ui basic segment">
-                            <h2 class="ui header">${msg("emailForgotTitle")}</h2>
-                        </div>
-                        <div class="content signin-contentPadding">
-                            <form id="kc-reset-password-form" class="ui form pre-signin" action="${url.loginAction}" method="post">
-                            <div class="field">
-                                <label for="username"><#if !realm.loginWithEmailAllowed>${msg("username")}<#elseif !realm.registrationEmailAsUsername>${msg("usernameOrEmailOrPhone")}<#else>${msg("email")}</#if></label>
-                                <input type="text" id="username" name="username" placeholder="${msg("emailInstruction")}" autofocus/>
-                            </div>
-
-                            <div class="ui grid margin-top2em">
-                                <div class="six wide column">
-                                        <div id="kc-form-options">
-                                            <div class="${properties.kcFormOptionsWrapperClass!}">
-                                                <span><a href="${url.loginUrl}">${msg("backToLogin")}</a></span>
-                                            </div>
-                                        </div>
-                                </div>
-                                <div class="six wide column">
-                                    <div id="kc-form-buttons">
-                                     <button class="ui primary right floated button buttonResizeClass" type="submit">${msg("doSubmit")}</button>
-                                    </div>
-                                </div>
-                            </div>
-                            </form>
-                        </div>
+                    </#if>
+                </div>
+                <form id="kc-reset-password-form" class="ui form" method="POST" action="${url.loginAction}">
+                    <div class="field mb-36">
+                        <label id="usernameLabel" for="username" class="">
+                            <#if !realm.loginWithEmailAllowed>
+                                ${msg("username")}
+                            <#elseif !realm.registrationEmailAsUsername>
+                                ${msg("emailOrPhone")}
+                            <#else>${msg("email")}
+                            </#if>
+                        </label>
+                        <label id="usernameLabelPlaceholder" for="username" class="activeLabelColor hide">
+                            <#if !realm.loginWithEmailAllowed>${msg("username")}
+                            <#elseif !realm.registrationEmailAsUsername>${msg("placeholderForEmailOrPhone")}
+                            <#else>${msg("email")}
+                            </#if>
+                        </label>
+                        <input type="text" id="username" class="mt-8" name="username" onfocusin="inputBoxFocusIn(this)" onfocusout="inputBoxFocusOut(this)" autofocus/>
                     </div>
+                    <div class="field">
+                        <button id="login" class="ui fluid submit button">
+                        ${msg("doReset")}
+                        </button>
+                    </div>
+                </form>
+                <div class="${properties.kcFormOptionsWrapperClass!} signUpMsg mb-56 mt-45 textCenter">
+                    <span><a id="versionLink" class="backToLogin" onclick="javascript:makeDivUnclickable()" href="${url.loginUrl}"><span class="fs-14"><< </span> ${msg("backToLogin")}</a></span>
                 </div>
             </div>
+            <div class="ui column tablet only computer only"></div>
         </div>
+    </div>
     <#elseif section = "info" >
     </#if>
 </@layout.registrationLayout>
-                              

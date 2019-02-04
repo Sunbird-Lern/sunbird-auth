@@ -2,50 +2,63 @@
 <@layout.registrationLayout displayInfo=true; section>
     <#if section = "title">
         ${msg("updatePasswordTitle")}
-    <#elseif section = "header">
-        ${msg("updatePasswordTitle")}
     <#elseif section = "form">
-        <div class="page-login">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-            <div class="ui centered grid container">
-                <div class="ten wide column signInGridAlign">
-                    <div class="ui fluid card">
-                        <div class="ui centered medium image signInLogo margin-top3em">
-                            <img src="${url.resourcesPath}/img/logo.png">
+    <div class="ui raised shadow container segment fullpage-background-image">
+        <div class="ui three column grid stackable">
+            <div class="ui column tablet only computer only"></div>
+            <div class="ui column height-fix">
+                <div class="ui header centered mb-18">
+                    <img onerror="" alt="">
+                    <div class="signInHead mt-27">${msg("newPasswordTitle")}</div>
+                </div>
+                <div class="ui content center justfy textCenter mb-36 loginupdate">
+                    <#if message?has_content>
+                        <div class="ui text ${message.type}">
+                            ${message.summary}
                         </div>
-                        <div class="ui basic segment">
-                            <h2 class="ui header">${msg("updatePasswordTitle")}</h2>
-                        </div>
-                        <div class="content signin-contentPadding">
-                            <form id="kc-passwd-update-form" class="ui form pre-signin" action="${url.loginAction}" method="post">
-                            <input type="text" readonly value="this is not a login form" style="display: none;">
-                            <input type="password" readonly value="this is not a login form" style="display: none;">
-
-                            <div class="field">
-                                <label for="password-new">${msg("passwordNew")}</label>
-                                <input type="password" id="password-new" name="password-new" autofocus autocomplete="off" />
+                    </#if>
+                </div>
+                <form id="kc-passwd-update-form" class="ui form" action="${url.loginAction}" method="post">
+                    <div class="field">
+                        <label id="password-newLabel" for="password-new" class="">
+                            ${msg("passwordNew")}
+                        </label>
+                        <label id="password-newLabelPlaceholder" for="password-new" class="activeLabelColor hide">
+                            ${msg("passwordNew")}
+                        </label>
+                        <div class="ui search">
+                            <div class="ui mt-8 icon input">
+                                <input class="" type="password" id="password-new" onfocusin="inputBoxFocusIn(this)" onfocusout="inputBoxFocusOut(this)" name="password-new" autocomplete="off" />    
+                                <i class="eye icon link" onclick="viewPassword(this)"></i>
+                                <!--i id="preview-hide" class="eye slash icon hide link"></i-->
                             </div>
-
-                            <div class="field">
-                                <label for="password-confirm" >${msg("passwordConfirm")}</label>
-                                <input type="password" id="password-confirm" name="password-confirm" autocomplete="off" />
-                            </div>
-
-                            <div class="ui grid margin-top2em">
-                                <div id="kc-form-options" class="${properties.kcFormOptionsClass!}">
-                                    <div class="${properties.kcFormOptionsWrapperClass!}">
-                                    </div>
-                                </div>
-
-                                <div id="kc-form-buttons" class="${properties.kcFormButtonsClass!}">
-                                    <button class="ui primary right floated button buttonResizeClass" type="submit">${msg("doSubmit")}</button>
-                                </div>
-                            </div>
-                            </form>
                         </div>
                     </div>
-                </div>
+                    <div class="field">
+                        <label id="password-confirmLabel" class="" for="password-confirm">
+                            ${msg("passwordConfirm")}
+                        </label>
+                        <label id="password-confirmLabelPlaceholder" class="activeLabelColor hide" for="password-confirm">
+                            ${msg("passwordConfirm")}
+                        </label>
+                        <input type="password" class="mt-8" onfocusin="inputBoxFocusIn(this)" onfocusout="inputBoxFocusOut(this)" id="password-confirm" name="password-confirm" autocomplete="off" />
+                    </div>
+                    <div class="field">
+                        <button id="login" class="ui fluid button submit mt-36" onclick="javascript:makeDivUnclickable()">
+                            ${msg("doReset")}
+                        </button>
+                    </div>
+                </form>
+                <!--div class="${properties.kcFormOptionsWrapperClass!} signUpMsg mb-56 mt-45 textCenter">
+                    <span>
+                        <a class="backToLogin" onclick="javascript:makeDivUnclickable()" href="${url.loginUrl}">
+                            <span class="fs-14"><< </span> ${msg("backToLogin")}
+                        </a>
+                    </span>
+                 </div-->
             </div>
+            <div class="ui column tablet only computer only"></div>
         </div>
+    </div>
     </#if>
 </@layout.registrationLayout>
