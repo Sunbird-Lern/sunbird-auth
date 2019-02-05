@@ -42,6 +42,7 @@
     path: "{{keycloak_home}}/bin/sms-provider"
     state: directory
     mode: 0755
+  when: "{{msg_91_required|default(false)}}"
 
 - name: SMS provider configuration file
   copy:
@@ -51,6 +52,7 @@
     group: "{{wildfly_group}}"
     mode: 0755
     remote_src: yes
+  when: "{{msg_91_required|default(false)}}"
 
 - name: Delete config directory
   file:
