@@ -16,6 +16,7 @@
   - { dest: 'sunbird_auth_{{sunbird_auth_version}}/themes/sunbird/login/resources/css/fonts/notosans', mode: '0755'}
   - { dest: 'sunbird_auth_{{sunbird_auth_version}}/themes/sunbird/login/resources/css/themes/default/assets/fonts', mode: '0755'}
   - { dest: 'sunbird_auth_{{sunbird_auth_version}}/themes/sunbird/login/resources/img', mode: '0755'}
+  - { dest: 'sunbird_auth_{{sunbird_auth_version}}/themes/sunbird/login/resources/js', mode: '0755'}
   - { dest: 'sunbird_auth_{{sunbird_auth_version}}/themes/sunbird/email/html', mode: '0755'}
   - { dest: 'sunbird_auth_{{sunbird_auth_version}}/themes/sunbird/email/messages', mode: '0755'}
   - { dest: 'sunbird_auth_{{sunbird_auth_version}}/themes/sunbird//email/text', mode: '0755'}
