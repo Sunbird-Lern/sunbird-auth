@@ -1,9 +1,3 @@
-#~ - name: Create directory for providers
-  #~ file:
-    #~ path: sunbird_auth_{{sunbird_auth_version}}/providers
-    #~ state: directory
-    #~ mode: 0755
-
 - name: ansible create directory with_items example
   file:
    path: "{{ item.dest }}"
@@ -27,12 +21,6 @@
 - name: Extract {{keycloak_pkg_file}}
   shell: cd sunbird_auth_{{sunbird_auth_version}} && tar -xvf {{keycloak_pkg_file}} --strip 1
 
-#~ - name: Create directory for postgresql driver
-  #~ file:
-    #~ path: sunbird_auth_{{sunbird_auth_version}}/modules/system/layers/keycloak/org/postgresql/main
-    #~ state: directory
-    #~ mode: 0755
-
 - name: Get the postgresql driver
   get_url: url={{postgresql_driver_src}} dest="sunbird_auth_{{sunbird_auth_version}}/modules/system/layers/keycloak/org/postgresql/main/" force=no
 
@@ -42,50 +30,11 @@
 - name: Copy SMS OTP jar file to providers directory
   copy: src="../../sms-provider/target/{{keycloak_sms_provider_build}}" dest="sunbird_auth_{{sunbird_auth_version}}/providers/"
 
-#~ - name: Create directory for sunbird login messages
-  #~ file:
-    #~ path: sunbird_auth_{{sunbird_auth_version}}/themes/sunbird/login/messages
-    #~ state: directory
-    #~ mode: 0755
-
-#~ - name: Create directory for sunbird login css resources
-  #~ file:
-    #~ path: sunbird_auth_{{sunbird_auth_version}}/themes/sunbird/login/resources/css
-    #~ state: directory
-    #~ mode: 0755
-
-#~ - name: Create directory for sunbird login img resources
-  #~ file:
-    #~ path: sunbird_auth_{{sunbird_auth_version}}/themes/sunbird/login/resources/img
-    #~ state: directory
-    #~ mode: 0755
-
 - name: Copy Sunbird login theme
   copy: src="artifacts/sunbird/login/" dest="sunbird_auth_{{sunbird_auth_version}}/themes/sunbird/login/" force="yes"
 
 - name: Copy Custom Validation theme html to sunbird login theme
   copy: src="../../sms-provider/templates/" dest="sunbird_auth_{{sunbird_auth_version}}/themes/sunbird/login/" force="yes"
-
-#~ - name: Create directory for sunbird email theme html folder
-  #~ file:
-    #~ path: sunbird_auth_{{sunbird_auth_version}}/themes/sunbird/email/html
-    #~ state: directory
-    #~ recurse: yes
-    #~ mode: 0755
-
-#~ - name: Create directory for sunbird email theme messages folder
-  #~ file:
-    #~ path: sunbird_auth_{{sunbird_auth_version}}/themes/sunbird/email/messages
-    #~ state: directory
-    #~ recurse: yes
-    #~ mode: 0755
-
-#~ - name: Create directory for sunbird email theme text folder
-  #~ file:
-    #~ path: sunbird_auth_{{sunbird_auth_version}}/themes/sunbird/email/text
-    #~ state: directory
-    #~ recurse: yes
-    #~ mode: 0755
 
 - name: Copy Sunbird email theme
   copy: src="artifacts/sunbird/email" dest="sunbird_auth_{{sunbird_auth_version}}/themes/sunbird/" force="yes"
@@ -101,18 +50,6 @@
     src: roles/keycloak/templates/module.xml.j2
     dest: "sunbird_auth_{{sunbird_auth_version}}/modules/system/layers/keycloak/org/postgresql/main/module.xml"
     mode: 0750
-
-#~ - name: Create sunbird auth directory
-  #~ file:
-    #~ path: sunbird_auth_{{sunbird_auth_version}}/bin/sms-provider
-    #~ state: directory
-    #~ mode: 0755
-
-#~ - name: Create SMS provider configuration file
-  #~ template:
-    #~ src: "roles/keycloak/templates/Msg91Creds.json.j2"
-    #~ dest: "sunbird_auth_{{sunbird_auth_version}}/bin/sms-provider/Msg91Creds.json"
-    #~ mode: 0750
 
 - name: Remove the Keycloak zip
   become: yes
