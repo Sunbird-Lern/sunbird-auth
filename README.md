@@ -1,2 +1,2 @@
 # sunbird-auth
-Repository for sunbird authentication service
+Repository for sunbird authentication service.
