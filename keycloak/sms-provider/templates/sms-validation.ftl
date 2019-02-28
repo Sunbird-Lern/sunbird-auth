@@ -1,7 +1,7 @@
 <#import "template.ftl" as layout>
     <@layout.registrationLayout; section>
     <#if section = "title">
-        ${msg("loginTitle",realm.name)}
+        ${msg("loginTitle",realm.displayName)}
     <#elseif section = "form">
     <div class="ui raised shadow container segment fullpage-background-image">
         <div class="ui three column grid stackable">
