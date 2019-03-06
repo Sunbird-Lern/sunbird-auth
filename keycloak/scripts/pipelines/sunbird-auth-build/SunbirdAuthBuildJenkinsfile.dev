@@ -1,0 +1,31 @@
+#!groovy
+
+node('build-slave') {
+
+	currentBuild.result = "SUCCESS"
+
+	try {
+
+		stage('checkout') {
+			checkout scm
+			// Need to remove custom code from shell script
+			//sh('rm -rf sunbird-auth')
+			// sh('rm -rf sunbird-devops')
+			// sh('./pipelines/setupDevopsCode.sh')
+			//sh('git clone https://github.com/project-sunbird/sunbird-auth.git -b 1.14.comp')
+		}
+
+		stage('Build'){
+			sh('cd sunbird-auth/keycloak/scripts/ansible && ansible-playbook sunbird-auth-build.yml --limit localhost -vv')
+		}
+
+		stage('Archive'){
+			// sh('cp sunbird-devops/ansible/sunbird_auth_1.0v.zip .')
+			archiveArtifacts('sunbird_auth_1.0v.zip');
+		}
+	}
+	catch (err) {
+		currentBuild.result = "FAILURE"
+		throw err
+	}
+}
