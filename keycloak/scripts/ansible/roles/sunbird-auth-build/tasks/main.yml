@@ -32,5 +32,5 @@
 
 - archive:
     path: sunbird_auth_{{sunbird_auth_version}}
-    dest: "../../sunbird_auth_{{sunbird_auth_version}}.zip"
+    dest: "../../../sunbird_auth_{{sunbird_auth_version}}.zip"
     format: zip
