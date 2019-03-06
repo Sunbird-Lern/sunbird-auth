@@ -8,11 +8,6 @@ node('build-slave') {
 
 		stage('checkout') {
 			checkout scm
-			// Need to remove custom code from shell script
-			//sh('rm -rf sunbird-auth')
-			// sh('rm -rf sunbird-devops')
-			// sh('./pipelines/setupDevopsCode.sh')
-			//sh('git clone https://github.com/project-sunbird/sunbird-auth.git -b 1.14.comp')
 		}
 
 		stage('Build'){
