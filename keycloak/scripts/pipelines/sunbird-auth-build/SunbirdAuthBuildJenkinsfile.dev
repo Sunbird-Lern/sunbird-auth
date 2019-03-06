@@ -11,7 +11,7 @@ node('build-slave') {
 		}
 
 		stage('Build'){
-			sh('cd sunbird-auth/keycloak/scripts/ansible && ansible-playbook sunbird-auth-build.yml --limit localhost -vv')
+			sh('cd keycloak/scripts/ansible && ansible-playbook sunbird-auth-build.yml --limit localhost -vv')
 		}
 
 		stage('Archive'){
