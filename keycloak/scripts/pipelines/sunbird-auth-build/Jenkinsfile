@@ -29,7 +29,7 @@ node('build-slave') {
             stage('Build') {
                 sh """
                         wget https://downloads.jboss.org/keycloak/3.2.0.Final/keycloak-3.2.0.Final.tar.gz
-                        tar -xvf sunbird_auth_1.0v/keycloak-3.2.0.Final.tar.gz --strip 1 -C sunbird_auth_1.0v
+                        tar -xvf keycloak-3.2.0.Final.tar.gz --strip 1 -C sunbird_auth_1.0v
                         mkdir -p sunbird_auth_1.0v/providers
                         mkdir -p sunbird_auth_1.0v/modules/system/layers/keycloak/org/postgresql/main
                         mkdir -p sunbird_auth_1.0v/themes/sunbird/login
@@ -51,7 +51,7 @@ node('build-slave') {
                 archiveArtifacts artifacts: "keycloak_artifacts.zip:${artifact_version}", fingerprint: true, onlyIfSuccessful: true
                 sh """echo {\\"artifact_name\\" : \\"keycloak_artifacts.zip\\", \\"artifact_version\\" : \\"${artifact_version}\\", \\"node_name\\" : \\"${env.NODE_NAME}\\"} > metadata.json"""
                 archiveArtifacts "metadata.json"
-                currentBuild.description = "${build_tag}"
+                currentBuild.description = "${artifact_version}"
             }
         }
 
