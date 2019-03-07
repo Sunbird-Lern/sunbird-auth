@@ -44,7 +44,7 @@ node('build-slave') {
             stage('ArchiveArtifacts') {
                 sh """
                         mkdir keycloak_artifacts
-                        mv sunbird_auth_1.0v.zip keycloak_artifacts
+                        mv sunbird_auth_1.0v keycloak_artifacts
                         zip -j keycloak_artifacts.zip:${artifact_version} keycloak_artifacts/*
                     """
                 archiveArtifacts artifacts: "keycloak_artifacts.zip:${artifact_version}", fingerprint: true, onlyIfSuccessful: true
