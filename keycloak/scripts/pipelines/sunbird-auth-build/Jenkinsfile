@@ -32,7 +32,7 @@ node('build-slave') {
                         mkdir -p sunbird_auth_1.0v/modules/system/layers/keycloak/org/postgresql/main
                         mkdir -p sunbird_auth_1.0v/themes/sunbird/login
                         wget -P sunbird_auth_1.0v https://downloads.jboss.org/keycloak/3.2.0.Final/keycloak-3.2.0.Final.tar.gz
-                        tar -xvf keycloak-3.2.0.Final.tar.gz --strip 1
+                        tar -xvf sunbird_auth_1.0v/keycloak-3.2.0.Final.tar.gz --strip 1
                         wget -P sunbird_auth_1.0v/modules/system/layers/keycloak/org/postgresql/main https://jdbc.postgresql.org/download/postgresql-9.4.1212.jar
                         cd keycloak/sms-provider
                         mvn package
