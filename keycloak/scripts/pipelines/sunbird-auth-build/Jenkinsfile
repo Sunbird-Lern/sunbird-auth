@@ -38,15 +38,13 @@ node('build-slave') {
                         mvn package
                         cp target/keycloak-email-phone-autthenticator-1.0-SNAPSHOT.jar $WORKSPACE/sunbird_auth_1.0v/providers
                         cp -r templates $WORKSPACE/sunbird_auth_1.0v/themes/sunbird/login
-                        rm -rf $WORKSPACE/sunbird_auth_1.0v/keycloak-3.2.0.Final.tar.gz
-                        zip sunbird_auth_1.0v.zip $WORKSPACE/sunbird_auth_1.0v
                 """
             }
 
             stage('ArchiveArtifacts') {
                 sh """
                         mkdir keycloak_artifacts
-                        cp sunbird_auth_1.0v.zip keycloak_artifacts
+                        mv sunbird_auth_1.0v.zip keycloak_artifacts
                         zip -j keycloak_artifacts.zip:${artifact_version} keycloak_artifacts/*
                     """
                 archiveArtifacts artifacts: "keycloak_artifacts.zip:${artifact_version}", fingerprint: true, onlyIfSuccessful: true
