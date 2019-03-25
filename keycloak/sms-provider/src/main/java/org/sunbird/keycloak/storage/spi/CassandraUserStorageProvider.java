@@ -121,6 +121,7 @@ public class CassandraUserStorageProvider
   @Override
   public List<UserModel> searchForUserByUserAttribute(
       String attrName, String attrValue, RealmModel realm) {
+    logger.info("Search user by user attributes: " + attrName);
     if(Constants.PHONE.equalsIgnoreCase(attrName)){
       return EsOperation.getUserByKey(attrName, attrValue).stream()
           .map(user -> new UserAdapter(session, realm, model, user))
