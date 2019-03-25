@@ -8,12 +8,14 @@ import org.jboss.logging.Logger;
 import org.keycloak.component.ComponentModel;
 import org.keycloak.models.GroupModel;
 import org.keycloak.models.KeycloakSession;
+import org.keycloak.models.ModelDuplicateException;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.storage.StorageId;
 import org.keycloak.storage.UserStorageProvider;
 import org.keycloak.storage.user.UserLookupProvider;
 import org.keycloak.storage.user.UserQueryProvider;
+import org.sunbird.keycloak.utils.Constants;
 
 public class CassandraUserStorageProvider
     implements UserStorageProvider, UserLookupProvider, UserQueryProvider {
@@ -44,11 +46,12 @@ public class CassandraUserStorageProvider
   @Override
   public UserModel getUserByUsername(String username, RealmModel realm) {
     logger.info("Get user by name " + username);
-    User user = repository.findUserByUsernameOrEmail(username);
-    if (user != null) {
-      return new UserAdapter(session, realm, model, user);
+    List<User> users = repository.findUserByUsernameOrEmail(username);
+    if (users != null && users.size() == 1) {
+      return new UserAdapter(session, realm, model, users.get(0));
     } else {
-      return null;
+      throw new ModelDuplicateException("Multiple users are associated with this login credentilas.",
+          "login credentilas");
     }
   }
 
@@ -105,7 +108,7 @@ public class CassandraUserStorageProvider
   @Override
   public List<UserModel> getGroupMembers(
       RealmModel realm, GroupModel group, int firstResult, int maxResults) {
-
+ 
     return Collections.emptyList();
   }
 
@@ -118,6 +121,11 @@ public class CassandraUserStorageProvider
   @Override
   public List<UserModel> searchForUserByUserAttribute(
       String attrName, String attrValue, RealmModel realm) {
-	  return Collections.emptyList();
+    if(Constants.PHONE.equalsIgnoreCase(attrName)){
+      return EsOperation.getUserByKey(attrName, attrValue).stream()
+          .map(user -> new UserAdapter(session, realm, model, user))
+          .collect(Collectors.toList());
+    }
+	return Collections.emptyList();
   }
 }
