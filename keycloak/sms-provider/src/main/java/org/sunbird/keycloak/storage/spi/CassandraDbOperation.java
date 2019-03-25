@@ -2,6 +2,8 @@ package org.sunbird.keycloak.storage.spi;
 
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
+import java.util.Collections;
+import java.util.List;
 import org.jboss.logging.Logger;
 import org.sunbird.keycloak.utils.Constants;
 
@@ -33,14 +35,14 @@ public class CassandraDbOperation {
     return user;
   }
 
-  public User getUserByName(String username) {
-      User user = null;
+  public List<User> getUserByName(String username) {
+    List<User> users = null;
       String numberRegex = "\\d+";
       //mobile number length is of 10 digit
       if (username.matches(numberRegex) && 10 == username.length()) {
-        user = getUserBy(Constants.PHONE, username);
-        if (user != null) {
-          return user;
+        users = getUserBy(Constants.PHONE, username);
+        if (users != null) {
+          return users;
         } else {
           return findUserByNameOrEmail(username);
         }
@@ -49,28 +51,28 @@ public class CassandraDbOperation {
       }
   }
 
-  private User findUserByNameOrEmail(String username) {
+  private List<User> findUserByNameOrEmail(String username) {
     String emailRegex = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
         + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
-    User user = null;
+    List<User> users = null;
     
     if (username.matches(emailRegex)) {
-      user = getUserBy(Constants.EMAIL, username);
-      if (user != null)
-        return user;
-    } else {
-      user = getUserBy(Constants.USERNAME, username);
-      if (user != null)
-        return user;
+      users = getUserBy(Constants.EMAIL, username);
+      if (users != null)
+        return users;
+    } else { 
+      users = getUserBy(Constants.USERNAME, username); 
+      if (users != null)
+        return users;
     }
-    return null;
+    return Collections.emptyList();
   }
 
   private String decrypt(String data) {
     return decryptionService.decryptData(data);
   }
   
-  private User getUserBy(String key, String searchValue) {
+  private List<User> getUserBy(String key, String searchValue) {
     logger.info("calling ES search api");
     return EsOperation.getUserByKey(key, searchValue);
   }
