@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -29,7 +30,7 @@ public class EsOperation {
   private EsOperation(){}
   
   @SuppressWarnings({"unchecked"})
-  public static User getUserByKey(String key,String value) {
+  public static List<User> getUserByKey(String key,String value) {
     Map<String,Object> userRequest = new HashMap<>();
     Map<String,Object> request = new HashMap<>();
     Map<String,String> filters = new HashMap<>(); 
@@ -52,13 +53,22 @@ public class EsOperation {
       content = (List<Map<String, Object>>) (responseMap).get("content");
     }
     if(null != content){
+      List<User> userList = new ArrayList<>();
+      if(content.size() > 1){
+        content.forEach(userMap -> {
+          if(null != userMap){
+          userList.add(createUser(userMap));
+          }
+        });
+      }
       Map<String, Object> userMap  = content.get(0);
       if(null != userMap){
         logger.info("usermap is not null from ES");
-        return createUser(userMap);
+        userList.add(createUser(userMap));
+        return userList;
       }
     }
-    return null;
+    return Collections.emptyList();
   }
   
   private static User createUser(Map<String, Object> userMap) {
