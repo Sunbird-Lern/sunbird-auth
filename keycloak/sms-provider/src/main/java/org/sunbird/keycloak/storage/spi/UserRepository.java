@@ -1,6 +1,5 @@
 package org.sunbird.keycloak.storage.spi;
 
-import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.sunbird.keycloak.utils.Constants;
@@ -31,11 +30,11 @@ class UserRepository {
     return cassandraOperation.getUserById(id);
   }
 
-  public User findUserByUsernameOrEmail(String username) {
+  public List<User> findUserByUsernameOrEmail(String username) {
     return cassandraOperation.getUserByName(username);
   }
 
   public List<User> findUsers(String query) {
-    return Arrays.asList(cassandraOperation.getUserByName(query));
+    return cassandraOperation.getUserByName(query); 
   }
 }
