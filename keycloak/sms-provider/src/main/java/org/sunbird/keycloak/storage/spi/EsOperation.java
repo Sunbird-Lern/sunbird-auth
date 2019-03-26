@@ -37,7 +37,8 @@ public class EsOperation {
     filters.put(key,value);
     request.put("filters", filters);
     userRequest.put("request", request);
-    String searchUrl = System.getenv("sunbird_cs_base_url")+"/user/v1/search";
+    // String searchUrl = System.getenv("sunbird_cs_base_url")+"/user/v1/search";
+    String searchUrl = "http://localhost:9000/v1/user/search";
     Map<String, Object> resMap = post(userRequest, searchUrl, System.getenv(Constants.SUNBIRD_LMS_AUTHORIZATION));
     Map<String, Object> result = null;
     Map<String, Object> responseMap = null;
