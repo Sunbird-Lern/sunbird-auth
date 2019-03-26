@@ -49,9 +49,11 @@ public class CassandraUserStorageProvider
     List<User> users = repository.findUserByUsernameOrEmail(username);
     if (users != null && users.size() == 1) {
       return new UserAdapter(session, realm, model, users.get(0));
-    } else {
+    } else if(users != null && users.size() > 1){
       throw new ModelDuplicateException("Multiple users are associated with this login credentilas.",
           "login credentilas");
+    } else {
+      return null;
     }
   }
 
