@@ -93,7 +93,7 @@ public class UserServiceProviderTest {
   
   
   @Test
-  public void searchForUserTest2(){
+  public void searchForUserWithPaginationTest(){
     UserServiceProvider userServiceProvider = new UserServiceProvider(session, model, userService);
     PowerMockito.when(userService.getByUsername("amit@gmail.com")).thenReturn(userList);
     List<UserModel> userModelList = userServiceProvider.searchForUser("amit@gmail.com", realm, 0, 5);
@@ -101,7 +101,7 @@ public class UserServiceProviderTest {
   }
   
   @Test
-  public void searchForUserTest3(){
+  public void searchForUserWithParamsWithPaginationTest(){
     UserServiceProvider userServiceProvider = new UserServiceProvider(session, model, userService);
     Map<String,String> params = new HashMap<>();
     List<UserModel> userModelList = userServiceProvider.searchForUser(params,realm,1,5);
@@ -109,7 +109,7 @@ public class UserServiceProviderTest {
   }
   
   @Test
-  public void searchForUserTest4(){
+  public void searchForUserWithParamsTest(){
     UserServiceProvider userServiceProvider = new UserServiceProvider(session, model, userService);
     Map<String,String> params = new HashMap<>();
     List<UserModel> userModelList = userServiceProvider.searchForUser(params,realm);
@@ -124,7 +124,7 @@ public class UserServiceProviderTest {
   }
   
   @Test
-  public void getGroupMembersTest2(){
+  public void getGroupMembersWithPaginationTest(){
     UserServiceProvider userServiceProvider = new UserServiceProvider(session, model, userService);
     List<UserModel> userModelList = userServiceProvider.getGroupMembers(realm,groupModel,1,5);
     assertEquals(0, userModelList.size());
@@ -138,26 +138,18 @@ public class UserServiceProviderTest {
   }
   
   @Test
-  public void getUsersTest(){
+  public void getUsersWithPaginationTest(){
     UserServiceProvider userServiceProvider = new UserServiceProvider(session, model, userService);
     List<UserModel> userModelList = userServiceProvider.getUsers(realm,1,5);
     assertEquals(0, userModelList.size());
   }
   
   @Test
-  public void getUsersTest2(){
+  public void getUsersTest(){
     UserServiceProvider userServiceProvider = new UserServiceProvider(session, model, userService);
     List<UserModel> userModelList = userServiceProvider.getUsers(realm);
     assertEquals(0, userModelList.size());
   }
   
-  //@Test
-  public void searchForUserByUserAttributeTest(){
-    UserServiceProvider userServiceProvider = new UserServiceProvider(session, model, userService);
-    PowerMockito.when(EsOperation.getUserByKey("phone","9876543210")).thenReturn(userList);
-    List<UserModel> userModelList = userServiceProvider.searchForUserByUserAttribute("phone","9876543210", realm);
-    System.out.println(userModelList.size());
-    System.out.println(userModelList.get(0).getEmail());
-    assertEquals("amit@gmail.com", userModelList.get(0).getEmail());
-  }
+ 
 }
