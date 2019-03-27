@@ -65,6 +65,16 @@ public class UserAdapter extends AbstractUserAdapterFederatedStorage {
   public void setPassword(String password) {
     user.setPassword(password);
   }
+  
+  @Override
+  public boolean isEnabled() {
+      return user.isEnabled();
+  }
+
+  @Override
+  public void setEnabled(boolean enabled) {
+     user.setEnabled(enabled);
+  }
 
   @Override
   public String getId() {

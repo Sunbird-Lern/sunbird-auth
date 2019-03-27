@@ -9,6 +9,7 @@ public class User {
   private String firstName;
   private String lastName;
   private String password;
+  private boolean enabled;
 
   public User() {}
 
@@ -73,4 +74,13 @@ public class User {
   public void setLastName(String lastName) {
     this.lastName = lastName;
   }
+
+  public boolean isEnabled() {
+    return enabled;
+  }
+
+  public void setEnabled(boolean enabled) {
+    this.enabled = enabled;
+  }
+  
 }
