@@ -13,20 +13,19 @@ import org.jboss.logging.Logger;
 
 public class DefaultDecryptionServiceImpl implements DecryptionService {
   private static Logger logger = Logger.getLogger(DefaultDecryptionServiceImpl.class);
-  private static String sunbird_encryption = "";
-  private static String encryption_key = "";
+  private String encryptionKey = "";
   private String sunbirdEncryption = "ON";
-  private static final String ON = "ON";
-  private static Cipher c;
-
-  static {
+  private final String ON = "ON";
+  private Cipher c;
+  
+  public DefaultDecryptionServiceImpl(){
     try {
-      sunbird_encryption = getSalt();
+      encryptionKey = getSalt();
       Key key = generateKey();
       c = Cipher.getInstance(ALGORITHM);
       c.init(Cipher.DECRYPT_MODE, key);
     } catch (Exception e) {
-      logger.error(e);
+      logger.error("exception occurred "+e);
     }
   }
 
@@ -80,7 +79,8 @@ public class DefaultDecryptionServiceImpl implements DecryptionService {
     }
   }
 
-  public static String decrypt(String value, boolean throwExceptionOnFailure) {
+  @SuppressWarnings("restriction")
+  public String decrypt(String value, boolean throwExceptionOnFailure) {
     try {
       String dValue = null;
       String valueToDecrypt = value.trim();
@@ -88,7 +88,7 @@ public class DefaultDecryptionServiceImpl implements DecryptionService {
         byte[] decordedValue = new sun.misc.BASE64Decoder().decodeBuffer(valueToDecrypt);
         byte[] decValue = c.doFinal(decordedValue);
         dValue =
-            new String(decValue, StandardCharsets.UTF_8).substring(sunbird_encryption.length());
+            new String(decValue, StandardCharsets.UTF_8).substring(encryptionKey.length());
         valueToDecrypt = dValue;
       }
       return dValue;
@@ -105,15 +105,11 @@ public class DefaultDecryptionServiceImpl implements DecryptionService {
     return new SecretKeySpec(keyValue, ALGORITHM);
   }
 
-  public static String getSalt() {
-    if (StringUtils.isNotBlank(encryption_key)) {
-      return encryption_key;
-    } else {
-      encryption_key = System.getenv("sunbird_encryption_key");
-    }
-    if (StringUtils.isBlank(encryption_key)) {
+  private String getSalt() {
+    String key = System.getenv("sunbird_encryption_key");
+    if (StringUtils.isBlank(key)) {
       throw new RuntimeException("Invalid encryption key");
     }
-    return encryption_key;
+    return key;
   }
 }
