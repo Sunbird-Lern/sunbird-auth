@@ -80,6 +80,11 @@ public class EsOperation {
     user.setLastName((String) userMap.get("lastName"));
     user.setPhone((String) userMap.get(Constants.PHONE));
     user.setUsername((String) userMap.get("userName"));
+    if (((Boolean)userMap.get("isDeleted"))) {
+      user.setEnabled(false);
+    } else {
+      user.setEnabled(true);
+    }
     return user;
   }
 
