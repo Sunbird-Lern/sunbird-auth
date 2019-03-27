@@ -1,5 +1,9 @@
 package org.sunbird.keycloak.storage.spi;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.keycloak.component.ComponentModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
@@ -75,10 +79,35 @@ public class UserAdapter extends AbstractUserAdapterFederatedStorage {
   public void setEnabled(boolean enabled) {
      user.setEnabled(enabled);
   }
+  
+  @Override
+  public List<String> getAttribute(String name) {
+    return getFederatedStorage().getAttributes(realm, keycloakId).get(name);
+  }
+  
+  @Override
+  public Map<String, List<String>> getAttributes() {
+    Map<String, List<String>> attributes = new HashMap<>();
+    List<String> phoneValues = new ArrayList<>();
+    phoneValues.add(user.getPhone());
+    attributes.put("phone", phoneValues);
+    List<String> countrycodeValues = new ArrayList<>();
+    countrycodeValues.add(user.getCountrycode());
+    attributes.put("countryCode", countrycodeValues);
+    List<String> currentLoginTime = getAttribute("currentLoginTime");
+    if(null != currentLoginTime){
+      attributes.put("currentLoginTime", currentLoginTime);
+    }
+    List<String> lastLoginTime = getAttribute("lastLoginTime");
+    if(null != lastLoginTime){
+      attributes.put("lastLoginTime", lastLoginTime);
+    }
+    return attributes;
+  }
 
   @Override
   public String getId() {
     return keycloakId;
   }
-
+  
 }
