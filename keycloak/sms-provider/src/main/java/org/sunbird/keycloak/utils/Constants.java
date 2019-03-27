@@ -48,5 +48,5 @@ public class Constants {
   public static final String PHONE = "phone";
   public static final String SUNBIRD_CASSANDRA_IP = "sunbird_cassandra_host";
   public static final String SUNBIRD_CASSANDRA_PORT = "sunbird_cassandra_port";
-  public static final String LAST_NAME = "lastName";
+  public static final String LAST_NAME = "lastname";
 }

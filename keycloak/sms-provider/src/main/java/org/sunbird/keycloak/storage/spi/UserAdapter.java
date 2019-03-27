@@ -39,6 +39,16 @@ public class UserAdapter extends AbstractUserAdapterFederatedStorage {
   }
 
   @Override
+  public String getLastName() {
+    return user.getLastName();
+  }
+
+  @Override
+  public void setLastName(String lastName) {
+    user.setLastName(lastName);
+  }
+
+  @Override
   public String getEmail() {
     return user.getEmail();
   }
@@ -60,5 +70,5 @@ public class UserAdapter extends AbstractUserAdapterFederatedStorage {
   public String getId() {
     return keycloakId;
   }
- 
+
 }

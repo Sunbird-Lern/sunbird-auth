@@ -8,13 +8,12 @@ import org.keycloak.provider.ProviderConfigProperty;
 import org.keycloak.provider.ProviderConfigurationBuilder;
 import org.keycloak.storage.UserStorageProviderFactory;
 
-public class CassandraUserStorgeProviderFactory
-    implements UserStorageProviderFactory<CassandraUserStorageProvider> {
+public class UserServiceProviderFactory implements UserStorageProviderFactory<UserServiceProvider> {
 
   @Override
-  public CassandraUserStorageProvider create(KeycloakSession session, ComponentModel model) {
-    UserRepository repository = new UserRepository();
-    return new CassandraUserStorageProvider(session, model, repository);
+  public UserServiceProvider create(KeycloakSession session, ComponentModel model) {
+    UserService userService = new UserService();
+    return new UserServiceProvider(session, model, userService);
   }
 
   @Override
@@ -29,14 +28,7 @@ public class CassandraUserStorgeProviderFactory
 
   @Override
   public List<ProviderConfigProperty> getConfigProperties() {
-    return ProviderConfigurationBuilder.create()
-        .property()
-        .name("host")
-        .label("Host")
-        .helpText("Cassandra DB host")
-        .type("String")
-        .defaultValue("localhost")
-        .add()
-        .build();
+    return ProviderConfigurationBuilder.create().property().name("host").label("Host")
+        .helpText("Cassandra DB host").type("String").defaultValue("localhost").add().build();
   }
 }

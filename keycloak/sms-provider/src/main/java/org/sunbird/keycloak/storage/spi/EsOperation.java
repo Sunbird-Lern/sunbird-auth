@@ -24,45 +24,46 @@ import org.jboss.logging.Logger;
 import org.sunbird.keycloak.utils.Constants;
 
 public class EsOperation {
-  
+
   private static Logger logger = Logger.getLogger(EsOperation.class);
-  
-  private EsOperation(){}
-  
+
+  private EsOperation() {}
+
   @SuppressWarnings({"unchecked"})
-  public static List<User> getUserByKey(String key,String value) {
-    Map<String,Object> userRequest = new HashMap<>();
-    Map<String,Object> request = new HashMap<>();
-    Map<String,String> filters = new HashMap<>(); 
-    filters.put(key,value);
+  public static List<User> getUserByKey(String key, String value) {
+    Map<String, Object> userRequest = new HashMap<>();
+    Map<String, Object> request = new HashMap<>();
+    Map<String, String> filters = new HashMap<>();
+    filters.put(key, value);
     request.put("filters", filters);
     userRequest.put("request", request);
     // String searchUrl = System.getenv("sunbird_cs_base_url")+"/user/v1/search";
     String searchUrl = "http://localhost:9000/v1/user/search";
-    Map<String, Object> resMap = post(userRequest, searchUrl, System.getenv(Constants.SUNBIRD_LMS_AUTHORIZATION));
+    Map<String, Object> resMap =
+        post(userRequest, searchUrl, System.getenv(Constants.SUNBIRD_LMS_AUTHORIZATION));
     Map<String, Object> result = null;
     Map<String, Object> responseMap = null;
     List<Map<String, Object>> content = null;
-    if(null != resMap){
+    if (null != resMap) {
       result = (Map<String, Object>) resMap.get("result");
     }
-    if(null != result){
+    if (null != result) {
       responseMap = (Map<String, Object>) result.get("response");
     }
-    if(null != responseMap){
+    if (null != responseMap) {
       content = (List<Map<String, Object>>) (responseMap).get("content");
     }
-    if(null != content){
+    if (null != content) {
       List<User> userList = new ArrayList<>();
-      if(content.size() > 1){
+      if (content.size() > 1) {
         content.forEach(userMap -> {
-          if(null != userMap){
-          userList.add(createUser(userMap));
+          if (null != userMap) {
+            userList.add(createUser(userMap));
           }
         });
       }
-      Map<String, Object> userMap  = content.get(0);
-      if(null != userMap){
+      Map<String, Object> userMap = content.get(0);
+      if (null != userMap) {
         logger.info("usermap is not null from ES");
         userList.add(createUser(userMap));
         return userList;
@@ -70,7 +71,7 @@ public class EsOperation {
     }
     return Collections.emptyList();
   }
-  
+
   private static User createUser(Map<String, Object> userMap) {
     User user = new User();
     user.setEmail((String) userMap.get(Constants.EMAIL));
@@ -101,13 +102,14 @@ public class EsOperation {
       httpPost.setHeader("x-authenticated-user-token", getToken());
       CloseableHttpResponse response = client.execute(httpPost);
       logger.debug("EsOperation:post: statusCode = " + response.getStatusLine().getStatusCode());
-      return mapper.readValue(response.getEntity().getContent(),new TypeReference<Map<String, Object>>(){});
+      return mapper.readValue(response.getEntity().getContent(),
+          new TypeReference<Map<String, Object>>() {});
     } catch (Exception e) {
       logger.error("EsOperation:post: Exception occurred = " + e);
     }
     return null;
   }
-  
+
   public static String getToken() {
     String userName = System.getenv("sunbird_sso_username");
     String password = System.getenv("sunbird_sso_password");
@@ -115,22 +117,16 @@ public class EsOperation {
     String urlPath =
         "realms/" + System.getenv("sunbird_sso_realm") + "/protocol/openid-connect/token";
     try (CloseableHttpClient client = HttpClients.createDefault()) {
-      HttpPost httpPost = new HttpPost(sunbirdAuthBaseUrl+urlPath);
-      StringEntity entity = new StringEntity(
-          "client_id="
-              + System.getenv("sunbird_sso_client_id")
-              + "&username="
-              + userName
-              + "&password="
-              + password
-              + "&grant_type=password");
+      HttpPost httpPost = new HttpPost(sunbirdAuthBaseUrl + urlPath);
+      StringEntity entity = new StringEntity("client_id=" + System.getenv("sunbird_sso_client_id")
+          + "&username=" + userName + "&password=" + password + "&grant_type=password");
       logger.debug("EsOperation:post: request entity = " + entity);
       httpPost.setEntity(entity);
       httpPost.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED);
       HttpResponse response = client.execute(httpPost);
       Map<String, Object> map = getResponse(response);
       String token = (String) map.get("access_token");
-      if(StringUtils.isNotBlank(token)){
+      if (StringUtils.isNotBlank(token)) {
         return token;
       }
       return "";
@@ -139,25 +135,25 @@ public class EsOperation {
     }
     return "";
   }
-  
-  public static Map<String,Object> getResponse(HttpResponse response){
+
+  public static Map<String, Object> getResponse(HttpResponse response) {
     InputStream inStream = null;
     BufferedReader reader = null;
     StringBuilder builder = new StringBuilder();
-    if(200 == response.getStatusLine().getStatusCode()){
-      try{
-      inStream = response.getEntity().getContent();
-      reader = new BufferedReader(new InputStreamReader(inStream, StandardCharsets.UTF_8));
-      String line = null;
-      while ((line = reader.readLine()) != null) {
-        builder.append(line);
-        String res = builder.toString();
-        if (StringUtils.isNotBlank(res)) {
-          ObjectMapper mapper = new ObjectMapper();
-          return mapper.readValue(res, new TypeReference<Map<String, Object>>(){});
+    if (200 == response.getStatusLine().getStatusCode()) {
+      try {
+        inStream = response.getEntity().getContent();
+        reader = new BufferedReader(new InputStreamReader(inStream, StandardCharsets.UTF_8));
+        String line = null;
+        while ((line = reader.readLine()) != null) {
+          builder.append(line);
+          String res = builder.toString();
+          if (StringUtils.isNotBlank(res)) {
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.readValue(res, new TypeReference<Map<String, Object>>() {});
+          }
         }
-      }
-      }catch(Exception ex){
+      } catch (Exception ex) {
         logger.error("EsOperation:getResponse: Exception occurred = " + ex);
       }
     }

@@ -14,14 +14,14 @@ import org.jboss.logging.Logger;
 public class DefaultDecryptionServiceImpl implements DecryptionService {
   private static Logger logger = Logger.getLogger(DefaultDecryptionServiceImpl.class);
   private static String sunbird_encryption = "";
-
+  private static String encryption_key = "";
   private String sunbirdEncryption = "ON";
   private static final String ON = "ON";
   private static Cipher c;
 
   static {
     try {
-      sunbird_encryption = DefaultEncryptionServivceImpl.getSalt();
+      sunbird_encryption = getSalt();
       Key key = generateKey();
       c = Cipher.getInstance(ALGORITHM);
       c.init(Cipher.DECRYPT_MODE, key);
@@ -103,5 +103,17 @@ public class DefaultDecryptionServiceImpl implements DecryptionService {
 
   private static Key generateKey() {
     return new SecretKeySpec(keyValue, ALGORITHM);
+  }
+
+  public static String getSalt() {
+    if (StringUtils.isNotBlank(encryption_key)) {
+      return encryption_key;
+    } else {
+      encryption_key = System.getenv("sunbird_encryption_key");
+    }
+    if (StringUtils.isBlank(encryption_key)) {
+      throw new RuntimeException("Invalid encryption key");
+    }
+    return encryption_key;
   }
 }

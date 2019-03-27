@@ -17,41 +17,41 @@ import org.keycloak.storage.user.UserLookupProvider;
 import org.keycloak.storage.user.UserQueryProvider;
 import org.sunbird.keycloak.utils.Constants;
 
-public class CassandraUserStorageProvider
+public class UserServiceProvider
     implements UserStorageProvider, UserLookupProvider, UserQueryProvider {
   private static final Logger logger = Logger.getLogger(UserStorageProvider.class);
 
   public static final String PASSWORD_CACHE_KEY = UserAdapter.class.getName() + ".password";
   private final KeycloakSession session;
   private final ComponentModel model;
-  private final UserRepository repository;
+  private final UserService userService;
 
-  public CassandraUserStorageProvider(
-      KeycloakSession session, ComponentModel model, UserRepository repository) {
+  public UserServiceProvider(KeycloakSession session, ComponentModel model,
+      UserService userService) {
     this.session = session;
     this.model = model;
-    this.repository = repository;
+    this.userService = userService;
   }
 
   @Override
   public void close() {}
 
   @Override
-  public UserModel getUserById(String id, RealmModel realm) { 
+  public UserModel getUserById(String id, RealmModel realm) {
     String externalId = StorageId.externalId(id);
-    logger.info("Get user by id " + id); 
-    return new UserAdapter(session, realm, model, repository.findUserById(externalId));
+    logger.info("Get user by id " + id);
+    return new UserAdapter(session, realm, model, userService.getById(externalId));
   }
 
   @Override
   public UserModel getUserByUsername(String username, RealmModel realm) {
-    logger.info("Get user by name " + username);
-    List<User> users = repository.findUserByUsernameOrEmail(username);
+    logger.info("Get user by name ");
+    List<User> users = userService.getByUsername(username);
     if (users != null && users.size() == 1) {
       return new UserAdapter(session, realm, model, users.get(0));
-    } else if(users != null && users.size() > 1){
-      throw new ModelDuplicateException("Multiple users are associated with this login credentilas.",
-          "login credentilas");
+    } else if (users != null && users.size() > 1) {
+      throw new ModelDuplicateException(
+          "Multiple users are associated with this login credentials.", "login credentials");
     } else {
       return null;
     }
@@ -59,7 +59,7 @@ public class CassandraUserStorageProvider
 
   @Override
   public UserModel getUserByEmail(String email, RealmModel realm) {
-    logger.info("Get user by email " + email);
+    logger.info("Get user by email ");
     return getUserByUsername(email, realm);
   }
 
@@ -80,18 +80,15 @@ public class CassandraUserStorageProvider
 
   @Override
   public List<UserModel> searchForUser(String search, RealmModel realm) {
-    logger.info("Search user, with search phrase: " + search);
-    return repository
-        .findUsers(search)
-        .stream()
-        .map(user -> new UserAdapter(session, realm, model, user))
-        .collect(Collectors.toList());
+    logger.info("Search user, with search phrase: ");
+    return userService.getByUsername(search).stream()
+        .map(user -> new UserAdapter(session, realm, model, user)).collect(Collectors.toList());
   }
 
   @Override
-  public List<UserModel> searchForUser(
-      String search, RealmModel realm, int firstResult, int maxResults) {
-    logger.info("Search user, with search phrase: " + search);
+  public List<UserModel> searchForUser(String search, RealmModel realm, int firstResult,
+      int maxResults) {
+    logger.info("Search user, with search phrase: ");
     return searchForUser(search, realm);
   }
 
@@ -101,16 +98,16 @@ public class CassandraUserStorageProvider
   }
 
   @Override
-  public List<UserModel> searchForUser(
-      Map<String, String> params, RealmModel realm, int firstResult, int maxResults) {
+  public List<UserModel> searchForUser(Map<String, String> params, RealmModel realm,
+      int firstResult, int maxResults) {
 
     return Collections.emptyList();
   }
 
   @Override
-  public List<UserModel> getGroupMembers(
-      RealmModel realm, GroupModel group, int firstResult, int maxResults) {
- 
+  public List<UserModel> getGroupMembers(RealmModel realm, GroupModel group, int firstResult,
+      int maxResults) {
+
     return Collections.emptyList();
   }
 
@@ -121,14 +118,13 @@ public class CassandraUserStorageProvider
   }
 
   @Override
-  public List<UserModel> searchForUserByUserAttribute(
-      String attrName, String attrValue, RealmModel realm) {
+  public List<UserModel> searchForUserByUserAttribute(String attrName, String attrValue,
+      RealmModel realm) {
     logger.info("Search user by user attributes: " + attrName);
-    if(Constants.PHONE.equalsIgnoreCase(attrName)){
-      return EsOperation.getUserByKey(attrName, attrValue).stream()
-          .map(user -> new UserAdapter(session, realm, model, user))
-          .collect(Collectors.toList());
+    if (Constants.PHONE.equalsIgnoreCase(attrName)) {
+      return userService.getByKey(attrName, attrValue).stream()
+          .map(user -> new UserAdapter(session, realm, model, user)).collect(Collectors.toList());
     }
-	return Collections.emptyList();
+    return Collections.emptyList();
   }
 }
