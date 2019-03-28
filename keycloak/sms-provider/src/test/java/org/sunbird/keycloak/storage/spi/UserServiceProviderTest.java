@@ -24,7 +24,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({StorageId.class,KeycloakSession.class,ComponentModel.class,UserService.class,
-  UserAdapter.class,RealmModel.class,UserModel.class,EsOperation.class,GroupModel.class})
+  UserAdapter.class,RealmModel.class,UserModel.class,UserSearchService.class,GroupModel.class})
 @PowerMockIgnore({"javax.management.*", "javax.net.ssl.*", "javax.security.*"})
 public class UserServiceProviderTest {
 
@@ -47,7 +47,7 @@ public class UserServiceProviderTest {
     user.setPhone("9876543210");
     userList.add(user);
     mockStatic(StorageId.class);
-    mockStatic(EsOperation.class);
+    mockStatic(UserSearchService.class);
     groupModel = PowerMockito.mock(GroupModel.class);
     session = PowerMockito.mock(KeycloakSession.class);
     model = PowerMockito.mock(ComponentModel.class);
@@ -71,7 +71,7 @@ public class UserServiceProviderTest {
     UserServiceProvider userServiceProvider = new UserServiceProvider(session, model, userService);
     PowerMockito.when(userService.getByUsername("username")).thenReturn(userList);
     userModel = userServiceProvider.getUserByUsername("username", realm);
-    assertEquals("firstName", userModel.getFirstName());
+    assertEquals("firstName", userModel.getFirstName()); 
     assertEquals("username", userModel.getUsername());
   }
   

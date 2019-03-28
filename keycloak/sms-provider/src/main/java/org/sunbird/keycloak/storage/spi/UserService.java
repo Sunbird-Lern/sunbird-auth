@@ -71,6 +71,6 @@ public class UserService {
 
   public List<User> getByKey(String key, String searchValue) {
     logger.info("calling ES search api");
-    return EsOperation.getUserByKey(key, searchValue);
+    return UserSearchService.getUserByKey(key, searchValue);
   }
 }

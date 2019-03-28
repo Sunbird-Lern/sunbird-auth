@@ -23,11 +23,11 @@ import org.apache.http.impl.client.HttpClients;
 import org.jboss.logging.Logger;
 import org.sunbird.keycloak.utils.Constants;
 
-public class EsOperation {
+public class UserSearchService {
 
-  private static Logger logger = Logger.getLogger(EsOperation.class);
+  private static Logger logger = Logger.getLogger(UserSearchService.class);
 
-  private EsOperation() {}
+  private UserSearchService() {}
 
   @SuppressWarnings({"unchecked"})
   public static List<User> getUserByKey(String key, String value) {
@@ -90,14 +90,13 @@ public class EsOperation {
 
   public static Map<String, Object> post(Map<String, Object> requestBody, String uri,
       String authorizationKey) {
-    logger.debug("EsOperation: post called");
+    logger.debug("UserSearchService: post called");
     try (CloseableHttpClient client = HttpClients.createDefault()) {
       ObjectMapper mapper = new ObjectMapper();
       HttpPost httpPost = new HttpPost(uri);
-      logger.debug("EsOperation:post: uri = " + uri);
+      logger.debug("UserSearchService:post: uri = " + uri);
       String authKey = Constants.BEARER + " " + authorizationKey;
       StringEntity entity = new StringEntity(mapper.writeValueAsString(requestBody));
-      logger.debug("EsOperation:post: request entity = " + entity);
       httpPost.setEntity(entity);
       httpPost.setHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON);
       httpPost.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
@@ -106,11 +105,11 @@ public class EsOperation {
       }
       httpPost.setHeader("x-authenticated-user-token", getToken());
       CloseableHttpResponse response = client.execute(httpPost);
-      logger.debug("EsOperation:post: statusCode = " + response.getStatusLine().getStatusCode());
+      logger.debug("UserSearchService:post: statusCode = " + response.getStatusLine().getStatusCode());
       return mapper.readValue(response.getEntity().getContent(),
           new TypeReference<Map<String, Object>>() {});
     } catch (Exception e) {
-      logger.error("EsOperation:post: Exception occurred = " + e);
+      logger.error("UserSearchService:post: Exception occurred = " + e);
     }
     return null;
   }
@@ -125,7 +124,7 @@ public class EsOperation {
       HttpPost httpPost = new HttpPost(sunbirdAuthBaseUrl + urlPath);
       StringEntity entity = new StringEntity("client_id=" + System.getenv("sunbird_sso_client_id")
           + "&username=" + userName + "&password=" + password + "&grant_type=password");
-      logger.debug("EsOperation:post: request entity = " + entity);
+      logger.debug("UserSearchService:post: request entity = " + entity);
       httpPost.setEntity(entity);
       httpPost.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED);
       HttpResponse response = client.execute(httpPost);
@@ -136,7 +135,7 @@ public class EsOperation {
       }
       return "";
     } catch (Exception e) {
-      logger.error("EsOperation:getToken: Exception occurred = " + e);
+      logger.error("UserSearchService:getToken: Exception occurred = " + e);
     }
     return "";
   }
@@ -159,7 +158,7 @@ public class EsOperation {
           }
         }
       } catch (Exception ex) {
-        logger.error("EsOperation:getResponse: Exception occurred = " + ex);
+        logger.error("UserSearchService:getResponse: Exception occurred = " + ex);
       }
     }
     return Collections.emptyMap();

@@ -28,7 +28,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
   HttpEntity.class})
 @PowerMockIgnore({"javax.management.*", "javax.net.ssl.*", "javax.security.*"})
 @Ignore
-public class EsOperationTest {
+public class UserSearchServiceTest {
   
   private static CloseableHttpClient client = null;
   //private static HttpResponse httpResponse = null;
@@ -71,7 +71,7 @@ public class EsOperationTest {
 
   @Test
   public void getUserByKeyTest(){
-    String token = EsOperation.getToken(); 
+    String token = UserSearchService.getToken(); 
     assertEquals("token1",token);
   }
 }
