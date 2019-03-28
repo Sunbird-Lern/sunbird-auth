@@ -10,7 +10,7 @@ public class User {
   private String lastName;
   private String password;
   private boolean enabled;
-  private String countrycode;
+  private String countryCode;
 
   public User() {}
 
@@ -48,7 +48,7 @@ public class User {
     return username;
   }
 
-  public void setUsername(String username) {
+  public void setUsername(String username) { 
     this.username = username;
   }
 
@@ -84,12 +84,12 @@ public class User {
     this.enabled = enabled;
   }
 
-  public String getCountrycode() {
-    return countrycode;
+  public String getCountryCode() {
+    return countryCode;
   }
 
-  public void setCountrycode(String countrycode) {
-    this.countrycode = countrycode;
+  public void setCountryCode(String countryCode) {
+    this.countryCode = countryCode;
   }
   
   
