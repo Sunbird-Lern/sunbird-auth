@@ -17,7 +17,7 @@ public class User {
   public User(String id, String firstName, String lastName) {
     this.id = id;
     this.firstName = firstName == null ? "" : firstName;
-    this.lastName = lastName;
+    this.lastName = lastName == null ? "" : lastName;
   }
 
   public String getPassword() {
@@ -91,7 +91,5 @@ public class User {
   public void setCountryCode(String countryCode) {
     this.countryCode = countryCode;
   }
-  
-  
   
 }

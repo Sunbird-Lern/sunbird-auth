@@ -25,7 +25,7 @@ public class DefaultDecryptionServiceImpl implements DecryptionService {
       c = Cipher.getInstance(ALGORITHM);
       c.init(Cipher.DECRYPT_MODE, key);
     } catch (Exception e) {
-      logger.error("exception occurred "+e);
+      logger.error("DefaultDecryptionServiceImpl:DefaultDecryptionServiceImpl: Exception occurred with error message = " + e.getMessage());
     }
   }
 
@@ -85,8 +85,8 @@ public class DefaultDecryptionServiceImpl implements DecryptionService {
       String dValue = null;
       String valueToDecrypt = value.trim();
       for (int i = 0; i < ITERATIONS; i++) {
-        byte[] decordedValue = new sun.misc.BASE64Decoder().decodeBuffer(valueToDecrypt);
-        byte[] decValue = c.doFinal(decordedValue);
+        byte[] decodedValue = new sun.misc.BASE64Decoder().decodeBuffer(valueToDecrypt);
+        byte[] decValue = c.doFinal(decodedValue);
         dValue =
             new String(decValue, StandardCharsets.UTF_8).substring(encryptionKey.length());
         valueToDecrypt = dValue;
@@ -94,7 +94,7 @@ public class DefaultDecryptionServiceImpl implements DecryptionService {
       return dValue;
     } catch (Exception ex) {
       if (throwExceptionOnFailure) {
-        logger.error(ex);
+        logger.error("DefaultDecryptionServiceImpl:decrypt: Exception occurred with error message = ", ex.getMessage());
         throw new RuntimeException(ex);
       }
     }

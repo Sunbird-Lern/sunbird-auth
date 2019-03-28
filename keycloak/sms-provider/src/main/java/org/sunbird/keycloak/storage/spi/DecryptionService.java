@@ -4,10 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * This service will have data decryption methods. decryption logic will differ based on imp
- * classes.
- *
- * @author Manzarul
+ * DecryptionService provides methods for decryption of data.
  */
 public interface DecryptionService {
 
@@ -17,28 +14,23 @@ public interface DecryptionService {
       new byte[] {'T', 'h', 'i', 's', 'A', 's', 'I', 'S', 'e', 'r', 'c', 'e', 'K', 't', 'e', 'y'};
 
   /**
-   * This method will take input as key value pair , value can be any primitive or String or both or
-   * can have another map as values. inner map will also have values as primitive or String or both
+   * Decrypt given data (map). Decryption of a key value that is a map or list is skipped.
    *
-   * @param data Map<String,Object>
-   * @return Map<String,Object>
-   * @throws Exception
+   * @param data Input data
+   * @return Decrypted data
    */
   Map<String, Object> decryptData(Map<String, Object> data);
 
   /**
-   * This method will take list of map as an input to decrypt the data, after decryption it will
-   * return same map with decrypted values. values in side map can have primitive , String or
-   * another map have primitive , String values.
+   * Decrypt given data (list of map).
    *
-   * @param data List<Map<String,Object>>
-   * @return List<Map<String,Object>>
-   * @throws Exception
+   * @param data Input data
+   * @return Decrypted data
    */
   List<Map<String, Object>> decryptData(List<Map<String, Object>> data);
 
   /**
-   * Decrypt given data.
+   * Decrypt given data (string).
    *
    * @param data Input data
    * @return Decrypted data
@@ -46,11 +38,12 @@ public interface DecryptionService {
   String decryptData(String data);
 
   /**
-   * Decrypt given data.
+   * Decrypt given data (string) or throw exception in case of any error.
    *
    * @param data Input data
    * @return Decrypted data
-   * @throws ProjectCommonException in case of an error during decryption.
+   * @throws ProjectCommonException in case of an error during decryption
    */
   String decryptData(String data, boolean throwExceptionOnFailure);
+
 }
