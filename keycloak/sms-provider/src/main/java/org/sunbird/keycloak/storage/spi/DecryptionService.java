@@ -14,7 +14,7 @@ public interface DecryptionService {
       new byte[] {'T', 'h', 'i', 's', 'A', 's', 'I', 'S', 'e', 'r', 'c', 'e', 'K', 't', 'e', 'y'};
 
   /**
-   * Decrypt given data (map).
+   * Decrypt given data (map). Decryption of a key value that is a map or list is skipped.
    *
    * @param data Input data
    * @return Decrypted data
