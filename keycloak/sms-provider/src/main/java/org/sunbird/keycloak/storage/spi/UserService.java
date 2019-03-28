@@ -31,13 +31,12 @@ public class UserService {
     String phone = decrypt(r.getString(Constants.PHONE));
     user.setPhone(phone);
     user.setLastName(r.getString(Constants.LAST_NAME));
+    user.setCountryCode(r.getString("countrycode"));
     if (r.getBool("isdeleted")) {
       user.setEnabled(false);
     } else {
       user.setEnabled(true);
     }
-    
-    
     return user;
   }
 
