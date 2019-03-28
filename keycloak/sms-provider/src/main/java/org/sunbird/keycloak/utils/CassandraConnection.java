@@ -3,9 +3,6 @@ package org.sunbird.keycloak.utils;
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.policies.DefaultRetryPolicy;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class CassandraConnection {
 
@@ -25,13 +22,11 @@ public class CassandraConnection {
   }
 
   private CassandraConnection() {
-    String host = System.getenv(Constants.SUNBIRD_CASSANDRA_IP);
-    List<String> hostList = Arrays.stream(host.split(",")).collect(Collectors.toList());
-    connect(hostList);
+    connect(System.getenv(Constants.SUNBIRD_CASSANDRA_IP));
   }
 
-  public void connect(List<String> nodeList) {
-    cluster = Cluster.builder().addContactPoints(String.join(",", nodeList))
+  public void connect(String nodes) {
+    cluster = Cluster.builder().addContactPoints(nodes)
         .withRetryPolicy(DefaultRetryPolicy.INSTANCE).build();
     session = cluster.connect();
   }
