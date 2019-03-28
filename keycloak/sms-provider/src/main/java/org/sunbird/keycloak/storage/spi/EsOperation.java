@@ -79,6 +79,7 @@ public class EsOperation {
     user.setLastName((String) userMap.get("lastName"));
     user.setPhone((String) userMap.get(Constants.PHONE));
     user.setUsername((String) userMap.get("userName"));
+    user.setCountryCode((String) userMap.get("countryCode"));
     if (((Boolean)userMap.get("isDeleted"))) {
       user.setEnabled(false);
     } else {
@@ -114,7 +115,7 @@ public class EsOperation {
     return null;
   }
 
-  public static String getToken() {
+  public static String getToken() { 
     String userName = System.getenv("sunbird_sso_username");
     String password = System.getenv("sunbird_sso_password");
     String sunbirdAuthBaseUrl = System.getenv("sunbird_sso_url");
