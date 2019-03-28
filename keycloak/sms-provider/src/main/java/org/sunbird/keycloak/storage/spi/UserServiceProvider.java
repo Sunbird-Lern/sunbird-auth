@@ -38,14 +38,14 @@ public class UserServiceProvider
 
   @Override
   public UserModel getUserById(String id, RealmModel realm) {
+    logger.info("UserServiceProvider:getUserById: id = " + id);
     String externalId = StorageId.externalId(id);
-    logger.info("Get user by id " + id);
     return new UserAdapter(session, realm, model, userService.getById(externalId));
   }
 
   @Override
   public UserModel getUserByUsername(String username, RealmModel realm) {
-    logger.info("Get user by name ");
+    logger.info("UserServiceProvider: getUserByUsername called");
     List<User> users = userService.getByUsername(username);
     if (users != null && users.size() == 1) {
       return new UserAdapter(session, realm, model, users.get(0));
@@ -59,7 +59,7 @@ public class UserServiceProvider
 
   @Override
   public UserModel getUserByEmail(String email, RealmModel realm) {
-    logger.info("Get user by email ");
+    logger.info("UserServiceProvider: getUserByEmail called");
     return getUserByUsername(email, realm);
   }
 
@@ -80,7 +80,7 @@ public class UserServiceProvider
 
   @Override
   public List<UserModel> searchForUser(String search, RealmModel realm) {
-    logger.info("Search user, with search phrase: ");
+    logger.info("UserServiceProvider: searchForUser called");
     return userService.getByUsername(search).stream()
         .map(user -> new UserAdapter(session, realm, model, user)).collect(Collectors.toList());
   }
@@ -88,7 +88,7 @@ public class UserServiceProvider
   @Override
   public List<UserModel> searchForUser(String search, RealmModel realm, int firstResult,
       int maxResults) {
-    logger.info("Search user, with search phrase: ");
+    logger.info("UserServiceProvider: searchForUser called with firstResult = " + firstResult);
     return searchForUser(search, realm);
   }
 
@@ -120,11 +120,12 @@ public class UserServiceProvider
   @Override
   public List<UserModel> searchForUserByUserAttribute(String attrName, String attrValue,
       RealmModel realm) {
-    logger.info("Search user by user attributes: " + attrName);
+    logger.info("UserServiceProvider: searchForUserByUserAttribute called");
     if (Constants.PHONE.equalsIgnoreCase(attrName)) {
       return userService.getByKey(attrName, attrValue).stream()
           .map(user -> new UserAdapter(session, realm, model, user)).collect(Collectors.toList());
     }
     return Collections.emptyList();
   }
+
 }
