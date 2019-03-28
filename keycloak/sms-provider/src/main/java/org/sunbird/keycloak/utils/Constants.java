@@ -43,4 +43,10 @@ public class Constants {
   public static final String RECIPIENT_EMAILS = "recipientEmails";
   public static final String FORGOT_PASSWORD_EMAIL_TEMPLATE = "forgotPasswordWithOTP";
   public static final String REQUEST = "request";
+  public static final String FIRST_NAME = "firstname";
+  public static final String ID = "id";
+  public static final String PHONE = "phone";
+  public static final String SUNBIRD_CASSANDRA_IP = "sunbird_cassandra_host";
+  public static final String SUNBIRD_CASSANDRA_PORT = "sunbird_cassandra_port";
+  public static final String LAST_NAME = "lastname";
 }
