@@ -94,7 +94,7 @@ public class UserAdapter extends AbstractUserAdapterFederatedStorage {
     phoneValues.add(decrypt(user.getPhone()));
     attributes.put("phone", phoneValues);
     List<String> countrycodeValues = new ArrayList<>();
-    countrycodeValues.add(user.getCountrycode());
+    countrycodeValues.add(user.getCountryCode());
     attributes.put("countryCode", countrycodeValues);
     List<String> currentLoginTime = getAttribute("currentLoginTime");
     if(null != currentLoginTime){
