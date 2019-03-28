@@ -56,11 +56,12 @@ public class UserService {
       users = getByKey(Constants.EMAIL, username);
       if (users != null)
         return users;
-    } else {
-      users = getByKey(Constants.USERNAME, username);
-      if (users != null)
-        return users;
     }
+
+    users = getByKey(Constants.USERNAME, username);
+    if (users != null)
+      return users;
+
     return Collections.emptyList();
   }
 
@@ -70,7 +71,8 @@ public class UserService {
   }
 
   public List<User> getByKey(String key, String searchValue) {
-    logger.info("calling ES search api");
+    logger.info("UserService: getByKey called");
     return UserSearchService.getUserByKey(key, searchValue);
   }
+
 }
