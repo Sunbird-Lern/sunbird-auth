@@ -27,9 +27,6 @@ public class CassandraConnection {
   private CassandraConnection() {
     String host = System.getenv(Constants.SUNBIRD_CASSANDRA_IP);
     List<String> hostList = Arrays.stream(host.split(",")).collect(Collectors.toList());
-    if (hostList.isEmpty()) {
-      hostList.add("localhost");
-    }
     connect(hostList);
   }
 
