@@ -27,7 +27,7 @@ public class SunbirdModelUtils {
       String username) {
     String numberRegex = "\\d+";
     KeycloakSession session = context.getSession();
-    logger.debug("SunbirdModelUtils@getUser " + username);
+    logger.info("SunbirdModelUtils@getUser " + username);
     if (username.matches(numberRegex)) {
       List<UserModel> userModels = session.users().searchForUserByUserAttribute(
           KeycloakSmsAuthenticatorConstants.ATTR_MOBILE, username, context.getRealm());
