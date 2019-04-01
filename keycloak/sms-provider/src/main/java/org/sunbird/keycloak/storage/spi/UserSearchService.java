@@ -54,19 +54,15 @@ public class UserSearchService {
     }
     if (null != content) {
       List<User> userList = new ArrayList<>();
-      if (content.size() > 1) {
+      if (!content.isEmpty()) {
+        logger.info("usermap is not null from ES");
         content.forEach(userMap -> {
           if (null != userMap) {
             userList.add(createUser(userMap));
           }
         });
       }
-      Map<String, Object> userMap = content.get(0);
-      if (null != userMap) {
-        logger.info("usermap is not null from ES");
-        userList.add(createUser(userMap));
-        return userList;
-      }
+      return userList;
     }
     return Collections.emptyList();
   }
@@ -90,11 +86,11 @@ public class UserSearchService {
 
   public static Map<String, Object> post(Map<String, Object> requestBody, String uri,
       String authorizationKey) {
-    logger.debug("UserSearchService: post called");
+    logger.info("UserSearchService: post called");
     try (CloseableHttpClient client = HttpClients.createDefault()) {
       ObjectMapper mapper = new ObjectMapper();
       HttpPost httpPost = new HttpPost(uri);
-      logger.debug("UserSearchService:post: uri = " + uri);
+      logger.info("UserSearchService:post: uri = " + uri);
       String authKey = Constants.BEARER + " " + authorizationKey;
       StringEntity entity = new StringEntity(mapper.writeValueAsString(requestBody));
       httpPost.setEntity(entity);
@@ -105,7 +101,7 @@ public class UserSearchService {
       }
       httpPost.setHeader("x-authenticated-user-token", getToken());
       CloseableHttpResponse response = client.execute(httpPost);
-      logger.debug("UserSearchService:post: statusCode = " + response.getStatusLine().getStatusCode());
+      logger.info("UserSearchService:post: statusCode = " + response.getStatusLine().getStatusCode());
       return mapper.readValue(response.getEntity().getContent(),
           new TypeReference<Map<String, Object>>() {});
     } catch (Exception e) {
