@@ -29,7 +29,7 @@ node('build-slave') {
             stage('Build') {
                 sh """
                         mkdir sunbird_auth_1.0v
-			wget https://downloads.jboss.org/keycloak/3.2.0.Final/keycloak-3.2.0.Final.tar.gz
+			wget https://sunbirdpublic.blob.core.windows.net/installation/keycloak-3.2.0.Final.tar.gz
                         tar -xvf keycloak-3.2.0.Final.tar.gz --strip 1 -C sunbird_auth_1.0v
                         mkdir -p sunbird_auth_1.0v/providers
                         mkdir -p sunbird_auth_1.0v/modules/system/layers/keycloak/org/postgresql/main
