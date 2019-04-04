@@ -76,7 +76,7 @@ public class UserSearchService {
     user.setPhone((String) userMap.get(Constants.PHONE));
     user.setUsername((String) userMap.get("userName"));
     user.setCountryCode((String) userMap.get("countryCode"));
-    if (null != userMap.get("isDeleted") && ((Boolean)userMap.get("isDeleted"))) {
+    if (null != userMap.get("isDeleted") && ((Boolean) userMap.get("isDeleted"))) {
       user.setEnabled(false);
     } else {
       user.setEnabled(true);
