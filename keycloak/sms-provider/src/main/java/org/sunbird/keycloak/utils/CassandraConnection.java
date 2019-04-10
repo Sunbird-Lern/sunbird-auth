@@ -27,13 +27,13 @@ public class CassandraConnection {
   }
 
   public void connect(String nodes) {
-    String[] hostIps =  null;
-    if(StringUtils.isNotBlank(nodes)){
-      hostIps =  nodes.split(",");
-    }else{
-      hostIps = new String[]{"localhost"};
+    String[] hosts =  null;
+    if (StringUtils.isNotBlank(nodes)) {
+      hosts =  nodes.split(",");
+    } else {
+      hosts = new String[] { "localhost" };
     }
-    cluster = Cluster.builder().addContactPoints(hostIps)
+    cluster = Cluster.builder().addContactPoints(hosts)
         .withRetryPolicy(DefaultRetryPolicy.INSTANCE).build();
     session = cluster.connect();
   }
