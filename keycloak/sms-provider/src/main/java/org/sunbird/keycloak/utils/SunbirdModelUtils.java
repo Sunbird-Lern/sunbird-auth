@@ -1,8 +1,11 @@
 package org.sunbird.keycloak.utils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -42,8 +45,14 @@ public class SunbirdModelUtils {
       		logger.info("SunbirdModelUtils@getUser userModel id=" + model.getId()+", userName=" + model.getUsername()+", firstName"+model.getFirstName());
       	}  
     	if (userModels.size() > 1) {  
-    		Map<String,UserModel> filteredModels = userModels.stream().filter(model->model.getId().startsWith("f:")).collect(Collectors.toMap(UserModel::getId, Function.identity()));  
-    		userModels = new ArrayList<>(filteredModels.values());
+    		List<UserModel> filtered = new ArrayList<>();
+    		Set<String> ids = new HashSet<>();
+    		userModels.forEach(model->{
+    			if(model.getId().startsWith("f:") && ids.add(model.getId())) {
+    				filtered.add(model);
+    			}
+    		});
+    		userModels = filtered;
     	}
     	logger.info("SunbirdModelUtils@getUser user model size "+userModels.size());
     	if (userModels.size() > 1) {
