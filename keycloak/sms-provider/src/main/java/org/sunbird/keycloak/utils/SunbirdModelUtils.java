@@ -1,6 +1,9 @@
 package org.sunbird.keycloak.utils;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.jboss.logging.Logger;
@@ -39,7 +42,8 @@ public class SunbirdModelUtils {
       		logger.info("SunbirdModelUtils@getUser userModel id=" + model.getId()+", userName=" + model.getUsername()+", firstName"+model.getFirstName());
       	}  
     	if (userModels.size() > 1) {  
-    		userModels = userModels.stream().filter(model->!model.getId().startsWith("f:")).collect(Collectors.toList());  
+    		Map<String,UserModel> filteredModels = userModels.stream().filter(model->model.getId().startsWith("f:")).collect(Collectors.toMap(UserModel::getId, Function.identity()));  
+    		userModels = new ArrayList<>(filteredModels.values());
     	}
     	logger.info("SunbirdModelUtils@getUser user model size "+userModels.size());
     	if (userModels.size() > 1) {
