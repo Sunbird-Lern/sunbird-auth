@@ -40,6 +40,7 @@ public class UserSearchService {
     String searchUrl = System.getenv("sunbird_cs_base_url")+"/user/v1/search";
     Map<String, Object> resMap =
         post(userRequest, searchUrl, System.getenv(Constants.SUNBIRD_LMS_AUTHORIZATION));
+    logger.info("UserSearchService:getUserByKey resMap="+resMap);
     Map<String, Object> result = null;
     Map<String, Object> responseMap = null;
     List<Map<String, Object>> content = null;
@@ -90,7 +91,7 @@ public class UserSearchService {
     try (CloseableHttpClient client = HttpClients.createDefault()) {
       ObjectMapper mapper = new ObjectMapper();
       HttpPost httpPost = new HttpPost(uri);
-      logger.info("UserSearchService:post: uri = " + uri);
+      logger.info("UserSearchService:post: uri = " + uri+ ", body = "+requestBody);
       String authKey = Constants.BEARER + " " + authorizationKey;
       StringEntity entity = new StringEntity(mapper.writeValueAsString(requestBody));
       httpPost.setEntity(entity);
