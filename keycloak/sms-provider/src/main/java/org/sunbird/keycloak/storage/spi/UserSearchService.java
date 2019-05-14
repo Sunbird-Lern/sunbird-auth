@@ -37,7 +37,7 @@ public class UserSearchService {
     filters.put(key, value);
     request.put("filters", filters);
     userRequest.put("request", request);
-    String searchUrl = System.getenv("sunbird_cs_base_url")+"/v1/user/search";
+    String searchUrl = System.getenv("sunbird_cs_base_url")+"/user/v1/search";
     Map<String, Object> resMap =
         post(userRequest, searchUrl, System.getenv(Constants.SUNBIRD_LMS_AUTHORIZATION));
     logger.info("UserSearchService:getUserByKey resMap="+resMap);
