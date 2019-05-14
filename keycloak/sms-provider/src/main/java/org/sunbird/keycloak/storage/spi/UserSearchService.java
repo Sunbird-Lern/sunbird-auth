@@ -37,7 +37,7 @@ public class UserSearchService {
     filters.put(key, value);
     request.put("filters", filters);
     userRequest.put("request", request);
-    String searchUrl = System.getenv("sunbird_cs_base_url")+"/user/v1/search";
+    String searchUrl = System.getenv("sunbird_cs_base_url")+"/v1/user/search";
     Map<String, Object> resMap =
         post(userRequest, searchUrl, System.getenv(Constants.SUNBIRD_LMS_AUTHORIZATION));
     Map<String, Object> result = null;
@@ -87,6 +87,7 @@ public class UserSearchService {
   public static Map<String, Object> post(Map<String, Object> requestBody, String uri,
       String authorizationKey) {
     logger.info("UserSearchService: post called");
+    long t1 = System.currentTimeMillis();
     try (CloseableHttpClient client = HttpClients.createDefault()) {
       ObjectMapper mapper = new ObjectMapper();
       HttpPost httpPost = new HttpPost(uri);
@@ -101,7 +102,9 @@ public class UserSearchService {
       }
       httpPost.setHeader("x-authenticated-user-token", getToken());
       CloseableHttpResponse response = client.execute(httpPost);
+      long t2 = System.currentTimeMillis();
       logger.info("UserSearchService:post: statusCode = " + response.getStatusLine().getStatusCode());
+      logger.info("UserSearchService: post total time taken : "+(t2-t1));
       return mapper.readValue(response.getEntity().getContent(),
           new TypeReference<Map<String, Object>>() {});
     } catch (Exception e) {

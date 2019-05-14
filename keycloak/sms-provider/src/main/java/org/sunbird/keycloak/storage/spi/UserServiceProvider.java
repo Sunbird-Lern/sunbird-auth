@@ -46,8 +46,13 @@ public class UserServiceProvider
   @Override
   public UserModel getUserByUsername(String username, RealmModel realm) {
     logger.info("UserServiceProvider: getUserByUsername called");
+    long time = System.currentTimeMillis();
+   
     List<User> users = userService.getByUsername(username);
+    long time2 = System.currentTimeMillis();
+    logger.info("UserServiceProvider: getUserByUsername for username "+ username +" TIME in ms: "+(time2-time));
     if (users != null && users.size() == 1) {
+   
       return new UserAdapter(session, realm, model, users.get(0));
     } else if (users != null && users.size() > 1) {
       throw new ModelDuplicateException(
