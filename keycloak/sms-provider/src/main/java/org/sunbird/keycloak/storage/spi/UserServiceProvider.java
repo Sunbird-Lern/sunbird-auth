@@ -46,11 +46,11 @@ public class UserServiceProvider
   @Override
   public UserModel getUserByUsername(String username, RealmModel realm) {
     logger.info("UserServiceProvider: getUserByUsername called");
-    long time = System.currentTimeMillis();
+    long t1 = System.currentTimeMillis();
    
     List<User> users = userService.getByUsername(username);
-    long time2 = System.currentTimeMillis();
-    logger.info("UserServiceProvider: getUserByUsername for username "+ username +" TIME in ms: "+(time2-time));
+    long t2 = System.currentTimeMillis();
+    logger.info("UserServiceProvider: getUserByUsername for username "+ username +" TIME in ms: "+(t2-t1));
     if (users != null && users.size() == 1) {
    
       return new UserAdapter(session, realm, model, users.get(0));
