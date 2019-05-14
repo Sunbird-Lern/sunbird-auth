@@ -40,6 +40,7 @@ public class UserSearchService {
     String searchUrl = System.getenv("sunbird_cs_base_url")+"/v1/user/search";
     Map<String, Object> resMap =
         post(userRequest, searchUrl, System.getenv(Constants.SUNBIRD_LMS_AUTHORIZATION));
+    logger.info("UserSearchService:getUserByKey resMap="+resMap);
     Map<String, Object> result = null;
     Map<String, Object> responseMap = null;
     List<Map<String, Object>> content = null;
@@ -76,7 +77,7 @@ public class UserSearchService {
     user.setPhone((String) userMap.get(Constants.PHONE));
     user.setUsername((String) userMap.get("userName"));
     user.setCountryCode((String) userMap.get("countryCode"));
-    if (((Boolean)userMap.get("isDeleted"))) {
+    if ( null != userMap.get("status") && ((Integer)userMap.get("status")) == 0) {
       user.setEnabled(false);
     } else {
       user.setEnabled(true);
@@ -91,7 +92,7 @@ public class UserSearchService {
     try (CloseableHttpClient client = HttpClients.createDefault()) {
       ObjectMapper mapper = new ObjectMapper();
       HttpPost httpPost = new HttpPost(uri);
-      logger.info("UserSearchService:post: uri = " + uri);
+      logger.info("UserSearchService:post: uri = " + uri+ ", body = "+requestBody);
       String authKey = Constants.BEARER + " " + authorizationKey;
       StringEntity entity = new StringEntity(mapper.writeValueAsString(requestBody));
       httpPost.setEntity(entity);

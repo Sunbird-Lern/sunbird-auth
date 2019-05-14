@@ -34,6 +34,9 @@ public class SunbirdModelUtils {
       if (userModels != null && !userModels.isEmpty()) {
         // multiple user found for same attribute
         if (userModels.size() > 1) {
+        	for(UserModel model : userModels) {
+        		logger.info("SunbirdModelUtils@getUser userModel id=" + model.getId()+", userName=" + model.getUsername()+", firstName"+model.getFirstName());
+        	}
           throw new ModelDuplicateException(Constants.MULTIPLE_USER_ASSOCIATED_WITH_PHONE,
               KeycloakSmsAuthenticatorConstants.ATTR_MOBILE);
         }
