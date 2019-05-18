@@ -1,6 +1,14 @@
 package org.sunbird.keycloak.utils;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 import org.jboss.logging.Logger;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.models.KeycloakSession;
@@ -33,10 +41,21 @@ public class SunbirdModelUtils {
           KeycloakSmsAuthenticatorConstants.ATTR_MOBILE, username, context.getRealm());
       if (userModels != null && !userModels.isEmpty()) {
         // multiple user found for same attribute
-        if (userModels.size() > 1) {
-        	for(UserModel model : userModels) {
-        		logger.info("SunbirdModelUtils@getUser userModel id=" + model.getId()+", userName=" + model.getUsername()+", firstName"+model.getFirstName());
-        	}
+    	for(UserModel model : userModels) {
+      		logger.info("SunbirdModelUtils@getUser userModel id=" + model.getId()+", userName=" + model.getUsername()+", firstName"+model.getFirstName());
+      	}  
+    	if (userModels.size() > 1) {  
+    		List<UserModel> filtered = new ArrayList<>();
+    		Set<String> ids = new HashSet<>();
+    		userModels.forEach(model->{
+    			if(model.getId().startsWith("f:") && ids.add(model.getId())) {
+    				filtered.add(model);
+    			}
+    		});
+    		userModels = filtered;
+    	}
+    	logger.info("SunbirdModelUtils@getUser user model size "+userModels.size());
+    	if (userModels.size() > 1) {
           throw new ModelDuplicateException(Constants.MULTIPLE_USER_ASSOCIATED_WITH_PHONE,
               KeycloakSmsAuthenticatorConstants.ATTR_MOBILE);
         }
