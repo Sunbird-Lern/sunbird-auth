@@ -1,18 +1,19 @@
 package org.sunbird.keycloak.storage.spi;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -22,6 +23,9 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.jboss.logging.Logger;
 import org.sunbird.keycloak.utils.Constants;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class UserSearchService {
 
@@ -36,10 +40,12 @@ public class UserSearchService {
     Map<String, String> filters = new HashMap<>();
     filters.put(key, value);
     request.put("filters", filters);
+    request.put("fields", Arrays.asList("email","firstName","lastName","id","phone","userName","countryCode","status"));
     userRequest.put("request", request);
-    String searchUrl = System.getenv("sunbird_cs_base_url")+"/user/v1/search";
+    String searchUrl = System.getenv("sunbird_cs_base_url")+"/private/user/v1/search";
     Map<String, Object> resMap =
         post(userRequest, searchUrl, System.getenv(Constants.SUNBIRD_LMS_AUTHORIZATION));
+    logger.info("UserSearchService:getUserByKey responseMap "+resMap);
     Map<String, Object> result = null;
     Map<String, Object> responseMap = null;
     List<Map<String, Object>> content = null;
@@ -99,7 +105,7 @@ public class UserSearchService {
       if (StringUtils.isNotBlank(authKey)) {
         httpPost.setHeader(HttpHeaders.AUTHORIZATION, authKey);
       }
-      httpPost.setHeader("x-authenticated-user-token", getToken());
+     // httpPost.setHeader("x-authenticated-user-token", getToken());
       CloseableHttpResponse response = client.execute(httpPost);
       logger.info("UserSearchService:post: statusCode = " + response.getStatusLine().getStatusCode());
       return mapper.readValue(response.getEntity().getContent(),
@@ -131,7 +137,8 @@ public class UserSearchService {
       }
       return "";
     } catch (Exception e) {
-      logger.error("UserSearchService:getToken: Exception occurred = " + e);
+      logger.error("UserSearchService:
+                   : Exception occurred = " + e);
     }
     return "";
   }

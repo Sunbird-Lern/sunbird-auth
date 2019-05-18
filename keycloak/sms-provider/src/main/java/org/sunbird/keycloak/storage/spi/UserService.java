@@ -4,6 +4,7 @@ import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import java.util.Collections;
 import java.util.List;
+
 import org.jboss.logging.Logger;
 import org.sunbird.keycloak.utils.CassandraConnection;
 import org.sunbird.keycloak.utils.Constants;
@@ -43,21 +44,20 @@ public class UserService {
   public List<User> getByUsername(String username) {
     List<User> users = null;
     String numberRegex = "\\d+";
+    String emailRegex = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
+            + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
     // mobile number length is of 10 digit
+    // assumption is either username will match with phone or email 
     if (username.matches(numberRegex) && 10 == username.length()) {
       users = getByKey(Constants.PHONE, username);
       if (users != null) {
         return users;
       }
-    }
-    String emailRegex = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
-        + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
-    if (username.matches(emailRegex)) {
+    } else if (username.matches(emailRegex)) {
       users = getByKey(Constants.EMAIL, username);
       if (users != null)
         return users;
     }
-
     users = getByKey(Constants.USERNAME, username);
     if (users != null)
       return users;
