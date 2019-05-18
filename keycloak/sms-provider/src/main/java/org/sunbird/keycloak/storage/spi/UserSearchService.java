@@ -137,8 +137,7 @@ public class UserSearchService {
       }
       return "";
     } catch (Exception e) {
-      logger.error("UserSearchService:
-                   : Exception occurred = " + e);
+      logger.error("UserSearchService: Exception occurred = " + e);
     }
     return "";
   }
