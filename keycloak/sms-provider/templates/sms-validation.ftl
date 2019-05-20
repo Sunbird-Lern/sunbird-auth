@@ -23,7 +23,10 @@
                 </div>
                 <form id="kc-totp-login-form" class="${properties.kcFormClass!} ui form pre-signin" action="${url.loginAction}" method="post">
                     <div class="field">
-                        <input id="totp" name="smsCode" type="text" class="mb-28 smsinput" onfocusin="inputBoxFocusIn(this)" onfocusout="inputBoxFocusOut(this)" />
+                        <input id="totp" name="smsCode" type="text" class="smsinput" onfocusin="inputBoxFocusIn(this)" onfocusout="inputBoxFocusOut(this)"/>
+                    </div>
+                    <div class="field textRight">
+                        <a id="resendOTPLink" class="pointer" onclick="javascript:resendOtp()">${msg("resendOtp")}</a>
                     </div>
                     <div class="field">
                         <button onclick="javascript:makeDivUnclickable()" class="ui fluid submit button" name="login" id="login" type="submit" value="${msg("doLogIn")}">${msg("doSubmit")}</button>
