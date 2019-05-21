@@ -105,5 +105,10 @@ public abstract class AbstractPhoneFormAuthenticator extends AbstractUsernameFor
     context.setUser(user);
     return true;
   }
+  
+  protected Response temporarilyDisabledUser(AuthenticationFlowContext context) {
+      return context.form()
+              .setError(Messages.ACCOUNT_TEMPORARILY_DISABLED).createLogin();
+  }
 
 }
