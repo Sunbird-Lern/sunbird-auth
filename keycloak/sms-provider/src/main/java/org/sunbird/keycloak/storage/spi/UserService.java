@@ -1,13 +1,14 @@
 package org.sunbird.keycloak.storage.spi;
 
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Row;
 import java.util.Collections;
 import java.util.List;
 
 import org.jboss.logging.Logger;
 import org.sunbird.keycloak.utils.CassandraConnection;
 import org.sunbird.keycloak.utils.Constants;
+
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
 
 public class UserService {
 
@@ -21,6 +22,7 @@ public class UserService {
   }
 
   public User getById(String id) {
+	logger.info("UserService:getById get by id method called from cassandra = " + id);  
     ResultSet rs =
         this.connection.getSession().execute("select * from sunbird.user where id = '" + id + "'");
     Row r = rs.one();
@@ -38,6 +40,7 @@ public class UserService {
     } else {
       user.setEnabled(true);
     }
+    logger.info("UserService:getById get by id method called ended from cassandra = " + id); 
     return user;
   }
 
