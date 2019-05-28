@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
 import org.jboss.logging.Logger;
 import org.keycloak.component.ComponentModel;
 import org.keycloak.models.GroupModel;
@@ -40,6 +41,7 @@ public class UserServiceProvider
   public UserModel getUserById(String id, RealmModel realm) {
     logger.info("UserServiceProvider:getUserById: id = " + id);
     String externalId = StorageId.externalId(id);
+    logger.info("UserServiceProvider:getUserById: externalId found = " + externalId);
     return new UserAdapter(session, realm, model, userService.getById(externalId));
   }
 

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.jboss.logging.Logger;
 import org.keycloak.component.ComponentModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
@@ -11,7 +13,7 @@ import org.keycloak.storage.StorageId;
 import org.keycloak.storage.adapter.AbstractUserAdapterFederatedStorage;
 
 public class UserAdapter extends AbstractUserAdapterFederatedStorage {
-
+	private static final Logger logger = Logger.getLogger(UserAdapter.class);
   private final User user;
   private final String keycloakId;
 
@@ -20,8 +22,11 @@ public class UserAdapter extends AbstractUserAdapterFederatedStorage {
   public UserAdapter(KeycloakSession session, RealmModel realm, ComponentModel storageProviderModel,
       User user) {
     super(session, realm, storageProviderModel);
+    logger.info("UserAdapter:UserAdapter constructor called");
     this.user = user;
+    logger.info("UserAdapter:StorageId.keycloakId method called to get keycloakId started");
     this.keycloakId = StorageId.keycloakId(storageProviderModel, user.getId());
+    logger.info("UserAdapter:StorageId.keycloakId method called to get keycloakId completed");
   }
 
   @Override
@@ -84,11 +89,15 @@ public class UserAdapter extends AbstractUserAdapterFederatedStorage {
   
   @Override
   public List<String> getAttribute(String name) {
-    return getFederatedStorage().getAttributes(realm, keycloakId).get(name);
+	  logger.info("UserAdapter:getAttribute method started " + name); 
+     List<String> list = getFederatedStorage().getAttributes(realm, keycloakId).get(name);
+     logger.info("UserAdapter:getAttribute method ended " + name);
+     return list;
   }
   
   @Override
   public Map<String, List<String>> getAttributes() {
+	logger.info("UserAdapter:getAttributes method started " );  
     Map<String, List<String>> attributes = new HashMap<>();
     List<String> phoneValues = new ArrayList<>();
     phoneValues.add(decrypt(user.getPhone()));
@@ -104,6 +113,7 @@ public class UserAdapter extends AbstractUserAdapterFederatedStorage {
     if(null != lastLoginTime){
       attributes.put("lastLoginTime", lastLoginTime);
     }
+    logger.info("UserAdapter:getAttributes method ended " );
     return attributes;
   }
 
