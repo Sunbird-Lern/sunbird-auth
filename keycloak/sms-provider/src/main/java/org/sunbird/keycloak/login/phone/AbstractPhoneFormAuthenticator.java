@@ -44,7 +44,7 @@ public abstract class AbstractPhoneFormAuthenticator extends AbstractUsernameFor
 
     if (username == null) {
       context.getEvent().error(Errors.USER_NOT_FOUND);
-      Response challengeResponse = invalidUser(context);
+      Response challengeResponse = challenge(context, Messages.INVALID_USER);
       context.failureChallenge(AuthenticationFlowError.INVALID_USER, challengeResponse);
       return false;
     }
