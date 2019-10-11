@@ -1,0 +1,15 @@
+cd sunbird-auth/keycloak/keycloak/
+
+docker build -t "keycloak_image:3.2.1.Final" .
+
+docker stack deploy -c "docker-compose.yml" "keycloak"
+
+docker service ls
+
+
+For getting logs:
+docker ps -a
+
+docker exec -i -t <container ID> /bin/bash
+
+cd /opt/jboss/keycloak/standalone/log/server.log
