@@ -7,8 +7,6 @@ jobs:
     steps:
       - checkout:
           path: ~/project/keycloak/sms-provider
-      - restore_cache:
-          key: lms-dependency-cache-{{ checksum "pom.xml" }}
       - run: mvn clean install
       - save_cache:
           key: lms-dependency-cache-{{ checksum "pom.xml" }}
