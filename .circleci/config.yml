@@ -5,7 +5,8 @@ jobs:
       - image: circleci/openjdk:8-jdk
     working_directory: ~/project
     steps:
-      - checkout
+      - checkout:
+          path: ~/project/keycloak/sms-provider
       - run: git submodule update --init
       - run: git submodule update --init --recursive --remote
       - restore_cache:
