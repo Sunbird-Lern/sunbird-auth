@@ -1,0 +1,25 @@
+version: 2.1
+jobs:
+  build:
+    docker:
+      - image: circleci/openjdk:8-jdk   
+    steps:
+    working_directory: ~/home/circleci/project
+      - checkout
+      - run: git submodule update --init
+      - run: git submodule update --init --recursive --remote
+      - restore_cache:
+          key: lms-dependency-cache-{{ checksum "pom.xml" }}
+      - run: mvn clean install
+      - save_cache:
+          key: lms-dependency-cache-{{ checksum "pom.xml" }}
+          paths: ~/.m2
+      - run:
+          name: Analyze on SonarCloud
+          command: mvn verify sonar:sonar
+
+workflows:
+  version: 2.1
+  workflow:
+    jobs:
+      - build
