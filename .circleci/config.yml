@@ -3,7 +3,6 @@ jobs:
   build:
     docker:
       - image: circleci/openjdk:8-jdk
-    working_directory: ~/project
     steps:
       - restore_cache:
           key: lms-dependency-cache-{{ checksum "pom.xml" }}      
