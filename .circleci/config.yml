@@ -3,12 +3,8 @@ jobs:
   build:
     docker:
       - image: circleci/openjdk:8-jdk
-    working_directory: ~/project
+    working_directory: ~/project/keycloak/sms-provider
     steps:
-      - run: pwd
-      - checkout:
-          path: ~/project/keycloak/sms-provider
-      - run: pwd
       - run: mvn clean install
       - save_cache:
           key: lms-dependency-cache-{{ checksum "pom.xml" }}
