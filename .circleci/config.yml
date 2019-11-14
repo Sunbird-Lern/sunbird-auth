@@ -18,7 +18,6 @@ jobs:
           name: Analyze on SonarCloud
           command: mvn verify sonar:sonar
 
-
 workflows:
   version: 2.1
   workflow:
