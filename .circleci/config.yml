@@ -3,7 +3,7 @@ jobs:
   build:
     docker:
       - image: circleci/openjdk:8-jdk
-    working_directory: project/keycloak/sms-provider
+    working_directory: ~/project/keycloak/sms-provider
     steps:
       - checkout
       - run: git submodule update --init
