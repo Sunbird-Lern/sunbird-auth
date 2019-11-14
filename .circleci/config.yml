@@ -5,8 +5,10 @@ jobs:
       - image: circleci/openjdk:8-jdk
     working_directory: ~/project
     steps:
+      - run: pwd
       - checkout:
           path: ~/project/keycloak/sms-provider
+      - run: pwd
       - run: mvn clean install
       - save_cache:
           key: lms-dependency-cache-{{ checksum "pom.xml" }}
