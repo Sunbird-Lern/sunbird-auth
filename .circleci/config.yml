@@ -5,10 +5,10 @@ jobs:
       - image: circleci/openjdk:8-jdk
     working_directory: ~/project
     steps:
-      - checkout:
-          path: ~/project/keycloak/sms-provider
       - run: git submodule update --init
       - run: git submodule update --init --recursive --remote
+      - checkout:
+          path: ~/project/keycloak/sms-provider
       - restore_cache:
           key: lms-dependency-cache-{{ checksum "pom.xml" }}
       - run: mvn clean install
