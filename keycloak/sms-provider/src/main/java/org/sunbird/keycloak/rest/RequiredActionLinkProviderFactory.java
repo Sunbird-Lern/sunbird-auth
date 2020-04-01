@@ -11,7 +11,7 @@ public class RequiredActionLinkProviderFactory implements RealmResourceProviderF
 
   private static Logger logger =
       Logger.getLogger(RequiredActionLinkProviderFactory.class);
-  public static final String PROVIDER_ID = "spi-get-required-action-link";
+  public static final String PROVIDER_ID = "get-required-action-link";
 
   @Override
   public String getId() {
