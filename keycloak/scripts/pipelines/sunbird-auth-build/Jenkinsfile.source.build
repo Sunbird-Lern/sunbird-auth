@@ -27,13 +27,13 @@ node('build-slave') {
 
             stage('Build') {
                 sh """
-                        git clone https://github.com/keshavprasadms/keycloak
-                        cd keycloak
+                        git clone https://github.com/keshavprasadms/keycloak -c keycloak_source
+                        cd keycloak_source
                         git checkout refs/tags/${public_keycloak_tag}
                         mvn clean install -Pdistribution -DskipTests
-                        mkdir sunbird_auth_1.0v
-                        tar -xvf distribution/server-dist/target/keycloak-3.2.0.Final.tar.gz --strip 1 -C sunbird_auth_1.0v
-                        cd sunbird_auth_1.0v
+                        mkdir ../sunbird_auth_1.0v
+                        tar -xvf distribution/server-dist/target/keycloak-3.2.0.Final.tar.gz --strip 1 -C ../sunbird_auth_1.0v
+                        cd ../sunbird_auth_1.0v
                         mkdir -p providers
                         mkdir -p modules/system/layers/keycloak/org/postgresql/main
                         mkdir -p themes/sunbird/login
