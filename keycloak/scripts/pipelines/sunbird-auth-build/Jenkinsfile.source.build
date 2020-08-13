@@ -27,7 +27,7 @@ node('build-slave') {
 
             stage('Build') {
                 sh """
-                        git clone https://github.com/keshavprasadms/keycloak keycloak_source
+                        git clone https://github.com/keycloak/keycloak.git keycloak_source
                         cd keycloak_source
                         git checkout refs/tags/${public_keycloak_tag}
                         mvn clean install -Pdistribution -DskipTests
