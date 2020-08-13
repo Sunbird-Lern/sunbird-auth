@@ -39,7 +39,7 @@ node('build-slave') {
                         mkdir -p themes/sunbird/login
                         wget https://jdbc.postgresql.org/download/postgresql-9.4.1212.jar
                         mv postgresql-9.4.1212.jar modules/system/layers/keycloak/org/postgresql/main
-                        cd keycloak/sms-provider
+                        cd ../keycloak/sms-provider
                         mvn package
                         cp target/keycloak-email-phone-autthenticator-1.0-SNAPSHOT.jar $WORKSPACE/sunbird_auth_1.0v/providers
                         cp -r templates/* $WORKSPACE/sunbird_auth_1.0v/themes/sunbird/login
