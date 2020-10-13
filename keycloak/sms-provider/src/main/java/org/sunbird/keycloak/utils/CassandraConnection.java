@@ -1,3 +1,4 @@
+/*
 package org.sunbird.keycloak.utils;
 
 import com.datastax.driver.core.Cluster;
@@ -47,3 +48,4 @@ public class CassandraConnection {
     cluster.close();
   }
 }
+*/

@@ -39,12 +39,13 @@ public class UserSearchService {
     Map<String, Object> request = new HashMap<>();
     Map<String, String> filters = new HashMap<>();
     filters.put(key, value);
+    request.put("callerId","keycloak");
     request.put("filters", filters);
     request.put("fields", Arrays.asList("email","firstName","lastName","id","phone","userName","countryCode","status"));
     userRequest.put("request", request);
     String searchUrl = System.getenv("sunbird_user_service_base_url")+"/private/user/v1/search";
     Map<String, Object> resMap =
-        post(userRequest, searchUrl, System.getenv(Constants.SUNBIRD_LMS_AUTHORIZATION));
+      post(userRequest, searchUrl, System.getenv(Constants.SUNBIRD_LMS_AUTHORIZATION));
     logger.info("UserSearchService:getUserByKey responseMap "+resMap);
     Map<String, Object> result = null;
     Map<String, Object> responseMap = null;
@@ -53,15 +54,11 @@ public class UserSearchService {
       result = (Map<String, Object>) resMap.get("result");
     }
     if (null != result) {
-      responseMap = (Map<String, Object>) result.get("response");
-    }
-    if (null != responseMap) {
-      content = (List<Map<String, Object>>) (responseMap).get("content");
+      content = (List<Map<String, Object>>) result.get("response");
     }
     if (null != content) {
       List<User> userList = new ArrayList<>();
       if (!content.isEmpty()) {
-        logger.info("usermap is not null from ES");
         content.forEach(userMap -> {
           if (null != userMap) {
             userList.add(createUser(userMap));
@@ -91,8 +88,7 @@ public class UserSearchService {
   }
 
   public static Map<String, Object> post(Map<String, Object> requestBody, String uri,
-      String authorizationKey) {
-    logger.info("UserSearchService: post called");
+                                         String authorizationKey) {
     try (CloseableHttpClient client = HttpClients.createDefault()) {
       ObjectMapper mapper = new ObjectMapper();
       HttpPost httpPost = new HttpPost(uri);
@@ -105,27 +101,25 @@ public class UserSearchService {
       if (StringUtils.isNotBlank(authKey)) {
         httpPost.setHeader(HttpHeaders.AUTHORIZATION, authKey);
       }
-     // httpPost.setHeader("x-authenticated-user-token", getToken());
       CloseableHttpResponse response = client.execute(httpPost);
-      logger.info("UserSearchService:post: statusCode = " + response.getStatusLine().getStatusCode());
       return mapper.readValue(response.getEntity().getContent(),
-          new TypeReference<Map<String, Object>>() {});
+        new TypeReference<Map<String, Object>>() {});
     } catch (Exception e) {
       logger.error("UserSearchService:post: Exception occurred = " + e);
     }
     return null;
   }
 
-  public static String getToken() { 
+  public static String getToken() {
     String userName = System.getenv("sunbird_sso_username");
     String password = System.getenv("sunbird_sso_password");
     String sunbirdAuthBaseUrl = System.getenv("sunbird_sso_url");
     String urlPath =
-        "realms/" + System.getenv("sunbird_sso_realm") + "/protocol/openid-connect/token";
+      "realms/" + System.getenv("sunbird_sso_realm") + "/protocol/openid-connect/token";
     try (CloseableHttpClient client = HttpClients.createDefault()) {
       HttpPost httpPost = new HttpPost(sunbirdAuthBaseUrl + urlPath);
       StringEntity entity = new StringEntity("client_id=" + System.getenv("sunbird_sso_client_id")
-          + "&username=" + userName + "&password=" + password + "&grant_type=password");
+        + "&username=" + userName + "&password=" + password + "&grant_type=password");
       logger.debug("UserSearchService:post: request entity = " + entity);
       httpPost.setEntity(entity);
       httpPost.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED);
