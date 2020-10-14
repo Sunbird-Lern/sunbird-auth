@@ -17,8 +17,6 @@ public class UserAdapter extends AbstractUserAdapterFederatedStorage {
   private final User user;
   private final String keycloakId;
 
-  private static DecryptionService decryptionService = new DefaultDecryptionServiceImpl();
-
   public UserAdapter(KeycloakSession session, RealmModel realm, ComponentModel storageProviderModel,
       User user) {
     super(session, realm, storageProviderModel);
@@ -29,7 +27,7 @@ public class UserAdapter extends AbstractUserAdapterFederatedStorage {
 
   @Override
   public String getUsername() {
-    return decrypt(user.getUsername());
+    return user.getUsername();
   }
 
   @Override
@@ -59,7 +57,7 @@ public class UserAdapter extends AbstractUserAdapterFederatedStorage {
 
   @Override
   public String getEmail() {
-    return decrypt(user.getEmail());
+    return user.getEmail();
   }
 
   @Override
@@ -96,7 +94,7 @@ public class UserAdapter extends AbstractUserAdapterFederatedStorage {
 	logger.info("UserAdapter:getAttributes method started " );  
     Map<String, List<String>> attributes = new HashMap<>();
     List<String> phoneValues = new ArrayList<>();
-    phoneValues.add(decrypt(user.getPhone()));
+    phoneValues.add(user.getPhone());
     attributes.put("phone", phoneValues);
     List<String> countrycodeValues = new ArrayList<>();
     countrycodeValues.add(user.getCountryCode());
@@ -108,9 +106,5 @@ public class UserAdapter extends AbstractUserAdapterFederatedStorage {
   @Override
   public String getId() {
     return keycloakId;
-  }
-  
-  private static String decrypt(String data) {
-    return decryptionService.decryptData(data);
   }
 }
