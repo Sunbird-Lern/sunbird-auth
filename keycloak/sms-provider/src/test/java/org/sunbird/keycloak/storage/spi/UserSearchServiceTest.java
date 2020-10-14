@@ -68,10 +68,4 @@ public class UserSearchServiceTest {
     PowerMockito.when(bufferedReader.readLine()).thenReturn("{\"access_token\":\"token1\"}");
     
   }
-
-  @Test
-  public void getUserByKeyTest(){
-    String token = UserSearchService.getToken(); 
-    assertEquals("token1",token);
-  }
 }
