@@ -10,8 +10,6 @@ public class UserService {
 
   private static Logger logger = Logger.getLogger(UserService.class);
 
-  private DecryptionService decryptionService = new DefaultDecryptionServiceImpl();
-
   public UserService() {
   }
 
@@ -46,11 +44,6 @@ public class UserService {
       return users;
 
     return Collections.emptyList();
-  }
-
-
-  private String decrypt(String data) {
-    return decryptionService.decryptData(data);
   }
 
   public List<User> getByKey(String key, String searchValue) {

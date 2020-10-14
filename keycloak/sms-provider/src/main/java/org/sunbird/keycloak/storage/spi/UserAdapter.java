@@ -22,9 +22,7 @@ public class UserAdapter extends AbstractUserAdapterFederatedStorage {
   public UserAdapter(KeycloakSession session, RealmModel realm, ComponentModel storageProviderModel,
       User user) {
     super(session, realm, storageProviderModel);
-    logger.info("UserAdapter:UserAdapter constructor called");
     this.user = user;
-    logger.info("UserAdapter:StorageId.keycloakId method called to get keycloakId started");
     this.keycloakId = StorageId.keycloakId(storageProviderModel, user.getId());
     logger.info("UserAdapter:StorageId.keycloakId method called to get keycloakId completed");
   }
@@ -89,9 +87,7 @@ public class UserAdapter extends AbstractUserAdapterFederatedStorage {
   
   @Override
   public List<String> getAttribute(String name) {
-	  logger.info("UserAdapter:getAttribute method started " + name); 
      List<String> list = getFederatedStorage().getAttributes(realm, keycloakId).get(name);
-     logger.info("UserAdapter:getAttribute method ended " + name);
      return list;
   }
   
@@ -105,14 +101,6 @@ public class UserAdapter extends AbstractUserAdapterFederatedStorage {
     List<String> countrycodeValues = new ArrayList<>();
     countrycodeValues.add(user.getCountryCode());
     attributes.put("countryCode", countrycodeValues);
-    List<String> currentLoginTime = getAttribute("currentLoginTime");
-    if(null != currentLoginTime){
-      attributes.put("currentLoginTime", currentLoginTime);
-    }
-    List<String> lastLoginTime = getAttribute("lastLoginTime");
-    if(null != lastLoginTime){
-      attributes.put("lastLoginTime", lastLoginTime);
-    }
     logger.info("UserAdapter:getAttributes method ended " );
     return attributes;
   }
