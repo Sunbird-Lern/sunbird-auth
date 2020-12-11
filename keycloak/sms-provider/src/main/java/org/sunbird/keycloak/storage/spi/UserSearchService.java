@@ -28,7 +28,7 @@ public class UserSearchService {
   public static List<User> getUserByKey(String key, String value) {
     Map<String, Object> userRequest = new HashMap<>();
     Map<String, Object> request = new HashMap<>();
-    request.put("key",key);
+    request.put("key",key.toLowerCase());
     request.put("value", value);
     request.put("fields", Arrays.asList("email","firstName","lastName","id","phone","userName","countryCode","status"));
     userRequest.put("request", request);
