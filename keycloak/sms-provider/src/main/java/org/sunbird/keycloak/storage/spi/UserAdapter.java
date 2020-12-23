@@ -1,6 +1,7 @@
 package org.sunbird.keycloak.storage.spi;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -89,32 +90,12 @@ public class UserAdapter extends AbstractUserAdapterFederatedStorage {
   
   @Override
   public List<String> getAttribute(String name) {
-	  logger.info("UserAdapter:getAttribute method started " + name); 
-     List<String> list = getFederatedStorage().getAttributes(realm, keycloakId).get(name);
-     logger.info("UserAdapter:getAttribute method ended " + name);
-     return list;
+     return Collections.emptyList();
   }
   
   @Override
   public Map<String, List<String>> getAttributes() {
-	logger.info("UserAdapter:getAttributes method started " );  
-    Map<String, List<String>> attributes = new HashMap<>();
-    List<String> phoneValues = new ArrayList<>();
-    phoneValues.add(decrypt(user.getPhone()));
-    attributes.put("phone", phoneValues);
-    List<String> countrycodeValues = new ArrayList<>();
-    countrycodeValues.add(user.getCountryCode());
-    attributes.put("countryCode", countrycodeValues);
-    List<String> currentLoginTime = getAttribute("currentLoginTime");
-    if(null != currentLoginTime){
-      attributes.put("currentLoginTime", currentLoginTime);
-    }
-    List<String> lastLoginTime = getAttribute("lastLoginTime");
-    if(null != lastLoginTime){
-      attributes.put("lastLoginTime", lastLoginTime);
-    }
-    logger.info("UserAdapter:getAttributes method ended " );
-    return attributes;
+    return Collections.EMPTY_MAP;
   }
 
   @Override
