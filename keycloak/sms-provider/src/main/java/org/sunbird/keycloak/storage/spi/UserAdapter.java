@@ -95,7 +95,7 @@ public class UserAdapter extends AbstractUserAdapterFederatedStorage {
   
   @Override
   public Map<String, List<String>> getAttributes() {
-    return Collections.EMPTY_MAP;
+    return Collections.emptyMap();
   }
 
   @Override
