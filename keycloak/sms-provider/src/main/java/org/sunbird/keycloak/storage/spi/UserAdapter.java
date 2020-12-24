@@ -1,11 +1,9 @@
 package org.sunbird.keycloak.storage.spi;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.jboss.logging.Logger;
 import org.keycloak.component.ComponentModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
@@ -13,7 +11,6 @@ import org.keycloak.storage.StorageId;
 import org.keycloak.storage.adapter.AbstractUserAdapterFederatedStorage;
 
 public class UserAdapter extends AbstractUserAdapterFederatedStorage {
-	private static final Logger logger = Logger.getLogger(UserAdapter.class);
   private final User user;
   private final String keycloakId;
 
@@ -22,7 +19,6 @@ public class UserAdapter extends AbstractUserAdapterFederatedStorage {
     super(session, realm, storageProviderModel);
     this.user = user;
     this.keycloakId = StorageId.keycloakId(storageProviderModel, user.getId());
-    logger.info("UserAdapter:StorageId.keycloakId method called to get keycloakId completed");
   }
 
   @Override
@@ -85,22 +81,12 @@ public class UserAdapter extends AbstractUserAdapterFederatedStorage {
   
   @Override
   public List<String> getAttribute(String name) {
-     List<String> list = getFederatedStorage().getAttributes(realm, keycloakId).get(name);
-     return list;
+     return Collections.emptyList();
   }
   
   @Override
   public Map<String, List<String>> getAttributes() {
-	logger.info("UserAdapter:getAttributes method started " );  
-    Map<String, List<String>> attributes = new HashMap<>();
-    List<String> phoneValues = new ArrayList<>();
-    phoneValues.add(user.getPhone());
-    attributes.put("phone", phoneValues);
-    List<String> countrycodeValues = new ArrayList<>();
-    countrycodeValues.add(user.getCountryCode());
-    attributes.put("countryCode", countrycodeValues);
-    logger.info("UserAdapter:getAttributes method ended " );
-    return attributes;
+    return Collections.emptyMap();
   }
 
   @Override

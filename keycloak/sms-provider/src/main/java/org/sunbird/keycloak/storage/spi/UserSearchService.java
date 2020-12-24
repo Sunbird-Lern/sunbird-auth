@@ -30,7 +30,7 @@ public class UserSearchService {
     Map<String, Object> request = new HashMap<>();
     request.put("key",key.toLowerCase());
     request.put("value", value);
-    request.put("fields", Arrays.asList("email","firstName","lastName","id","phone","userName","countryCode","status"));
+    request.put("fields", Arrays.asList("email","firstName","lastName","id","phone","userName","status"));
     userRequest.put("request", request);
     String userLookupUrl = System.getenv("sunbird_user_service_base_url")+"/private/user/v1/lookup";
     Map<String, Object> resMap =
