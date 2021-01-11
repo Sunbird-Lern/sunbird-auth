@@ -66,7 +66,6 @@ public class UserSearchService {
     user.setLastName((String) userMap.get("lastName"));
     user.setPhone((String) userMap.get(Constants.PHONE));
     user.setUsername((String) userMap.get("userName"));
-    user.setCountryCode((String) userMap.get("countryCode"));
     if ( null != userMap.get("status") && ((Integer)userMap.get("status")) == 0) {
       user.setEnabled(false);
     } else {

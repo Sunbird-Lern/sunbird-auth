@@ -1,10 +1,5 @@
 package org.sunbird.keycloak.storage.spi;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import org.jboss.logging.Logger;
 import org.keycloak.component.ComponentModel;
 import org.keycloak.models.GroupModel;
@@ -17,6 +12,11 @@ import org.keycloak.storage.UserStorageProvider;
 import org.keycloak.storage.user.UserLookupProvider;
 import org.keycloak.storage.user.UserQueryProvider;
 import org.sunbird.keycloak.utils.Constants;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class UserServiceProvider
     implements UserStorageProvider, UserLookupProvider, UserQueryProvider {
@@ -102,24 +102,20 @@ public class UserServiceProvider
   }
 
   @Override
-  public List<UserModel> getGroupMembers(RealmModel realm, GroupModel group, int firstResult,
-      int maxResults) {
-
+  public List<UserModel> getGroupMembers(RealmModel realm, GroupModel group, int firstResult, int maxResults) {
     return Collections.emptyList();
   }
 
   @Override
   public List<UserModel> getGroupMembers(RealmModel realm, GroupModel group) {
-
     return Collections.emptyList();
   }
 
   @Override
-  public List<UserModel> searchForUserByUserAttribute(String attrName, String attrValue,
-      RealmModel realm) {
+  public List<UserModel> searchForUserByUserAttribute(String attrName, String attrValue, RealmModel realm) {
     if (Constants.PHONE.equalsIgnoreCase(attrName)) {
       return userService.getByKey(attrName, attrValue).stream()
-          .map(user -> new UserAdapter(session, realm, model, user)).collect(Collectors.toList());
+        .map(user -> new UserAdapter(session, realm, model, user)).collect(Collectors.toList());
     }
     return Collections.emptyList();
   }

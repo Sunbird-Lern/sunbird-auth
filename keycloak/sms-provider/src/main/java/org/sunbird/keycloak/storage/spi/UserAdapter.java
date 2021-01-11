@@ -78,16 +78,6 @@ public class UserAdapter extends AbstractUserAdapterFederatedStorage {
   public void setEnabled(boolean enabled) {
      user.setEnabled(enabled);
   }
-  
-  @Override
-  public List<String> getAttribute(String name) {
-     return Collections.emptyList();
-  }
-  
-  @Override
-  public Map<String, List<String>> getAttributes() {
-    return Collections.emptyMap();
-  }
 
   @Override
   public String getId() {

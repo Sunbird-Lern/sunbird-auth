@@ -10,7 +10,6 @@ public class User {
   private String lastName;
   private String password;
   private boolean enabled;
-  private String countryCode;
 
   public User() {}
 
@@ -82,14 +81,6 @@ public class User {
 
   public void setEnabled(boolean enabled) {
     this.enabled = enabled;
-  }
-
-  public String getCountryCode() {
-    return countryCode;
-  }
-
-  public void setCountryCode(String countryCode) {
-    this.countryCode = countryCode;
   }
   
 }
