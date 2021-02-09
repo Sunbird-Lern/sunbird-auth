@@ -17,21 +17,17 @@ public class UserAdapter extends AbstractUserAdapterFederatedStorage {
   private final User user;
   private final String keycloakId;
 
-  private static DecryptionService decryptionService = new DefaultDecryptionServiceImpl();
-  
   public UserAdapter(KeycloakSession session, RealmModel realm, ComponentModel storageProviderModel,
       User user) {
     super(session, realm, storageProviderModel);
-    logger.info("UserAdapter:UserAdapter constructor called");
     this.user = user;
-    logger.info("UserAdapter:StorageId.keycloakId method called to get keycloakId started");
     this.keycloakId = StorageId.keycloakId(storageProviderModel, user.getId());
     logger.info("UserAdapter:StorageId.keycloakId method called to get keycloakId completed");
   }
 
   @Override
   public String getUsername() {
-    return decrypt(user.getUsername());
+    return user.getUsername();
   }
 
   @Override
@@ -61,7 +57,7 @@ public class UserAdapter extends AbstractUserAdapterFederatedStorage {
 
   @Override
   public String getEmail() {
-    return decrypt(user.getEmail());
+    return user.getEmail();
   }
 
   @Override
@@ -89,9 +85,7 @@ public class UserAdapter extends AbstractUserAdapterFederatedStorage {
   
   @Override
   public List<String> getAttribute(String name) {
-	  logger.info("UserAdapter:getAttribute method started " + name); 
      List<String> list = getFederatedStorage().getAttributes(realm, keycloakId).get(name);
-     logger.info("UserAdapter:getAttribute method ended " + name);
      return list;
   }
   
@@ -100,19 +94,11 @@ public class UserAdapter extends AbstractUserAdapterFederatedStorage {
 	logger.info("UserAdapter:getAttributes method started " );  
     Map<String, List<String>> attributes = new HashMap<>();
     List<String> phoneValues = new ArrayList<>();
-    phoneValues.add(decrypt(user.getPhone()));
+    phoneValues.add(user.getPhone());
     attributes.put("phone", phoneValues);
     List<String> countrycodeValues = new ArrayList<>();
     countrycodeValues.add(user.getCountryCode());
     attributes.put("countryCode", countrycodeValues);
-    List<String> currentLoginTime = getAttribute("currentLoginTime");
-    if(null != currentLoginTime){
-      attributes.put("currentLoginTime", currentLoginTime);
-    }
-    List<String> lastLoginTime = getAttribute("lastLoginTime");
-    if(null != lastLoginTime){
-      attributes.put("lastLoginTime", lastLoginTime);
-    }
     logger.info("UserAdapter:getAttributes method ended " );
     return attributes;
   }
@@ -120,9 +106,5 @@ public class UserAdapter extends AbstractUserAdapterFederatedStorage {
   @Override
   public String getId() {
     return keycloakId;
-  }
-  
-  private static String decrypt(String data) {
-    return decryptionService.decryptData(data);
   }
 }
