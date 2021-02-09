@@ -29,8 +29,8 @@ node('build-slave') {
             stage('Build') {
                 sh """
                         mkdir sunbird_auth_1.0v
-                        wget https://sunbirdpublic.blob.core.windows.net/installation/keycloak-6.0.1.tar.gz
-                        tar -xvf keycloak-6.0.1.tar.gz --strip 1 -C sunbird_auth_1.0v
+                        wget -q https://downloads.jboss.org/keycloak/7.0.1/keycloak-7.0.1.tar.gz
+                        tar -xvf keycloak-7.0.1.tar.gz --strip 1 -C sunbird_auth_1.0v
                         mkdir -p sunbird_auth_1.0v/providers
                         mkdir -p sunbird_auth_1.0v/modules/system/layers/keycloak/org/postgresql/main
                         mkdir -p sunbird_auth_1.0v/themes/sunbird/login
