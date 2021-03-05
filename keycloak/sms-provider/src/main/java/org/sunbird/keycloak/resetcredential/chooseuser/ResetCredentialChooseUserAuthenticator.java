@@ -36,7 +36,7 @@ public class ResetCredentialChooseUserAuthenticator implements Authenticator {
 
 
   private static Logger logger = Logger.getLogger(KeycloakSmsAuthenticator.class);
-  public static final String PROVIDER_ID = "reset-credentials-choose-user";
+  public static final String PROVIDER_ID = "spi-reset-credentials-choose-user";
 
 
   @Override

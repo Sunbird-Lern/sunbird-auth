@@ -20,7 +20,7 @@ import org.keycloak.provider.ProviderConfigProperty;
 public class ResetCredentialChooseUserAuthenticatorFactory
     implements AuthenticatorFactory, ConfigurableAuthenticatorFactory {
 
-  public static final String PROVIDER_ID = "reset-credentials-choose-user";
+  public static final String PROVIDER_ID = "spi-reset-credentials-choose-user";
 
   private static Logger logger =
       Logger.getLogger(ResetCredentialChooseUserAuthenticatorFactory.class);
