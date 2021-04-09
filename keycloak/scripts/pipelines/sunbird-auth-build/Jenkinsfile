@@ -9,33 +9,22 @@ node('build-slave') {
         ansiColor('xterm') {
             stage('Checkout') {
                 cleanWs()
-                def scmVars = checkout scm
-                if (params.github_release_tag == "") {
-                    checkout scm
-                    commit_hash = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
-                    branch_name = sh(script: 'git name-rev --name-only HEAD | rev | cut -d "/" -f1| rev', returnStdout: true).trim()
-                    artifact_version = branch_name + "_" + commit_hash
-                    println(ANSI_BOLD + ANSI_YELLOW + "github_release_tag not specified, using the latest commit hash: " + commit_hash + ANSI_NORMAL)
-                }
-                else {
-                    checkout scm: [$class: 'GitSCM', branches: [[name: "refs/tags/${params.github_release_tag}"]], userRemoteConfigs: [[url: scmVars.GIT_URL]]]
-                    artifact_version = params.github_release_tag
-                    println(ANSI_BOLD + ANSI_YELLOW + "github_release_tag specified, building from: " + params.github_release_tag + ANSI_NORMAL)
-                }
+                checkout scm
+                commit_hash = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+                artifact_version = sh(script: "echo " + params.github_release_tag.split('/')[-1] + "_" + commit_hash + "_" + env.BUILD_NUMBER, returnStdout: true).trim()
                 echo "artifact_version: "+ artifact_version
             }
-
 
             stage('Build') {
                 sh """
                         mkdir sunbird_auth_1.0v
-			wget https://sunbirdpublic.blob.core.windows.net/installation/keycloak-3.2.0.Final.tar.gz
-                        tar -xvf keycloak-3.2.0.Final.tar.gz --strip 1 -C sunbird_auth_1.0v
+                        wget -q https://downloads.jboss.org/keycloak/7.0.1/keycloak-7.0.1.tar.gz
+                        tar -xvf keycloak-7.0.1.tar.gz --strip 1 -C sunbird_auth_1.0v
                         mkdir -p sunbird_auth_1.0v/providers
                         mkdir -p sunbird_auth_1.0v/modules/system/layers/keycloak/org/postgresql/main
                         mkdir -p sunbird_auth_1.0v/themes/sunbird/login
                         wget https://jdbc.postgresql.org/download/postgresql-9.4.1212.jar
-			mv postgresql-9.4.1212.jar sunbird_auth_1.0v/modules/system/layers/keycloak/org/postgresql/main
+                        mv postgresql-9.4.1212.jar sunbird_auth_1.0v/modules/system/layers/keycloak/org/postgresql/main
                         cd keycloak/sms-provider
                         mvn package
                         cp target/keycloak-email-phone-autthenticator-1.0-SNAPSHOT.jar $WORKSPACE/sunbird_auth_1.0v/providers
