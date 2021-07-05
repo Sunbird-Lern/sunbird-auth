@@ -28,7 +28,6 @@ node('build-slave') {
                         cd keycloak/sms-provider
                         mvn package
                         cp target/keycloak-email-phone-autthenticator-1.0-SNAPSHOT.jar $WORKSPACE/sunbird_auth_1.0v/providers
-                        cp -r templates/* $WORKSPACE/sunbird_auth_1.0v/themes/sunbird/login
                 """
             }
 
