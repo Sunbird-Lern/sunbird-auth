@@ -44,7 +44,7 @@
 			<groupId>org.keycloak</groupId>
 			<artifactId>keycloak-core</artifactId>
 			<scope>provided</scope>
-			<version>3.2.0.Final</version>
+			<version>20.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.keycloak</groupId>
