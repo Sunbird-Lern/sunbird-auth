@@ -1,7 +1,7 @@
 # sunbird-auth
 Repository for sunbird authentication service.
 
-## Steps to generate Sunbird authentication keycloak jar
+## Steps to generate Sunbird authentication keycloak SPI jar
 1. Clone the latest branch of the sunbird-auth repository using the following command:
 ```shell
 git clone https://github.com/Sunbird-Lern/sunbird-auth.git
