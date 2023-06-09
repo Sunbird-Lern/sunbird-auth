@@ -22,7 +22,8 @@ fix any configuration issues and rebuild the application.
 mkdir providers
 ```
 
-4. Copy the jar which got created in step:2 and keep the jar `keycloak-email-phone-autthenticator-1.0-SNAPSHOT.jar` inside the providers folder
+4. Copy the jar which got created in step:2 from path `<project-base-path>/keycloak/sms-provider/target/` and keep the jar `keycloak-email-phone-autthenticator-1.0-SNAPSHOT.jar` inside the providers folder
+
 
 5. Before running the Keycloak, set up the necessary environment variables by running the following script in the path `<project-base-path>/sunbird-auth`:
 ```shell
