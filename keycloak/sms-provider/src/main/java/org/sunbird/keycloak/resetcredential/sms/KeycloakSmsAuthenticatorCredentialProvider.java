@@ -9,11 +9,14 @@ import org.keycloak.models.UserCredentialModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.cache.CachedUserModel;
 import org.keycloak.models.cache.OnUserCache;
+import org.keycloak.models.cache.UserCache;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by nickpack on 09/08/2017.
@@ -36,7 +39,7 @@ public class KeycloakSmsAuthenticatorCredentialProvider implements CredentialPro
             secret = (CredentialModel) cached.getCachedWith().get(CACHE_KEY);
 
         } else {
-            List<CredentialModel> creds = session.userCredentialManager().getStoredCredentialsByType(realm, user, KeycloakSmsAuthenticatorConstants.USR_CRED_MDL_SMS_CODE);
+            List<CredentialModel> creds = session.userCredentialManager().getStoredCredentialsByTypeStream(realm, user, KeycloakSmsAuthenticatorConstants.USR_CRED_MDL_SMS_CODE).collect(Collectors.toList());
             if (!creds.isEmpty()) secret = creds.get(0);
         }
         return secret;
@@ -50,7 +53,7 @@ public class KeycloakSmsAuthenticatorCredentialProvider implements CredentialPro
         if (!KeycloakSmsAuthenticatorConstants.USR_CRED_MDL_SMS_CODE.equals(input.getType())) return false;
         if (!(input instanceof UserCredentialModel)) return false;
         UserCredentialModel credInput = (UserCredentialModel) input;
-        List<CredentialModel> creds = session.userCredentialManager().getStoredCredentialsByType(realm, user, KeycloakSmsAuthenticatorConstants.USR_CRED_MDL_SMS_CODE);
+        List<CredentialModel> creds = session.userCredentialManager().getStoredCredentialsByTypeStream(realm, user, KeycloakSmsAuthenticatorConstants.USR_CRED_MDL_SMS_CODE).collect(Collectors.toList());
         if (creds.isEmpty()) {
             CredentialModel secret = new CredentialModel();
             secret.setType(KeycloakSmsAuthenticatorConstants.USR_CRED_MDL_SMS_CODE);
@@ -64,7 +67,7 @@ public class KeycloakSmsAuthenticatorCredentialProvider implements CredentialPro
             session.userCredentialManager().updateCredential(realm, user, creds.get(0));
             logger.debug("KeycloakSmsAuthenticatorCredentialProvider@action Credentials updated for User = " + user.getUsername());
         }
-        session.userCache().evict(realm, user);
+        session.getProvider(UserCache.class).evict(realm, user);
         return true;
     }
 
@@ -72,20 +75,19 @@ public class KeycloakSmsAuthenticatorCredentialProvider implements CredentialPro
     public void disableCredentialType(RealmModel realm, UserModel user, String credentialType) {
         if (!KeycloakSmsAuthenticatorConstants.USR_CRED_MDL_SMS_CODE.equals(credentialType)) return;
         session.userCredentialManager().disableCredentialType(realm, user, credentialType);
-        session.userCache().evict(realm, user);
+        session.getProvider(UserCache.class).evict(realm, user);
 
     }
 
     @Override
-    public Set<String> getDisableableCredentialTypes(RealmModel realm, UserModel user) {
-        if (!session.userCredentialManager().getStoredCredentialsByType(realm, user, KeycloakSmsAuthenticatorConstants.USR_CRED_MDL_SMS_CODE).isEmpty()) {
+    public Stream<String> getDisableableCredentialTypesStream(RealmModel realm, UserModel user) {
+        if (!session.userCredentialManager().getStoredCredentialsByTypeStream(realm, user, KeycloakSmsAuthenticatorConstants.USR_CRED_MDL_SMS_CODE).collect(Collectors.toList()).isEmpty()) {
             Set<String> set = new HashSet<>();
             set.add(KeycloakSmsAuthenticatorConstants.USR_CRED_MDL_SMS_CODE);
-            return set;
+            return set.stream();
         } else {
-            return Collections.<String>emptySet();
+            return Stream.empty();
         }
-
     }
 
     @Override
@@ -110,9 +112,34 @@ public class KeycloakSmsAuthenticatorCredentialProvider implements CredentialPro
 
     @Override
     public void onCache(RealmModel realm, CachedUserModel user, UserModel delegate) {
-        List<CredentialModel> creds = session.userCredentialManager().getStoredCredentialsByType(realm, user, KeycloakSmsAuthenticatorConstants.USR_CRED_MDL_SMS_CODE);
+        List<CredentialModel> creds = session.userCredentialManager().getStoredCredentialsByTypeStream(realm, user, KeycloakSmsAuthenticatorConstants.USR_CRED_MDL_SMS_CODE).collect(Collectors.toList());
         if (!creds.isEmpty()) {
             user.getCachedWith().put(CACHE_KEY, creds.get(0));
         }
+    }
+
+    @Override
+    public String getType() {
+        return null;
+    }
+
+    @Override
+    public CredentialModel createCredential(RealmModel realmModel, UserModel userModel, CredentialModel credentialModel) {
+        return null;
+    }
+
+    @Override
+    public boolean deleteCredential(RealmModel realmModel, UserModel userModel, String s) {
+        return false;
+    }
+
+    @Override
+    public CredentialModel getCredentialFromModel(CredentialModel credentialModel) {
+        return null;
+    }
+
+    @Override
+    public CredentialTypeMetadata getCredentialTypeMetadata(CredentialTypeMetadataContext credentialTypeMetadataContext) {
+        return null;
     }
 }

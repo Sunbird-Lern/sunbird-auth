@@ -82,11 +82,14 @@ public abstract class AbstractPhoneFormAuthenticator extends AbstractUsernameFor
       return false;
     }
 
-    if (invalidUser(context, user)) {
+    /*if (invalidUser(context, user)) {
       return false;
-    }
+    }*/
+    //found the method name but we need to see how error will be responded back
+    testInvalidUser(context, user);
 
-    if (!validatePassword(context, user, inputData)) {
+    //based on  innner method implementation clearUser value set as true
+    if (!validatePassword(context, user, inputData, true)) {
       return false;
     }
 
@@ -107,8 +110,9 @@ public abstract class AbstractPhoneFormAuthenticator extends AbstractUsernameFor
   }
   
   protected Response temporarilyDisabledUser(AuthenticationFlowContext context) {
+    //this one need to check
       return context.form()
-              .setError(Messages.ACCOUNT_TEMPORARILY_DISABLED).createLogin();
+              .setError(Messages.ACCOUNT_TEMPORARILY_DISABLED).createLoginUsername();
   }
 
 }

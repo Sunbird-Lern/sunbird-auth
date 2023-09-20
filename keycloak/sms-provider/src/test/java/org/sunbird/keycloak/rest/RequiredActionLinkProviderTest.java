@@ -74,7 +74,7 @@ public class RequiredActionLinkProviderTest {
   @Test
   public void checkRealmAdminAccessForUnAuthorized() throws Exception {
     PowerMockito.whenNew(AppAuthManager.class).withAnyArguments().thenReturn(authMangr);
-    PowerMockito.when(authMangr.authenticateBearerToken(session, model)).thenReturn(null);
+    PowerMockito.when(authMangr.authenticateIdentityCookie(session, model)).thenReturn(null);
     RequiredActionLinkProvider provider = new RequiredActionLinkProvider(session);
     WebApplicationException expectedException = new WebApplicationException(
         ErrorResponse.error(Constants.ERROR_NOT_AUTHORIZED, Status.UNAUTHORIZED));
@@ -92,7 +92,7 @@ public class RequiredActionLinkProviderTest {
   @Test
   public void checkRealmAdminAccessForForbidden() throws Exception {
     PowerMockito.whenNew(AppAuthManager.class).withAnyArguments().thenReturn(authMangr);
-    PowerMockito.when(authMangr.authenticateBearerToken(session, model)).thenReturn(authResult);
+    PowerMockito.when(authMangr.authenticateIdentityCookie(session, model)).thenReturn(authResult);
     AccessToken accessToken = PowerMockito.mock(AccessToken.class);
     PowerMockito.when(authResult.getToken()).thenReturn(accessToken);
     Access access = PowerMockito.mock(Access.class);
@@ -118,7 +118,7 @@ public class RequiredActionLinkProviderTest {
   @Test
   public void usernameMandatoryCheck() throws Exception {
     PowerMockito.whenNew(AppAuthManager.class).withAnyArguments().thenReturn(authMangr);
-    PowerMockito.when(authMangr.authenticateBearerToken(session, model)).thenReturn(authResult);
+    PowerMockito.when(authMangr.authenticateIdentityCookie(session, model)).thenReturn(authResult);
     AccessToken accessToken = PowerMockito.mock(AccessToken.class);
     PowerMockito.when(authResult.getToken()).thenReturn(accessToken);
     Access access = PowerMockito.mock(Access.class);
@@ -147,7 +147,7 @@ public class RequiredActionLinkProviderTest {
   public void invalidUserNameCheck() throws Exception {
     String userName = "amit";
     PowerMockito.whenNew(AppAuthManager.class).withAnyArguments().thenReturn(authMangr);
-    PowerMockito.when(authMangr.authenticateBearerToken(session, model)).thenReturn(authResult);
+    PowerMockito.when(authMangr.authenticateIdentityCookie(session, model)).thenReturn(authResult);
     AccessToken accessToken = PowerMockito.mock(AccessToken.class);
     PowerMockito.when(authResult.getToken()).thenReturn(accessToken);
     Access access = PowerMockito.mock(Access.class);
@@ -178,7 +178,7 @@ public class RequiredActionLinkProviderTest {
   public void userEnabilityCheck() throws Exception {
     String userName = "amit";
     PowerMockito.whenNew(AppAuthManager.class).withAnyArguments().thenReturn(authMangr);
-    PowerMockito.when(authMangr.authenticateBearerToken(session, model)).thenReturn(authResult);
+    PowerMockito.when(authMangr.authenticateIdentityCookie(session, model)).thenReturn(authResult);
     AccessToken accessToken = PowerMockito.mock(AccessToken.class);
     PowerMockito.when(authResult.getToken()).thenReturn(accessToken);
     Access access = PowerMockito.mock(Access.class);
@@ -212,7 +212,7 @@ public class RequiredActionLinkProviderTest {
     String clientId = null;
     request.put("clientId", clientId);
     PowerMockito.whenNew(AppAuthManager.class).withAnyArguments().thenReturn(authMangr);
-    PowerMockito.when(authMangr.authenticateBearerToken(session, model)).thenReturn(authResult);
+    PowerMockito.when(authMangr.authenticateIdentityCookie(session, model)).thenReturn(authResult);
     AccessToken accessToken = PowerMockito.mock(AccessToken.class);
     PowerMockito.when(authResult.getToken()).thenReturn(accessToken);
     Access access = PowerMockito.mock(Access.class);
@@ -245,7 +245,7 @@ public class RequiredActionLinkProviderTest {
     String clientId = "master1";
     request.put("clientId", clientId);
     PowerMockito.whenNew(AppAuthManager.class).withAnyArguments().thenReturn(authMangr);
-    PowerMockito.when(authMangr.authenticateBearerToken(session, model)).thenReturn(authResult);
+    PowerMockito.when(authMangr.authenticateIdentityCookie(session, model)).thenReturn(authResult);
     AccessToken accessToken = PowerMockito.mock(AccessToken.class);
     PowerMockito.when(authResult.getToken()).thenReturn(accessToken);
     Access access = PowerMockito.mock(Access.class);
@@ -280,7 +280,7 @@ public class RequiredActionLinkProviderTest {
     String clientId = "master1";
     request.put("clientId", clientId);
     PowerMockito.whenNew(AppAuthManager.class).withAnyArguments().thenReturn(authMangr);
-    PowerMockito.when(authMangr.authenticateBearerToken(session, model)).thenReturn(authResult);
+    PowerMockito.when(authMangr.authenticateIdentityCookie(session, model)).thenReturn(authResult);
     AccessToken accessToken = PowerMockito.mock(AccessToken.class);
     PowerMockito.when(authResult.getToken()).thenReturn(accessToken);
     Access access = PowerMockito.mock(Access.class);
@@ -317,7 +317,7 @@ public class RequiredActionLinkProviderTest {
     request.put("clientId", clientId);
     request.put("redirectUri", redirectUri);
     PowerMockito.whenNew(AppAuthManager.class).withAnyArguments().thenReturn(authMangr);
-    PowerMockito.when(authMangr.authenticateBearerToken(session, model)).thenReturn(authResult);
+    PowerMockito.when(authMangr.authenticateIdentityCookie(session, model)).thenReturn(authResult);
     AccessToken accessToken = PowerMockito.mock(AccessToken.class);
     PowerMockito.when(authResult.getToken()).thenReturn(accessToken);
     Access access = PowerMockito.mock(Access.class);
@@ -332,8 +332,7 @@ public class RequiredActionLinkProviderTest {
     PowerMockito.when(model.getClientByClientId(clientId)).thenReturn(client);
     PowerMockito.when(client.isEnabled()).thenReturn(true);
     PowerMockito.mockStatic(RedirectUtils.class);
-    PowerMockito.when(RedirectUtils.verifyRedirectUri(session.getContext().getUri(), redirectUri,
-        session.getContext().getRealm(), client)).thenReturn(null);
+    PowerMockito.when(RedirectUtils.verifyRedirectUri(session, redirectUri, client)).thenReturn(null);
     RequiredActionLinkProvider provider = new RequiredActionLinkProvider(session);
     WebApplicationException expectedException = new WebApplicationException(
         ErrorResponse.error(MessageFormat.format(Constants.ERROR_INVALID_PARAMETER_VALUE,
@@ -359,7 +358,7 @@ public class RequiredActionLinkProviderTest {
     String actionName = null;
     request.put("requiredAction", actionName);
     PowerMockito.whenNew(AppAuthManager.class).withAnyArguments().thenReturn(authMangr);
-    PowerMockito.when(authMangr.authenticateBearerToken(session, model)).thenReturn(authResult);
+    PowerMockito.when(authMangr.authenticateIdentityCookie(session, model)).thenReturn(authResult);
     AccessToken accessToken = PowerMockito.mock(AccessToken.class);
     PowerMockito.when(authResult.getToken()).thenReturn(accessToken);
     Access access = PowerMockito.mock(Access.class);
@@ -374,8 +373,7 @@ public class RequiredActionLinkProviderTest {
     PowerMockito.when(model.getClientByClientId(clientId)).thenReturn(client);
     PowerMockito.when(client.isEnabled()).thenReturn(true);
     PowerMockito.mockStatic(RedirectUtils.class);
-    PowerMockito.when(RedirectUtils.verifyRedirectUri(session.getContext().getUri(), redirectUri,
-        session.getContext().getRealm(), client)).thenReturn("/login");
+    PowerMockito.when(RedirectUtils.verifyRedirectUri(session, redirectUri, client)).thenReturn("/login");
     RequiredActionLinkProvider provider = new RequiredActionLinkProvider(session);
     WebApplicationException expectedException = new WebApplicationException(
         ErrorResponse.error(MessageFormat.format(Constants.ERROR_MANDATORY_PARAM_MISSING,
@@ -402,7 +400,7 @@ public class RequiredActionLinkProviderTest {
     String actionName = "INVALID_ACTION";
     request.put("requiredAction", actionName);
     PowerMockito.whenNew(AppAuthManager.class).withAnyArguments().thenReturn(authMangr);
-    PowerMockito.when(authMangr.authenticateBearerToken(session, model)).thenReturn(authResult);
+    PowerMockito.when(authMangr.authenticateIdentityCookie(session, model)).thenReturn(authResult);
     AccessToken accessToken = PowerMockito.mock(AccessToken.class);
     PowerMockito.when(authResult.getToken()).thenReturn(accessToken);
     Access access = PowerMockito.mock(Access.class);
@@ -417,8 +415,7 @@ public class RequiredActionLinkProviderTest {
     PowerMockito.when(model.getClientByClientId(clientId)).thenReturn(client);
     PowerMockito.when(client.isEnabled()).thenReturn(true);
     PowerMockito.mockStatic(RedirectUtils.class);
-    PowerMockito.when(RedirectUtils.verifyRedirectUri(session.getContext().getUri(), redirectUri,
-        session.getContext().getRealm(), client)).thenReturn("/login");
+    PowerMockito.when(RedirectUtils.verifyRedirectUri(session, redirectUri, client)).thenReturn("/login");
     RequiredActionLinkProvider provider = new RequiredActionLinkProvider(session);
     WebApplicationException expectedException = new WebApplicationException(
         ErrorResponse.error(MessageFormat.format(Constants.ERROR_INVALID_PARAMETER_VALUE,
