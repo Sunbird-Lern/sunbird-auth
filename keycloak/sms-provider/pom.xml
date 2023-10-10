@@ -86,6 +86,7 @@
 			<groupId>org.keycloak</groupId>
 			<artifactId>keycloak-model-legacy-private</artifactId>
 			<version>21.1.2</version>
+			<scope>provided</scope>
 		</dependency>
 
 
