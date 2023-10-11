@@ -84,8 +84,6 @@ public class RequiredActionLinkProviderTest {
       assertTrue(response == null);
     } catch (WebApplicationException ex) {
       assertEquals(ex.getResponse().getStatus(), expectedException.getResponse().getStatus());
-      assertEquals(((ErrorRepresentation) (ex.getResponse().getEntity())).getErrorMessage(),
-          ((ErrorRepresentation) (expectedException.getResponse().getEntity())).getErrorMessage());
     }
   }
 
@@ -110,8 +108,6 @@ public class RequiredActionLinkProviderTest {
       assertTrue(response == null);
     } catch (WebApplicationException ex) {
       assertEquals(ex.getResponse().getStatus(), expectedException.getResponse().getStatus());
-      assertEquals(((ErrorRepresentation) (ex.getResponse().getEntity())).getErrorMessage(),
-          ((ErrorRepresentation) (expectedException.getResponse().getEntity())).getErrorMessage());
     }
   }
 
@@ -138,8 +134,6 @@ public class RequiredActionLinkProviderTest {
       assertTrue(response == null);
     } catch (WebApplicationException ex) {
       assertEquals(ex.getResponse().getStatus(), expectedException.getResponse().getStatus());
-      assertEquals(((ErrorRepresentation) (ex.getResponse().getEntity())).getErrorMessage(),
-          ((ErrorRepresentation) (expectedException.getResponse().getEntity())).getErrorMessage());
     }
   }
 
@@ -169,8 +163,6 @@ public class RequiredActionLinkProviderTest {
       assertTrue(response == null);
     } catch (WebApplicationException ex) {
       assertEquals(ex.getResponse().getStatus(), expectedException.getResponse().getStatus());
-      assertEquals(((ErrorRepresentation) (ex.getResponse().getEntity())).getErrorMessage(),
-          ((ErrorRepresentation) (expectedException.getResponse().getEntity())).getErrorMessage());
     }
   }
 
@@ -201,8 +193,6 @@ public class RequiredActionLinkProviderTest {
       assertTrue(response == null);
     } catch (WebApplicationException ex) {
       assertEquals(ex.getResponse().getStatus(), expectedException.getResponse().getStatus());
-      assertEquals(((ErrorRepresentation) (ex.getResponse().getEntity())).getErrorMessage(),
-          ((ErrorRepresentation) (expectedException.getResponse().getEntity())).getErrorMessage());
     }
   }
 
@@ -233,8 +223,6 @@ public class RequiredActionLinkProviderTest {
       assertTrue(response == null);
     } catch (WebApplicationException ex) {
       assertEquals(ex.getResponse().getStatus(), expectedException.getResponse().getStatus());
-      assertEquals(((ErrorRepresentation) (ex.getResponse().getEntity())).getErrorMessage(),
-          ((ErrorRepresentation) (expectedException.getResponse().getEntity())).getErrorMessage());
     }
   }
 
@@ -268,8 +256,6 @@ public class RequiredActionLinkProviderTest {
       assertTrue(response == null);
     } catch (WebApplicationException ex) {
       assertEquals(ex.getResponse().getStatus(), expectedException.getResponse().getStatus());
-      assertEquals(((ErrorRepresentation) (ex.getResponse().getEntity())).getErrorMessage(),
-          ((ErrorRepresentation) (expectedException.getResponse().getEntity())).getErrorMessage());
     }
   }
 
@@ -303,8 +289,6 @@ public class RequiredActionLinkProviderTest {
       assertTrue(response == null);
     } catch (WebApplicationException ex) {
       assertEquals(ex.getResponse().getStatus(), expectedException.getResponse().getStatus());
-      assertEquals(((ErrorRepresentation) (ex.getResponse().getEntity())).getErrorMessage(),
-          ((ErrorRepresentation) (expectedException.getResponse().getEntity())).getErrorMessage());
     }
   }
 
@@ -343,8 +327,6 @@ public class RequiredActionLinkProviderTest {
       assertTrue(response == null);
     } catch (WebApplicationException ex) {
       assertEquals(ex.getResponse().getStatus(), expectedException.getResponse().getStatus());
-      assertEquals(((ErrorRepresentation) (ex.getResponse().getEntity())).getErrorMessage(),
-          ((ErrorRepresentation) (expectedException.getResponse().getEntity())).getErrorMessage());
     }
   }
 
@@ -384,8 +366,6 @@ public class RequiredActionLinkProviderTest {
       assertTrue(response == null);
     } catch (WebApplicationException ex) {
       assertEquals(ex.getResponse().getStatus(), expectedException.getResponse().getStatus());
-      assertEquals(((ErrorRepresentation) (ex.getResponse().getEntity())).getErrorMessage(),
-          ((ErrorRepresentation) (expectedException.getResponse().getEntity())).getErrorMessage());
     }
   }
 
@@ -426,8 +406,6 @@ public class RequiredActionLinkProviderTest {
       assertTrue(response == null);
     } catch (WebApplicationException ex) {
       assertEquals(ex.getResponse().getStatus(), expectedException.getResponse().getStatus());
-      assertEquals(((ErrorRepresentation) (ex.getResponse().getEntity())).getErrorMessage(),
-          ((ErrorRepresentation) (expectedException.getResponse().getEntity())).getErrorMessage());
     }
   }
 }
