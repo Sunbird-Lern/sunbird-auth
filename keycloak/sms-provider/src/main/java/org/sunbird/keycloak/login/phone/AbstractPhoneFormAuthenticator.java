@@ -87,6 +87,8 @@ public abstract class AbstractPhoneFormAuthenticator extends AbstractUsernameFor
     }*/
     //found the method name but we need to see how error will be responded back
     testInvalidUser(context, user);
+    if(user == null)
+      return false;
 
     //based on  innner method implementation clearUser value set as true
     if (!validatePassword(context, user, inputData, true)) {
