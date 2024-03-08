@@ -88,6 +88,8 @@ public class UserAdapter extends AbstractUserAdapterFederatedStorage {
      List<String> list = getFederatedStorage().getAttributes(realm, keycloakId).get(name);
      return list;
   }
+
+
   
   @Override
   public Map<String, List<String>> getAttributes() {

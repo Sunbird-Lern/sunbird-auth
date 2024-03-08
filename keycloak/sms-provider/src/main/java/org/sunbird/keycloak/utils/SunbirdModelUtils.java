@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jboss.logging.Logger;
 import org.keycloak.authentication.AuthenticationFlowContext;
@@ -37,29 +38,31 @@ public class SunbirdModelUtils {
     KeycloakSession session = context.getSession();
     logger.info("SunbirdModelUtils@getUser " + username);
     if (username.matches(numberRegex)) {
-      List<UserModel> userModels = session.users().searchForUserByUserAttribute(
-          KeycloakSmsAuthenticatorConstants.ATTR_MOBILE, username, context.getRealm());
-      if (userModels != null && !userModels.isEmpty()) {
+        Stream<UserModel> userModels = session.users().searchForUserByUserAttributeStream(
+              context.getRealm(), KeycloakSmsAuthenticatorConstants.ATTR_MOBILE, username);
+        //try the whole thing with streams if possible
+        List<UserModel> userModelsList = userModels.collect(Collectors.toList());
+      if (userModelsList != null && !userModelsList.isEmpty()) {
         // multiple user found for same attribute
-    	for(UserModel model : userModels) {
+    	for(UserModel model : userModelsList) {
       		logger.info("SunbirdModelUtils@getUser userModel id=" + model.getId()+", userName=" + model.getUsername()+", firstName"+model.getFirstName());
       	}  
-    	if (userModels.size() > 1) {  
+    	if (userModelsList.size() > 1) {
     		List<UserModel> filtered = new ArrayList<>();
     		Set<String> ids = new HashSet<>();
-    		userModels.forEach(model->{
+            userModelsList.forEach(model->{
     			if(model.getId().startsWith("f:") && ids.add(model.getId())) {
     				filtered.add(model);
     			}
     		});
-    		userModels = filtered;
+            userModelsList = filtered;
     	}
-    	logger.info("SunbirdModelUtils@getUser user model size "+userModels.size());
-    	if (userModels.size() > 1) {
+    	logger.info("SunbirdModelUtils@getUser user model size "+userModelsList.size());
+    	if (userModelsList.size() > 1) {
           throw new ModelDuplicateException(Constants.MULTIPLE_USER_ASSOCIATED_WITH_PHONE,
               KeycloakSmsAuthenticatorConstants.ATTR_MOBILE);
         }
-        return userModels.get(0);
+        return userModelsList.get(0);
       } else {
         return KeycloakModelUtils.findUserByNameOrEmail(context.getSession(), context.getRealm(),
             username);
