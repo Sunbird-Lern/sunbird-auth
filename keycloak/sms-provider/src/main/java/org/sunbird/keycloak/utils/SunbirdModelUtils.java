@@ -38,31 +38,31 @@ public class SunbirdModelUtils {
     KeycloakSession session = context.getSession();
     logger.info("SunbirdModelUtils@getUser " + username);
     if (username.matches(numberRegex)) {
-        Stream<UserModel> userModels = session.users().searchForUserByUserAttributeStream(
+        Stream<UserModel> userModelsStream = session.users().searchForUserByUserAttributeStream(
               context.getRealm(), KeycloakSmsAuthenticatorConstants.ATTR_MOBILE, username);
         //try the whole thing with streams if possible
-        List<UserModel> userModelsList = userModels.collect(Collectors.toList());
-      if (userModelsList != null && !userModelsList.isEmpty()) {
+        List<UserModel> userModels = userModelsStream.collect(Collectors.toList());
+      if (userModels != null && !userModels.isEmpty()) {
         // multiple user found for same attribute
-    	for(UserModel model : userModelsList) {
+    	for(UserModel model : userModels) {
       		logger.info("SunbirdModelUtils@getUser userModel id=" + model.getId()+", userName=" + model.getUsername()+", firstName"+model.getFirstName());
       	}  
-    	if (userModelsList.size() > 1) {
+    	if (userModels.size() > 1) {
     		List<UserModel> filtered = new ArrayList<>();
     		Set<String> ids = new HashSet<>();
-            userModelsList.forEach(model->{
+            userModels.forEach(model->{
     			if(model.getId().startsWith("f:") && ids.add(model.getId())) {
     				filtered.add(model);
     			}
     		});
-            userModelsList = filtered;
+            userModels = filtered;
     	}
-    	logger.info("SunbirdModelUtils@getUser user model size "+userModelsList.size());
-    	if (userModelsList.size() > 1) {
+    	logger.info("SunbirdModelUtils@getUser user model size "+userModels.size());
+    	if (userModels.size() > 1) {
           throw new ModelDuplicateException(Constants.MULTIPLE_USER_ASSOCIATED_WITH_PHONE,
               KeycloakSmsAuthenticatorConstants.ATTR_MOBILE);
         }
-        return userModelsList.get(0);
+        return userModels.get(0);
       } else {
         return KeycloakModelUtils.findUserByNameOrEmail(context.getSession(), context.getRealm(),
             username);

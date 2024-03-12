@@ -162,9 +162,12 @@ public class RequiredActionLinkProvider implements RealmResourceProvider {
 
   private void checkRealmAdminAccess() {
     logger.debug("RestResourceProvider: checkRealmAdminAccess called");
-    
-    AuthResult authResult =
-        new AppAuthManager().authenticateIdentityCookie(session, session.getContext().getRealm());
+
+    AuthenticationManager.AuthResult authResult = new AppAuthManager.BearerTokenAuthenticator(session)
+            .setRealm(session.getContext().getRealm())
+            .setConnection(session.getContext().getConnection())
+            .setHeaders(session.getContext().getHttpRequest().getHttpHeaders())
+            .authenticate();
     
     if (authResult == null) {
       throw new WebApplicationException(
