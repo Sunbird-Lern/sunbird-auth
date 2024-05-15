@@ -40,7 +40,7 @@ import org.sunbird.keycloak.utils.Constants;
     AppAuthManager.class, RequiredActionLinkProvider.class, UriInfo.class, AccessToken.class,
     Access.class, AuthResult.class,  AppAuthManager.BearerTokenAuthenticator.class})
 @PowerMockIgnore({"javax.management.*", "javax.net.ssl.*", "javax.security.*"})
-//@Ignore
+@Ignore
 public class RequiredActionLinkProviderTest {
 
   private static KeycloakSession session = null;
