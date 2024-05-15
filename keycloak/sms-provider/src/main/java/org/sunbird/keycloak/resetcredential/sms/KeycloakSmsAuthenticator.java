@@ -221,9 +221,9 @@ public class KeycloakSmsAuthenticator implements Authenticator {
         KeycloakSession session = context.getSession();
 
         List codeCreds = session.userCredentialManager().getStoredCredentialsByTypeStream(context.getRealm(), context.getUser(), KeycloakSmsAuthenticatorConstants.USR_CRED_MDL_SMS_CODE).collect(Collectors.toList());
-        UserModel.credentialManager().getStoredCredentialsByTypeStream()
+        /*UserModel.credentialManager().getStoredCredentialsByTypeStream()
         session.users().getUserById(context.getRealm(), context.id);
-        session.
+        session.*/
         /*List timeCreds = session.userCredentialManager().getStoredCredentialsByType(context.getRealm(), context.getUser(), KeycloakSmsAuthenticatorConstants.USR_CRED_MDL_SMS_EXP_TIME);*/
 
         CredentialModel expectedCode = (CredentialModel) codeCreds.get(0);
