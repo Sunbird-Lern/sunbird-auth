@@ -85,9 +85,13 @@ public class UserAdapter extends AbstractUserAdapterFederatedStorage {
   
   @Override
   public List<String> getAttribute(String name) {
+    logger.info("UserAdapter:getAttribute method started " + name);
      List<String> list = getFederatedStorage().getAttributes(realm, keycloakId).get(name);
+     list.forEach(e -> logger.info("UserAdapter:getAttribute attribute value: " + e));
      return list;
   }
+
+
   
   @Override
   public Map<String, List<String>> getAttributes() {
@@ -99,7 +103,7 @@ public class UserAdapter extends AbstractUserAdapterFederatedStorage {
     List<String> countrycodeValues = new ArrayList<>();
     countrycodeValues.add(user.getCountryCode());
     attributes.put("countryCode", countrycodeValues);
-    logger.info("UserAdapter:getAttributes method ended " );
+    logger.info("UserAdapter:getAttributes method ended " + attributes);
     return attributes;
   }
 

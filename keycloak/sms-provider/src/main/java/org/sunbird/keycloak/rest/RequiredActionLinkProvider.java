@@ -89,7 +89,8 @@ public class RequiredActionLinkProvider implements RealmResourceProvider {
       response.put(Constants.LINK, link);
       return Response.ok(response).build();
     } catch (Exception e) {
-      return ErrorResponse.error(Constants.ERROR_CREATE_LINK, Status.INTERNAL_SERVER_ERROR);
+      //response.put(Constants.ERROR_CREATE_LINK, Status.INTERNAL_SERVER_ERROR);
+      throw new WebApplicationException(ErrorResponse.error(Constants.ERROR_CREATE_LINK, Status.INTERNAL_SERVER_ERROR));
     }
   }
 
@@ -161,9 +162,12 @@ public class RequiredActionLinkProvider implements RealmResourceProvider {
 
   private void checkRealmAdminAccess() {
     logger.debug("RestResourceProvider: checkRealmAdminAccess called");
-    
-    AuthResult authResult =
-        new AppAuthManager().authenticateBearerToken(session, session.getContext().getRealm());
+
+    AuthenticationManager.AuthResult authResult = new AppAuthManager.BearerTokenAuthenticator(session)
+            .setRealm(session.getContext().getRealm())
+            .setConnection(session.getContext().getConnection())
+            .setHeaders(session.getContext().getHttpRequest().getHttpHeaders())
+            .authenticate();
     
     if (authResult == null) {
       throw new WebApplicationException(
@@ -178,8 +182,7 @@ public class RequiredActionLinkProvider implements RealmResourceProvider {
   private void validateRedirectUri(String redirectUri, ClientModel client) {
     logger.debug("RestResourceProvider: validateRedirectUri called");
     if (StringUtils.isNotBlank(redirectUri)) {
-      String redirect = RedirectUtils.verifyRedirectUri(session.getContext().getUri(), redirectUri,
-          session.getContext().getRealm(), client);
+      String redirect = RedirectUtils.verifyRedirectUri(session, redirectUri, client);
       if (redirect == null) {
         throw new WebApplicationException(
             ErrorResponse.error(MessageFormat.format(Constants.ERROR_INVALID_PARAMETER_VALUE,

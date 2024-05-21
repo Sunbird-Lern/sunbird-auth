@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jboss.logging.Logger;
 import org.keycloak.authentication.AuthenticationFlowContext;
@@ -37,22 +38,24 @@ public class SunbirdModelUtils {
     KeycloakSession session = context.getSession();
     logger.info("SunbirdModelUtils@getUser " + username);
     if (username.matches(numberRegex)) {
-      List<UserModel> userModels = session.users().searchForUserByUserAttribute(
-          KeycloakSmsAuthenticatorConstants.ATTR_MOBILE, username, context.getRealm());
+        Stream<UserModel> userModelsStream = session.users().searchForUserByUserAttributeStream(
+              context.getRealm(), KeycloakSmsAuthenticatorConstants.ATTR_MOBILE, username);
+        //try the whole thing with streams if possible
+        List<UserModel> userModels = userModelsStream.collect(Collectors.toList());
       if (userModels != null && !userModels.isEmpty()) {
         // multiple user found for same attribute
     	for(UserModel model : userModels) {
       		logger.info("SunbirdModelUtils@getUser userModel id=" + model.getId()+", userName=" + model.getUsername()+", firstName"+model.getFirstName());
       	}  
-    	if (userModels.size() > 1) {  
+    	if (userModels.size() > 1) {
     		List<UserModel> filtered = new ArrayList<>();
     		Set<String> ids = new HashSet<>();
-    		userModels.forEach(model->{
+            userModels.forEach(model->{
     			if(model.getId().startsWith("f:") && ids.add(model.getId())) {
     				filtered.add(model);
     			}
     		});
-    		userModels = filtered;
+            userModels = filtered;
     	}
     	logger.info("SunbirdModelUtils@getUser user model size "+userModels.size());
     	if (userModels.size() > 1) {

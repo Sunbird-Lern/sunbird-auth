@@ -89,8 +89,7 @@ public class PhonePasswordForm extends AbstractPhoneFormAuthenticator implements
         LoginFormsProvider forms = context.form();
 
         if (formData.size() > 0) forms.setFormData(formData);
-
-        return forms.createLogin();
+        return forms.createLoginUsernamePassword();
     }
 
 

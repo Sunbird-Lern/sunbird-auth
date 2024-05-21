@@ -1,8 +1,8 @@
 version: 2.1
 jobs:
   build:
-    docker:
-      - image: circleci/openjdk:8-jdk
+    machine:
+      image: ubuntu-2004:202008-01
     working_directory: ~/project/keycloak/sms-provider
     steps:
       - checkout:

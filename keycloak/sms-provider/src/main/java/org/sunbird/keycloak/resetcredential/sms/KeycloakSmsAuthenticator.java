@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.StringUtils;
@@ -46,7 +47,7 @@ public class KeycloakSmsAuthenticator implements Authenticator {
         UserModel user = context.getUser();
         logger.debug("KeycloakSmsAuthenticator@authenticate - User = " + user.getUsername());
 
-        List<String> mobileNumberCreds = user.getAttribute(KeycloakSmsAuthenticatorConstants.ATTR_MOBILE);
+        List<String> mobileNumberCreds = user.getAttributeStream(KeycloakSmsAuthenticatorConstants.ATTR_MOBILE).collect(Collectors.toList());
 
         String mobileNumber = null;
         String userEmail = user.getEmail();
@@ -161,7 +162,7 @@ public class KeycloakSmsAuthenticator implements Authenticator {
             case INVALID:
                 logger.debug("KeycloakSmsAuthenticator@action - INVALID");
 
-                if (context.getExecution().getRequirement() == AuthenticationExecutionModel.Requirement.OPTIONAL ||
+                if (context.getExecution().getRequirement() == AuthenticationExecutionModel.Requirement.CONDITIONAL ||
                         context.getExecution().getRequirement() == AuthenticationExecutionModel.Requirement.ALTERNATIVE) {
                     logger.debug("KeycloakSmsAuthenticator@action - OPTIONAL || ALTERNATIVE");
 
@@ -219,7 +220,10 @@ public class KeycloakSmsAuthenticator implements Authenticator {
         String enteredCode = formData.getFirst(KeycloakSmsAuthenticatorConstants.ANSW_SMS_CODE);
         KeycloakSession session = context.getSession();
 
-        List codeCreds = session.userCredentialManager().getStoredCredentialsByType(context.getRealm(), context.getUser(), KeycloakSmsAuthenticatorConstants.USR_CRED_MDL_SMS_CODE);
+        List codeCreds = session.userCredentialManager().getStoredCredentialsByTypeStream(context.getRealm(), context.getUser(), KeycloakSmsAuthenticatorConstants.USR_CRED_MDL_SMS_CODE).collect(Collectors.toList());
+        /*UserModel.credentialManager().getStoredCredentialsByTypeStream()
+        session.users().getUserById(context.getRealm(), context.id);
+        session.*/
         /*List timeCreds = session.userCredentialManager().getStoredCredentialsByType(context.getRealm(), context.getUser(), KeycloakSmsAuthenticatorConstants.USR_CRED_MDL_SMS_EXP_TIME);*/
 
         CredentialModel expectedCode = (CredentialModel) codeCreds.get(0);
