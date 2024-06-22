@@ -1,46 +1,19 @@
 <#import "template.ftl" as layout>
-<@layout.registrationLayout; section>
-    <#if section = "header">
-        ${msg("logoutConfirmTitle")}
+<@layout.registrationLayout displayInfo=social.displayInfo; section>
+<#if section = "title">
+    ${msg("loginTitle",(realm.displayName!''))}
+    <#elseif section = "header">
     <#elseif section = "form">
-      <div class="divider"></div>
-      <div class="kcform">
-        <h1 id="kc-page-title">
-          ${msg("doLogout")}
-        </h1>
-        <div id="kc-logout-confirm" class="content-area">
-            <p class="instruction">${msg("logoutConfirmHeader")}</p>
-
-            <form class="form-actions" action="${url.logoutConfirmAction}" method="POST">
-                <input type="hidden" name="session_code" value="${logoutConfirm.code}">
-                <div class="${properties.kcFormGroupClass!}">
-                    <div id="kc-form-options">
-                        <div class="${properties.kcFormOptionsWrapperClass!}">
-                        </div>
-                    </div>
-
-                    <div id="kc-form-buttons" class="${properties.kcFormGroupClass!}">
-                        <div class="${properties.kcInputWrapperClass!} form-buttons flex-row-reverse">
-                            <input tabindex="4"
-                                class="btn btn-primary"
-                                name="confirmLogout" id="kc-logout" type="submit" value="${msg("doLogout")}"/>
-                        </div>
-                    </div>
-
+    <#if realm.password>
+    <div class="fullpage-background-image">
+    <div class="container-wrapper">
+                <div class="ui header centered mb-8">
+                    <img onerror="" alt="">
+                    <p class="subtitle">Logout Page</p>
                 </div>
-            </form>
-
-            <div id="kc-info-message">
-                <#if logoutConfirm.skipLink>
-                <#else>
-                    <#if (client.baseUrl)?has_content>
-                        <p><a href="${client.baseUrl}">${kcSanitize(msg("backToApplication"))?no_esc}</a></p>
-                    </#if>
-                </#if>
-            </div>
-
-            <div class="clearfix"></div>
-        </div>
-      </div>
+               <p class="instruction mb-0 textCenter">${msg("logoutConfirmHeader")}</p>
+    </div>
+    </div>
     </#if>
+</#if>
 </@layout.registrationLayout>
