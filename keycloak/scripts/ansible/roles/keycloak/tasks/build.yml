@@ -44,6 +44,12 @@
     state: directory
     mode: 0755
 
+- name: Create directory for sunbird login js resources
+  file:
+    path: sunbird_auth_{{sunbird_auth_version}}/themes/sunbird/login/resources/js
+    state: directory
+    mode: 0755
+
 - name: Copy Sunbird login theme
   copy: src="artifacts/sunbird/login/" dest="sunbird_auth_{{sunbird_auth_version}}/themes/sunbird/login/" force="yes"
 

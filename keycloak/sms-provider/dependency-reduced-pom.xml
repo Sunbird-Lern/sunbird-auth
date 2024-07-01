@@ -35,7 +35,7 @@
     <dependency>
       <groupId>org.keycloak</groupId>
       <artifactId>keycloak-core</artifactId>
-      <version>3.2.0.Final</version>
+      <version>7.0.1</version>
       <scope>provided</scope>
       <exclusions>
         <exclusion>
@@ -55,25 +55,19 @@
     <dependency>
       <groupId>org.keycloak</groupId>
       <artifactId>keycloak-server-spi</artifactId>
-      <version>3.2.0.Final</version>
+      <version>7.0.1</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.keycloak</groupId>
       <artifactId>keycloak-server-spi-private</artifactId>
-      <version>3.2.0.Final</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.logging</groupId>
-      <artifactId>jboss-logging</artifactId>
-      <version>3.3.1.Final</version>
+      <version>7.0.1</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.keycloak</groupId>
       <artifactId>keycloak-services</artifactId>
-      <version>3.2.0.Final</version>
+      <version>7.0.1</version>
       <scope>provided</scope>
       <exclusions>
         <exclusion>
@@ -81,7 +75,11 @@
           <groupId>javax.mail</groupId>
         </exclusion>
         <exclusion>
-          <artifactId>jboss-servlet-api_3.0_spec</artifactId>
+          <artifactId>javax.json</artifactId>
+          <groupId>org.glassfish</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>jboss-servlet-api_4.0_spec</artifactId>
           <groupId>org.jboss.spec.javax.servlet</groupId>
         </exclusion>
         <exclusion>
@@ -89,11 +87,7 @@
           <groupId>org.twitter4j</groupId>
         </exclusion>
         <exclusion>
-          <artifactId>resteasy-jaxrs</artifactId>
-          <groupId>org.jboss.resteasy</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>jboss-jaxrs-api_2.0_spec</artifactId>
+          <artifactId>jboss-jaxrs-api_2.1_spec</artifactId>
           <groupId>org.jboss.spec.javax.ws.rs</groupId>
         </exclusion>
         <exclusion>
@@ -105,8 +99,16 @@
           <groupId>org.jboss.resteasy</groupId>
         </exclusion>
         <exclusion>
+          <artifactId>owasp-java-html-sanitizer</artifactId>
+          <groupId>com.googlecode.owasp-java-html-sanitizer</groupId>
+        </exclusion>
+        <exclusion>
           <artifactId>javase</artifactId>
           <groupId>com.google.zxing</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>openshift-restclient-java</artifactId>
+          <groupId>com.openshift</groupId>
         </exclusion>
         <exclusion>
           <artifactId>bcprov-jdk15on</artifactId>
@@ -139,12 +141,6 @@
       <artifactId>junit</artifactId>
       <version>4.12</version>
       <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <artifactId>hamcrest-core</artifactId>
-          <groupId>org.hamcrest</groupId>
-        </exclusion>
-      </exclusions>
     </dependency>
   </dependencies>
   <properties>

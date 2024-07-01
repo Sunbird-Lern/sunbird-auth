@@ -44,7 +44,7 @@ public abstract class AbstractPhoneFormAuthenticator extends AbstractUsernameFor
 
     if (username == null) {
       context.getEvent().error(Errors.USER_NOT_FOUND);
-      Response challengeResponse = invalidUser(context);
+      Response challengeResponse = challenge(context, Messages.INVALID_USER);
       context.failureChallenge(AuthenticationFlowError.INVALID_USER, challengeResponse);
       return false;
     }
@@ -104,6 +104,11 @@ public abstract class AbstractPhoneFormAuthenticator extends AbstractUsernameFor
     }
     context.setUser(user);
     return true;
+  }
+  
+  protected Response temporarilyDisabledUser(AuthenticationFlowContext context) {
+      return context.form()
+              .setError(Messages.ACCOUNT_TEMPORARILY_DISABLED).createLogin();
   }
 
 }
