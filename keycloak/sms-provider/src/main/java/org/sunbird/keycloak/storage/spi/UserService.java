@@ -25,8 +25,10 @@ public class UserService {
   public List<User> getByUsername(String username) {
     List<User> users = null;
     String numberRegex = "\\d+";
-    String emailRegex = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
-      + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+    String emailRegex = System.getenv(Constants.DEFAULT_EMAIL_REGEX);
+    if (emailRegex == null || emailRegex.isEmpty() || emailRegex.isBlank()) {
+      emailRegex = "^([A-Za-z0-9!#$%&'*+/=?^_\\{|}~-]+(\\.[A-Za-z0-9!#$%&'*+/=?^_\\{|}~-]+)*|\\\"([A-Za-z0-9!#$%&'*+/=?^_\\{|}~-]+|\\.[A-Za-z0-9!#$%&'*+/=?^_\\{|}~-]+)*\\\")@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+    }
     // mobile number length is of 10 digit
     // assumption is either username will match with phone or email
     if (username.matches(numberRegex) && 10 == username.length()) {
