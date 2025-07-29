@@ -87,8 +87,11 @@ public class UserAdapter extends AbstractUserAdapterFederatedStorage {
   public List<String> getAttribute(String name) {
     logger.info("UserAdapter:getAttribute method started " + name);
      List<String> list = getFederatedStorage().getAttributes(realm, keycloakId).get(name);
-     list.forEach(e -> logger.info("UserAdapter:getAttribute attribute value: " + e));
-     return list;
+     if (list != null) {
+      list.forEach(e -> logger.info("UserAdapter:getAttribute attribute value: " + e));
+      return list;
+     }
+     return new ArrayList<>();
   }
 
 
