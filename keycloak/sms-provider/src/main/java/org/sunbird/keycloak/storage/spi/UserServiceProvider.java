@@ -23,6 +23,7 @@ import org.sunbird.keycloak.utils.Constants;
 public class UserServiceProvider
     implements UserStorageProvider, UserLookupProvider, UserQueryProvider, UserRegistrationProvider {
   private static final Logger logger = Logger.getLogger(UserStorageProvider.class);
+  private static final String FEDERATED_USER_ID_PREFIX = "f:";
 
   public static final String PASSWORD_CACHE_KEY = UserAdapter.class.getName() + ".password";
   private final KeycloakSession session;
@@ -132,7 +133,7 @@ public class UserServiceProvider
   public boolean removeUser(RealmModel realm, UserModel user) {
     logger.info("UserServiceProvider: removeUser called for user = " + user.getUsername() + " with ID = " + user.getId());
     
-    if (user.getId().startsWith("f:")) {
+    if (user.getId().startsWith(FEDERATED_USER_ID_PREFIX)) {
       String externalId = StorageId.externalId(user.getId());
       logger.info("UserServiceProvider: removeUser - externalId = " + externalId);
       logger.warn("UserServiceProvider: User removal not supported for read-only storage, but operation handled gracefully");
