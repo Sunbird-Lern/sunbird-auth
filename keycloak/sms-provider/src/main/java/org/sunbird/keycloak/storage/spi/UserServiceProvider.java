@@ -17,11 +17,13 @@ import org.keycloak.storage.StorageId;
 import org.keycloak.storage.UserStorageProvider;
 import org.keycloak.storage.user.UserLookupProvider;
 import org.keycloak.storage.user.UserQueryProvider;
+import org.keycloak.storage.user.UserRegistrationProvider;
 import org.sunbird.keycloak.utils.Constants;
 
 public class UserServiceProvider
-    implements UserStorageProvider, UserLookupProvider, UserQueryProvider {
+    implements UserStorageProvider, UserLookupProvider, UserQueryProvider, UserRegistrationProvider {
   private static final Logger logger = Logger.getLogger(UserStorageProvider.class);
+  private static final String FEDERATED_USER_ID_PREFIX = "f:";
 
   public static final String PASSWORD_CACHE_KEY = UserAdapter.class.getName() + ".password";
   private final KeycloakSession session;
@@ -120,4 +122,25 @@ public class UserServiceProvider
     return Stream.empty();
   }
 
+  @Override
+  public UserModel addUser(RealmModel realm, String username) {
+    logger.info("UserServiceProvider: addUser called for username = " + username);
+    logger.warn("UserServiceProvider: User creation not supported for read-only storage");
+    return null;
+  }
+
+  @Override
+  public boolean removeUser(RealmModel realm, UserModel user) {
+    logger.info("UserServiceProvider: removeUser called for user = " + user.getUsername() + " with ID = " + user.getId());
+    
+    if (user.getId().startsWith(FEDERATED_USER_ID_PREFIX)) {
+      String externalId = StorageId.externalId(user.getId());
+      logger.info("UserServiceProvider: removeUser - externalId = " + externalId);
+      logger.warn("UserServiceProvider: User removal not supported for read-only storage, but operation handled gracefully");
+      return true;
+    }
+    
+    logger.info("UserServiceProvider: removeUser - not a federated user, letting Keycloak handle removal");
+    return false;
+  }
 }
