@@ -2,8 +2,8 @@ name: Build and Deploy
 
 on:
     push:
-      # tags:
-      #   - '*'
+      tags:
+        - '*'
 
 jobs:
   ghcr-build-and-deploy:
