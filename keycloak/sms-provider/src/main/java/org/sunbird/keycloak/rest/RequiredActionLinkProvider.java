@@ -147,13 +147,17 @@ public class RequiredActionLinkProvider implements RealmResourceProvider {
 
     try {
       if (StringUtils.isNotBlank(expirationInSecsStr)) {
-        expirationInSecs = Integer.parseInt(expirationInSecsStr);
+        expirationInSecs = (int) Double.parseDouble(expirationInSecsStr);
       } else {
         expirationInSecs = Constants.DEFAULT_LINK_EXPIRATION_IN_SECS;
       }
-    } catch (Exception ex) {
+    } catch (NumberFormatException ex) {
       throw new WebApplicationException(
           ErrorResponse.error(MessageFormat.format(Constants.ERROR_INVALID_PARAMETER_VALUE,
+              expirationInSecsStr, Constants.EXPIRATION_IN_SECS), Status.BAD_REQUEST));
+    } catch (Exception ex) {
+      throw new WebApplicationException(
+        ErrorResponse.error(MessageFormat.format(Constants.ERROR_INVALID_PARAMETER_VALUE,
               expirationInSecsStr, Constants.EXPIRATION_IN_SECS), Status.BAD_REQUEST));
     }
 
