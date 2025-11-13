@@ -1,0 +1,5 @@
+org.keycloak:keycloak-core:21.1.2
+org.keycloak:keycloak-server-spi:21.1.2
+org.keycloak:keycloak-server-spi-private:21.1.2
+org.jboss.resteasy:resteasy-core:6.2.6.Final
+jakarta.ws.rs:jakarta.ws.rs-api:3.1.0
