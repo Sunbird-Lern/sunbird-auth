@@ -1,0 +1,27 @@
+name: Dependency Submission (Maven)
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+    branches: ["master"]
+
+permissions:
+  contents: write
+
+jobs:
+  dependency-submission:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Submit Maven Dependencies
+        uses: advanced-security/maven-dependency-submission-action@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
