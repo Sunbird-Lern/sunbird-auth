@@ -25,3 +25,4 @@ jobs:
         uses: advanced-security/maven-dependency-submission-action@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          directory: keycloak/sms-provider
