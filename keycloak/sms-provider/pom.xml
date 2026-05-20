@@ -46,7 +46,7 @@
 			<groupId>org.keycloak</groupId>
 			<artifactId>keycloak-core</artifactId>
 			<scope>provided</scope>
-			<version>7.0.1</version>
+			<version>25.0.4</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.keycloak/keycloak-server-spi -->
