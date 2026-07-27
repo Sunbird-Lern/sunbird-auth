@@ -9,9 +9,9 @@ import org.sunbird.sms.provider.ISmsProvider;
 import org.sunbird.utils.JsonUtil;
 
 import java.io.File;
+import java.security.SecureRandom;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.stream.Collectors;
 
 /**
@@ -20,6 +20,8 @@ import java.util.stream.Collectors;
 public class KeycloakSmsAuthenticatorUtil {
 
     private static Logger logger = Logger.getLogger(KeycloakSmsAuthenticatorUtil.class);
+
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     public static String getAttributeValue(UserModel user, String attributeName) {
         String result = null;
@@ -119,14 +121,17 @@ public class KeycloakSmsAuthenticatorUtil {
     }
 
     static String getSmsCode(long nrOfDigits) {
-        if (nrOfDigits < 1) {
-            throw new RuntimeException("Number of digits must be bigger than 0");
+        if (nrOfDigits < 1 || nrOfDigits > 9) {
+            // 10^9 fits in an int; higher widths would need a long/BigInteger draw.
+            throw new IllegalArgumentException("Number of digits must be between 1 and 9");
         }
 
-        double maxValue = Math.pow(10.0, nrOfDigits); // 10 ^ nrOfDigits;
-        Random r = new Random();
-        long code = (long) (r.nextFloat() * maxValue);
-        return Long.toString(code);
+        // SecureRandom + uniform integer draw (not java.util.Random / nextFloat, which is a
+        // predictable LCG that under-samples the code space). Zero-pad so leading zeros are
+        // preserved and every OTP is exactly nrOfDigits long.
+        int bound = (int) Math.pow(10, nrOfDigits);
+        int code = SECURE_RANDOM.nextInt(bound);
+        return String.format("%0" + nrOfDigits + "d", code);
     }
 
     public static boolean validateTelephoneNumber(String telephoneNumber) {
