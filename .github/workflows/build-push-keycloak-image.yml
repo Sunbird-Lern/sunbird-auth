@@ -1,0 +1,51 @@
+name: Build and Push Keycloak Image
+
+on:
+  push:
+    tags:
+      - 'keycloak-v*'
+  workflow_dispatch: {}
+
+jobs:
+  docker-build-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Lowercase repository owner and generate tag
+        id: prep
+        run: |
+          echo "OWNER_LOWERCASE=${GITHUB_REPOSITORY_OWNER,,}" >> $GITHUB_OUTPUT
+          # Format: keycloak-v<tag>_<short-sha>, or just the short sha on a
+          # manual (workflow_dispatch) run with no tag
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            RAW_TAG="${GITHUB_REF_NAME}_${GITHUB_SHA::7}"
+          else
+            RAW_TAG="${GITHUB_SHA::7}"
+          fi
+          echo "IMAGE_TAG=$(echo $RAW_TAG | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+
+      - name: Build and Push
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        with:
+          context: ./keycloak
+          file: ./keycloak/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ steps.prep.outputs.OWNER_LOWERCASE }}/keycloak-21.1.2:${{ steps.prep.outputs.IMAGE_TAG }}
+            ghcr.io/${{ steps.prep.outputs.OWNER_LOWERCASE }}/keycloak-21.1.2:latest
